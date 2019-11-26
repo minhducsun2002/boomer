@@ -1,0 +1,20 @@
+{
+  "name": "boomer",
+  "version": "0.0.1",
+  "description": "FGO database exposed by a bot scraping GamePress.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Minh Duc Vo <minhducsun2002@gmail.com>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "discord-akairo": "^7.5.6",
+    "discord.js": "^11.5.1",
+    "dotenv": "^8.2.0",
+    "jsdom": "^15.2.1",
+    "mongoose": "^5.7.11",
+    "node-fetch": "^2.6.0"
+  }
+}
