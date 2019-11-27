@@ -35,16 +35,16 @@ const PassiveSkill = new Schema({
 
 const NoblePhantasmEffect = new Schema({ effectName: String, effectStrength: [String] });
 const NoblePhantasm = new Schema({
-     name: String,
-     extendedName: String,
-     rank: String,
-     detail: String,
-     class: String,
-     hitcount: Number,
-     overchargeDetail: String,
-     records: [NoblePhantasmEffect],
-     overchargeRecords : [NoblePhantasmEffect],
-     condition: String
+    name: String,
+    extendedName: String,
+    rank: String,
+    detail: String,
+    class: String,
+    hitcount: Number,
+    overchargeDetail: String,
+    records: [NoblePhantasmEffect],
+    overchargeRecords: [NoblePhantasmEffect],
+    condition: String
 })
 
 const Hitcount = new Schema({ buster: Number, quick: Number, arts: Number, extra: Number, np: Number })

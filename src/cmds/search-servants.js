@@ -1,43 +1,86 @@
 const { Command } = require('discord-akairo');
 const { RichEmbed } = require('discord.js');
-const fetch = require('node-fetch');
 
-const searchURL = 'https://gamepress.gg/sites/default/files/aggregatedjson/servants-FGO.json';
+const { ServantModel: model } = require('../db/model');
+
+const ERROR_COLOR = '#FF0000';
+const INDETERMINATE_COLOR = '#FFFF00';
+const SUCCESS_COLOR = '#00FF00';
+
+const MAX_RESULTS = 5;
 
 class Search extends Command {
     constructor() {
         super('search', {
-            aliases: ['search-servant', 'ss'],
+            aliases: ['search-servants-detail', 'ssd'],
             args : [{
                 id: 'query',
-                match: 'content',
-                description: 'Search query.'
-            }]
+                match: 'rest',
+                description: 'Search query'
+            }],
+            typing: true,
+            description: 'Search for servants.'
         });
     }
 
     async exec(msg, { query }) {
         const embed = new RichEmbed()
-            .setAuthor('Search', 'https://github.com/google/material-design-icons/raw/master/action/1x_web/ic_search_black_24dp.png')
-            .setTitle(`Search : \`${query}\``)
-            .setDescription('Fetching servants list...');
-        await msg.channel.send(embed)
-        const db = fetch(searchURL).then(res => res.json());
-        await msg.channel.send(embed.setDescription('Parsed servants list. Parsing your query...'));
+            .setDescription(':hourglass: Querying database...')
+        const out = await msg.channel.send(embed);
 
+        // process query here
+        const stringMatch = { $regex: query, $options: "i" };
 
-        // valid id
-        const isId = (Number(query) > 0) && (Number(query) < db.length + 2);
-        if (isId) {
-            await msg.channel.send(embed.setDescription(`Your query seems to be a valid ID, corresponding to **${db.find(
-                ({ servant_id }) => servant_id === query
-            )}**`))
-            return;
-        }
-        else {
-            // search by name
-            const results = db.filter
-        }
+        const results = await model.find({ 
+            $or : [
+                { name: stringMatch },
+                // search by name...
+                { 
+                    alias: {
+                        $elemMatch: {...stringMatch}
+                    } 
+                }
+            ]
+        }).limit(MAX_RESULTS).exec();
+        
+        if (!results.length) out.edit(
+            '', 
+            embed.setColor(ERROR_COLOR)
+                .setDescription(':frowning: I could not find anything that match.')
+        )
+        
+        await out.edit('', 
+            embed.setColor(INDETERMINATE_COLOR)
+                .setDescription(`:hourglass: I found something here : ${results.length} servant${
+                    results.length > 1 ? 's' : ''
+                } match${results.length > 1 ? '' : 'es'} your query. Wait a little...`)
+        )
+
+        let result = new RichEmbed()
+            .setTitle(`Found ${results.length} servant${results.length > 1 ? 's' : ''}.`)
+            .setTimestamp();
+
+        if (results.length === 5)
+            result = result
+                .setFooter('Only 5 first matches are shown. Use `ss` to search with higher limits.')
+        
+        results.slice(0, MAX_RESULTS).forEach(
+            ({ 
+                class: _class, name, rarity, id, cardSet: set, stats: { hp, atk },
+                npGainStat: [npActive, npPassive], criticalStat: [abs, gen], growth
+            }) => {
+                result = result.addField(
+                    `[${rarity} :star: ${_class.sentence()}] ${id}. **${name}**`,
+                    `- Card set : ${':red_square: '.repeat(set.buster)}${':blue_square: '.repeat(set.arts)}${':green_square: '.repeat(set.quick)}`
+                    + `\n - HP/ATK : ${hp.shift()}/${atk.shift()} - ${hp.pop()}/${atk.pop()}`
+                    + `\n - NP gain : ${npPassive} (when hit) / ${npActive} (per attack)`
+                    + `\n - C. Star : ${gen} generation per hit, ${abs} absorption`
+                    + `\n - Growth curve : ${growth}`
+                )
+            }
+        )
+
+        await out.edit('', result.setColor(SUCCESS_COLOR))
     }
 }
 
