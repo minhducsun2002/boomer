@@ -8,6 +8,7 @@ const INDETERMINATE_COLOR = '#FFFF00';
 const SUCCESS_COLOR = '#00FF00';
 
 const MAX_RESULTS = 5;
+const alphaOnly = require('../lib/alphabeticOnly');
 
 class Search extends Command {
     constructor() {
@@ -24,6 +25,19 @@ class Search extends Command {
     }
 
     async exec(msg, { query }) {
+        if (alphaOnly(query) !== query
+            // if meta char...
+            && (('' + msg.author.id !== this.client.ownerID) 
+                && ('' + msg.author.id !== this.client.ownerID[0]))
+            // and not owner..
+        )
+            return msg.channel.send(
+                new RichEmbed()
+                    .setColor(ERROR_COLOR)
+                    .setTitle('Error')
+                    .setDescription('Invalid query supplied.')
+            )
+    
         const embed = new RichEmbed()
             .setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(embed);
@@ -40,10 +54,11 @@ class Search extends Command {
                         $elemMatch: {...stringMatch}
                     } 
                 }
+                // and by alias
             ]
         }).limit(MAX_RESULTS).exec();
         
-        if (!results.length) out.edit(
+        if (!results.length) return out.edit(
             '', 
             embed.setColor(ERROR_COLOR)
                 .setDescription(':frowning: I could not find anything that match.')
