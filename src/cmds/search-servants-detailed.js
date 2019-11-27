@@ -12,7 +12,7 @@ const alphaOnly = require('../lib/alphabeticOnly');
 
 class Search extends Command {
     constructor() {
-        super('search', {
+        super('search-servants-detailed', {
             aliases: ['search-servants-detailed', 'ssd'],
             args : [{
                 id: 'query',
@@ -56,7 +56,8 @@ class Search extends Command {
                 }
                 // and by alias
             ]
-        }).limit(MAX_RESULTS).exec();
+        }).limit(MAX_RESULTS)
+            .select('class name rarity id cardSet stats npGainStat criticalStat growth').exec();
         
         if (!results.length) return out.edit(
             '', 
