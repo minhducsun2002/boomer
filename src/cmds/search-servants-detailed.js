@@ -12,7 +12,7 @@ const MAX_RESULTS = 5;
 class Search extends Command {
     constructor() {
         super('search', {
-            aliases: ['search-servants-detail', 'ssd'],
+            aliases: ['search-servants-detailed', 'ssd'],
             args : [{
                 id: 'query',
                 match: 'rest',
