@@ -125,7 +125,7 @@ module.exports = class extends Command {
                 + (npExtName ? `\n_${npExtName}_` : '')
                 + `\n\n- ${npDetail.split('\n').filter(a=>!!a).join('\n- ')}`
                 + `\n- ${npOverDetail.split('\n').filter(a=>!!a).map(a=>`__${a}__`).join('\n- ')}`
-                + `\n_${npCondition}_`
+                + (npCondition ? `\n_${npCondition}_` : '')
             )
 
         if (img && img > 0 && img < 5) resultEmbed.setImage(arts[--img]);
