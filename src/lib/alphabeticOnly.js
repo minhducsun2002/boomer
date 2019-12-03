@@ -1,1 +1,0 @@
-module.exports = a => typeof a !== 'string' ? a : (a.replace(/^[^a-zA-Z]*$/, ''))

@@ -45,6 +45,7 @@ module.exports = class extends Command {
             results = await model.find({ id: query }).limit(1).exec();
         }
         else {
+            query = escape(query)
             const stringMatch = { $regex: query, $options: "i" };
             results = await model.find({ 
                 $or : [

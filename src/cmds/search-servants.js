@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const { RichEmbed } = require('discord.js');
+const escape = require('escape-string-regexp');
 
 const { ServantModel: model } = require('../db/model');
 
@@ -24,6 +25,7 @@ class Search extends Command {
     }
 
     async exec(msg, { query }) {
+        query = escape(query)
         const embed = new RichEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(embed);
 
