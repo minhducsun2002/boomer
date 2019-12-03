@@ -31,6 +31,12 @@ module.exports = class extends Command {
         const wait = new RichEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(wait);
 
+        if (!query) return out.edit(
+            '', 
+            wait.setColor(ERROR_COLOR)
+                .setDescription(':frowning: Where is your query?')
+        )
+
         // process query here
         const stringMatch = { $regex: query, $options: "i" };
 
@@ -87,7 +93,7 @@ module.exports = class extends Command {
                                 return `**[${effectName.sentence()}]** : ${effectStrength.join(' / ')}`
                             else return ''
                         }
-                    ).join('\n')}`
+                    ).filter(a=>!!a).join('\n')}`
                     + `\n__${overchargeRecords.map(
                         ({ effectName, effectStrength }) => {
                             if (effectStrength.length)

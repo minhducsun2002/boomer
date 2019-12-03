@@ -37,6 +37,12 @@ module.exports = class extends Command {
         const embed = new RichEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(embed);
 
+        if (!query) return out.edit(
+            '', 
+            embed.setColor(ERROR_COLOR)
+                .setDescription(':frowning: Where is your query?')
+        )
+
         // process query here
 
         let results;

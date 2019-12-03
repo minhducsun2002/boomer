@@ -26,8 +26,15 @@ class Search extends Command {
 
     async exec(msg, { query }) {
         query = escape(query)
+
         const embed = new RichEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(embed);
+
+        if (!query) return out.edit(
+            '', 
+            embed.setColor(ERROR_COLOR)
+                .setDescription(':frowning: Where is your query?')
+        )
 
         // process query here
         const stringMatch = { $regex: query, $options: "i" };
