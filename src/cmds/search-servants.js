@@ -18,38 +18,78 @@ class Search extends Command {
                 id: 'query',
                 match: 'rest',
                 description: 'Search query'
+            },{
+                id: 'trait',
+                match: 'option',
+                description: 'Filtering by trait',
+                flag: ['-t', '-t=', '/t:', '--trait=', '/trait:'],
+                multipleFlags: true
+            },{
+                id: 'looseTrait',
+                match: 'option',
+                description: 'Filtering by trait (allow substring matches, like `female` matching `male`)',
+                flag: ['-lt', '-lt=', '/lt:', '--loose-trait=', '/loose_trait:'],
+                multipleFlags: true
+            },{
+                id: '_class',
+                match: 'option',
+                description: 'Filtering by class',
+                flag: ['-c', '-c=', '/c:', '--class=', '/class:'],
+                multipleFlags: true
             }],
             typing: true,
-            description: 'Search for servants.'
+            description: 'Search for servants. Traits filtering are ANDed, and class filtering are ORed.',
+            split: 'sticky',
         });
     }
 
-    async exec(msg, { query }) {
-        query = escape(query)
-
+    async exec(msg, { query, trait, looseTrait, _class }) {
         const embed = new RichEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(embed);
 
-        if (!query) return out.edit(
+        if (!query && !trait.length && !looseTrait.length && !_class.length) return out.edit(
             '', 
             embed.setColor(ERROR_COLOR)
                 .setDescription(':frowning: Where is your query?')
         )
 
+        if (query) query = escape(query)
+        if (trait.length) trait = trait.map(a => escape(a));
+        if (looseTrait.length) looseTrait = looseTrait.map(a => escape(a));
+        if (_class.length) _class = _class.map(a => escape(a));
+
         // process query here
-        const stringMatch = { $regex: query, $options: "i" };
+        const stringMatch = { $regex: query || '', $options: "i" };
 
         const results = await model.find({ 
-            $or : [
-                { name: stringMatch },
-                // search by name...
-                { 
-                    alias: {
-                        $elemMatch: {...stringMatch}
-                    } 
-                }
-                // and by alias
-            ]
+            $and: [{
+                $or : [
+                    // either name or alias should work
+                    { name: stringMatch },
+                    // search by name...
+                    { 
+                        alias: {
+                            $elemMatch: stringMatch
+                        } 
+                    }
+                    // and by alias
+                ]
+            },
+            (trait.length ? {
+                // for each trait
+                $and : trait.map(a => ({ traits: { $elemMatch: { $regex: `^${a}$`, $options: "i" } } }))
+                // find servants with `traits` containing the strings matching as a whole
+            } : {}),
+            (looseTrait.length ? {
+                // for each trait
+                $and : looseTrait.map(a => ({ traits: { $elemMatch: { $regex: a, $options: "i" } } }))
+                // find servants with `traits` containing the strings matching as a superstring
+            }: {}),
+            (_class.length ? {
+                // for each class
+                $or : _class.map(a => ({ class: { $regex: a, $options: "i" } }))
+                // find servants with `class` 
+            } : {})]
         }).limit(MAX_RESULTS)
             .select('class rarity id name').exec();
 

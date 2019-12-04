@@ -18,13 +18,13 @@ module.exports = class extends Command {
             args : [{
                 id: 'query',
                 match: 'rest',
-                description: 'Search query',
-                type: 'dynamicInt'
+                description: 'Search query. Can be a servant ID.',
+                type: 'string'
             }, {
                 id: 'img',
-                match: 'prefix',
-                prefix: '-i',
-                description: 'Toggle whether an art is shown, and which stage to show.',
+                match: 'option',
+                flag: '-i',
+                description: 'Toggle whether an art is shown (a non-zero value shows), and which stage to show.',
                 type: 'integer',
                 default: 0
             }],
@@ -47,7 +47,7 @@ module.exports = class extends Command {
 
         let results;
 
-        if (typeof query === 'number') {
+        if (Number.isInteger(+query)) {
             results = await model.find({ id: query }).limit(1).exec();
         }
         else {

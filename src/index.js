@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { AkairoClient } = require('discord-akairo')
+const { AkairoClient, CommandHandler } = require('discord-akairo')
 const chalk = require('chalk');
 
 String.prototype.sentence = function () {
@@ -8,13 +8,23 @@ String.prototype.sentence = function () {
 
 const log = (arg) => console.log(chalk.bgGreen.white('[Bot]') + ' ' + arg);
 
-const client = new AkairoClient({
-    ownerID: [process.env.OWNER],
-    blockBots: false, // I have other bots
-    prefix: JSON.parse(process.env.PREFIX || '[b!]'),
-    allowMention: JSON.parse(process.env.PING_AS_PREFIX || 'false'),
-    commandDirectory: './src/cmds'
-})
+class Bot extends AkairoClient {
+    constructor() {
+        super({ ownerID: [process.env.OWNER] });
+
+        this.mainHandler = new CommandHandler(this, {
+            blockBots: false, // I have other bots
+            prefix: JSON.parse(process.env.PREFIX),
+            allowMention: true,
+            directory: './src/cmds'
+        })
+
+        this.mainHandler.loadAll();
+        log(`Loaded ${this.mainHandler.modules.size} command(s).`)
+    }
+}
+
+const client = new Bot();
 
 if (process.env.NODE_ENV === 'development')
     client.on('debug', info => console.log(`${chalk.bgBlue.white('[Debug]')} ${info}`))

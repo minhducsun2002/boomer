@@ -10,7 +10,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "chalk": "^3.0.0",
-    "discord-akairo": "^7.5.6",
+    "discord-akairo": "git+https://github.com/discord-akairo/discord-akairo.git#cb458b3a9b8b8fd944dd9c0ebed89268c5cd91f5",
     "discord.js": "^11.5.1",
     "dotenv": "^8.2.0",
     "escape-string-regexp": "^2.0.0",
