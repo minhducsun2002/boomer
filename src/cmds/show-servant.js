@@ -85,7 +85,7 @@ module.exports = class extends Command {
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
             criticalStat: [starAbsorption, starGen], traits, gender, attribute, alignment, growth,
-            noblePhantasm: { length: npUpgradesCount }
+            noblePhantasm: { length: npUpgradesCount }, activeSkill
         } = result;
 
         let { name: npName, extendedName: npExtName, 
@@ -124,6 +124,18 @@ module.exports = class extends Command {
                     alignment.split(' ').map(a => a.sentence()).join(' ')
                 }`,
                 true
+            )
+            .addBlankField()
+            .addField(
+                'Active skill',
+                activeSkill.map(a => {
+                    const upgrades = a.length, { name, rank, detail, condition } = a.pop();
+                    return (
+                        `**${name}** __[${rank}]__` + (upgrades > 1 ? ` (${upgrades} upgrades)` : '')
+                        + `\n${detail}`
+                        + `\n_${condition}_`
+                    )
+                }).join('\n')
             )
             .addBlankField()
             .addField(
