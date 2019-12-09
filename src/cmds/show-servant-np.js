@@ -20,14 +20,12 @@ module.exports = class extends Command {
                 id: 'query',
                 match: 'rest',
                 description: 'Search query',
-                type: 'dynamicInt'
+                type: 'string'
             }]
         })
     }
 
     async exec(msg, { query }) {
-        if (typeof query !== 'number') query = escape(query);
-        
         const wait = new RichEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(wait);
 
@@ -36,28 +34,34 @@ module.exports = class extends Command {
             wait.setColor(ERROR_COLOR)
                 .setDescription(':frowning: Where is your query?')
         )
+        
+        let results;
+        if (Number.isInteger(+query)) {
+            results = await model.find({ id: +query }).limit(1).exec();
+        }
+        else {
+            // process query here
+            const stringMatch = { $regex: query, $options: "i" };
 
-        // process query here
-        const stringMatch = { $regex: query, $options: "i" };
-
-        const results = await model.find({ 
-            $or : [
-                { name: stringMatch },
-                // search by name...
-                { 
-                    alias: {
-                        $elemMatch: {...stringMatch}
-                    } 
-                },
-                {
-                    noblePhantasm: {
-                        $elemMatch: { name: stringMatch }
+            results = await model.find({ 
+                $or : [
+                    { name: stringMatch },
+                    // search by name...
+                    { 
+                        alias: {
+                            $elemMatch: {...stringMatch}
+                        } 
+                    },
+                    {
+                        noblePhantasm: {
+                            $elemMatch: { name: stringMatch }
+                        }
                     }
-                }
-                // and by alias
-            ]
-        }).limit(MAX_RESULTS)
-            .select('name noblePhantasm id dmgDistribution.np').exec();
+                    // and by alias
+                ]
+            }).limit(MAX_RESULTS)
+                .select('name noblePhantasm id dmgDistribution.np').exec();
+        }
 
         if (!results.length) return out.edit(
             '', 
