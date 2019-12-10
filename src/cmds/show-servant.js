@@ -142,7 +142,7 @@ module.exports = class extends Command {
                         + `\n${detail}`
                         + `\n_${condition}_`
                     )
-                }).join('\n')
+                }).join('\n\n')
             )
             .addBlankField()
             .addField(

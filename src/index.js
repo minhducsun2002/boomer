@@ -29,9 +29,15 @@ const client = new Bot();
 if (process.env.NODE_ENV === 'development')
     client.on('debug', info => console.log(`${chalk.bgBlue.white('[Debug]')} ${info}`))
 
-client.on('ready', () => log(`Logged in as ${client.user.tag}. Ready to serve ${client.guilds.size} guild${
-    client.guilds.size > 1 ? 's' : ''
-}.`))
+client.on('ready', () => {
+    log(`Logged in as ${client.user.tag}. Ready to serve ${client.guilds.size} guild${
+        client.guilds.size > 1 ? 's' : ''
+    }.`);
+    if (process.env.NODE_ENV === 'development')
+        client.user.setPresence({
+            game: { name: 'debugging mode' }
+        })
+})
 
 require('./db/index')().then(() => {
     log('Successfully connected to database.');
