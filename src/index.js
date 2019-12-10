@@ -35,8 +35,10 @@ client.on('ready', () => {
     }.`);
     if (process.env.NODE_ENV === 'development')
         client.user.setPresence({
+            status: 'dnd',
             game: { name: 'debugging mode' }
         })
+    else client.user.setStatus('idle')
 })
 
 require('./db/index')().then(() => {
