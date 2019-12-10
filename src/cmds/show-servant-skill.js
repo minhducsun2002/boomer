@@ -42,21 +42,25 @@ module.exports = class extends Command {
             // process query here
             const stringMatch = { $regex: query, $options: "i" };
 
-            results = await model.find({ 
+            results = model.find({ 
                 $or : [
                     { name: stringMatch },
                     // search by name...
                     { 
                         alias: {
-                            $elemMatch: {...stringMatch}
+                            $elemMatch: stringMatch
                         } 
                     },
                     {
-                        noblePhantasm: {
-                            $elemMatch: { name: stringMatch }
+                        activeSkill: {
+                            $elemMatch: {
+                                $elemMatch: {
+                                    name: stringMatch
+                                }
+                            }
                         }
+                        // [[{ name: "skill name" }]]
                     }
-                    // and by alias
                 ]
             })
         }
@@ -68,6 +72,12 @@ module.exports = class extends Command {
             '', 
             wait.setColor(ERROR_COLOR)
                 .setDescription(':no_entry_sign: No matching record found.')
+        )
+
+        await out.edit(
+            '',
+            wait.setDescription(`:hourglass: Found record for **${results.name}**. Please wait...`)
+                .setColor(INDETERMINATE_COLOR)
         )
 
         const { id, name, activeSkill } = results
