@@ -36,14 +36,12 @@ module.exports = class extends Command {
         )
         
         let results;
-        if (Number.isInteger(+query)) {
-            results = await model.find({ id: +query }).limit(1).exec();
-        }
+        if (Number.isInteger(+query)) results = model.find({ id: +query });
         else {
             // process query here
             const stringMatch = { $regex: query, $options: "i" };
 
-            results = await model.find({ 
+            results = model.find({ 
                 $or : [
                     { name: stringMatch },
                     // search by name...
@@ -59,9 +57,11 @@ module.exports = class extends Command {
                     }
                     // and by alias
                 ]
-            }).limit(MAX_RESULTS)
-                .select('name noblePhantasm id dmgDistribution.np').exec();
+            })
         }
+
+        results = await results.limit(MAX_RESULTS)
+            .select('name noblePhantasm id dmgDistribution.np').exec();
 
         if (!results.length) return out.edit(
             '', 

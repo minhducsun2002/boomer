@@ -53,12 +53,12 @@ module.exports = class extends Command {
         let results;
 
         if (Number.isInteger(+query)) {
-            results = await model.find({ id: query }).limit(1).exec();
+            results = model.find({ id: query });
         }
         else {
             query = escape(query); _class = escape(_class);
             const stringMatch = { $regex: query, $options: "i" };
-            results = await model.find({ 
+            results = model.find({ 
                 $and: [{
                     $or : [
                         { name: stringMatch },
@@ -71,8 +71,10 @@ module.exports = class extends Command {
                         // and by alias
                     ]
                 },(_class ? { class : { $regex: _class, $options: "i" } } : {})]
-            }).limit(1).exec();
+            });
         }
+
+        results = await results.limit(1).exec()
 
         if (!results.length) 
             return out.edit(
