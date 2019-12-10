@@ -23,21 +23,26 @@ module.exports = class extends Command {
             }, {
                 id: 'img',
                 match: 'option',
-                flag: '-i',
+                flag: ['-i', '-i=', '/i:', '--image=', '/image:'],
                 description: 'Toggle whether an art is shown (a non-zero value shows), and which stage to show.',
                 type: 'integer',
                 default: 0
+            },{
+                id: '_class',
+                match: 'option',
+                description: 'Filtering by class',
+                flag: ['-c', '-c=', '/c:', '--class=', '/class:']
             }],
             typing: true,
             description: 'Servant details'
         });
     }
 
-    async exec(msg, { query, img }) {
+    async exec(msg, { query, img, _class }) {
         const embed = new RichEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(embed);
 
-        if (!query) return out.edit(
+        if (!query && !_class) return out.edit(
             '', 
             embed.setColor(ERROR_COLOR)
                 .setDescription(':frowning: Where is your query?')
@@ -51,19 +56,21 @@ module.exports = class extends Command {
             results = await model.find({ id: query }).limit(1).exec();
         }
         else {
-            query = escape(query)
+            query = escape(query); _class = escape(_class);
             const stringMatch = { $regex: query, $options: "i" };
             results = await model.find({ 
-                $or : [
-                    { name: stringMatch },
-                    // search by name...
-                    { 
-                        alias: {
-                            $elemMatch: {...stringMatch}
-                        } 
-                    }
-                    // and by alias
-                ]
+                $and: [{
+                    $or : [
+                        { name: stringMatch },
+                        // search by name...
+                        { 
+                            alias: {
+                                $elemMatch: {...stringMatch}
+                            } 
+                        }
+                        // and by alias
+                    ]
+                },(_class ? { class : { $regex: _class, $options: "i" } } : {})]
             }).limit(1).exec();
         }
 
@@ -81,7 +88,7 @@ module.exports = class extends Command {
                 .setColor(INDETERMINATE_COLOR)
         )
 
-        const { name, rarity, class: _class, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
+        const { name, rarity, class: __class, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
             criticalStat: [starAbsorption, starGen], traits, gender, attribute, alignment, growth,
@@ -95,7 +102,7 @@ module.exports = class extends Command {
 
         const resultEmbed = new RichEmbed()
             .setColor(SUCCESS_COLOR)
-            .setAuthor(`${rarity}☆ ${_class.sentence()}`)
+            .setAuthor(`${rarity}☆ ${__class.sentence()}`)
             .setTitle(`${id}. **${name}**`)
             .addField(
                 'HP/ATK',
