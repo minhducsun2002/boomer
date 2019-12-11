@@ -36,6 +36,11 @@ class Search extends Command {
                 description: 'Filtering by class',
                 flag: ['-c', '-c=', '/c:', '--class=', '/class:'],
                 multipleFlags: true
+            },{
+                id: 'gender',
+                match: 'option',
+                description: 'Filtering by gender',
+                flag: ['-g', '-g=', '/g:', '--gender=', '/gender:'],
             }],
             typing: true,
             description: 'Search for servants. Traits filtering are ANDed, and class filtering are ORed.',
@@ -43,11 +48,11 @@ class Search extends Command {
         });
     }
 
-    async exec(msg, { query, trait, looseTrait, _class }) {
+    async exec(msg, { query, trait, looseTrait, _class, gender }) {
         const embed = new RichEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(embed);
 
-        if (!query && !trait.length && !looseTrait.length && !_class.length) return out.edit(
+        if (!query && !trait.length && !looseTrait.length && !_class.length && !gender) return out.edit(
             '', 
             embed.setColor(ERROR_COLOR)
                 .setDescription(':frowning: Where is your query?')
@@ -89,6 +94,10 @@ class Search extends Command {
                 // for each class
                 $or : _class.map(a => ({ class: { $regex: a, $options: "i" } }))
                 // find servants with `class` 
+            } : {}),
+            (gender ? {
+                gender: { $regex: `^${escape(gender)}$`, $options: "i" }
+                // strictly as typed
             } : {})]
         }).limit(MAX_RESULTS)
             .select('class rarity id name').exec();
