@@ -32,13 +32,18 @@ module.exports = class extends Command {
                 match: 'option',
                 description: 'Filtering by class',
                 flag: ['-c', '-c=', '/c:', '--class=', '/class:']
+            },{
+                id: 'alias',
+                match: 'flag',
+                description: 'Toggle alias(es) display.',
+                flag: ['-a', '/a', '--alias', '/alias']
             }],
             typing: true,
             description: 'Servant details'
         });
     }
 
-    async exec(msg, { query, img, _class }) {
+    async exec(msg, { query, img, _class, alias }) {
         const embed = new RichEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(embed);
 
@@ -56,8 +61,7 @@ module.exports = class extends Command {
             results = model.find({ id: query });
         }
         else {
-            query = escape(query); _class = escape(_class);
-            const stringMatch = { $regex: query, $options: "i" };
+            const stringMatch = { $regex: escape(query), $options: "i" };
             results = model.find({ 
                 $and: [{
                     $or : [
@@ -70,7 +74,7 @@ module.exports = class extends Command {
                         }
                         // and by alias
                     ]
-                },(_class ? { class : { $regex: _class, $options: "i" } } : {})]
+                },(_class ? { class : { $regex: escape(_class), $options: "i" } } : {})]
             });
         }
 
@@ -94,7 +98,7 @@ module.exports = class extends Command {
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
             criticalStat: [starAbsorption, starGen], traits, gender, attribute, alignment, growth,
-            noblePhantasm: { length: npUpgradesCount }, activeSkill
+            noblePhantasm: { length: npUpgradesCount }, activeSkill, alias: _alias
         } = result;
 
         let { name: npName, extendedName: npExtName, 
@@ -134,6 +138,14 @@ module.exports = class extends Command {
                 }`,
                 true
             )
+
+        if (alias) resultEmbed.addField(
+            'Aliases',
+            _alias.filter(a=>a!==name).join(', '),
+            true
+        )
+
+        resultEmbed
             .addBlankField()
             .addField(
                 'Active skill',
