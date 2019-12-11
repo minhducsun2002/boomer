@@ -38,7 +38,7 @@ client.on('ready', () => {
             status: 'dnd',
             game: { name: 'debugging mode' }
         })
-    else client.user.setStatus('idle')
+    else client.user.setPresence({ status: 'idle', game: {} })
 })
 
 require('./db/index')().then(() => {
