@@ -1,17 +1,16 @@
-require('dotenv').config()
-const mongoose = require('mongoose');
-const chalk = require('chalk')
+import dotenv = require('dotenv'); dotenv.config();
+import mongoose = require('mongoose');
+import chalk = require('chalk');
 
-const log = (...arg) => chalk.bgYellow.white(...arg);
+let log : Function = (t : String) => console.log(chalk.bgYellow.white('[Database]') + ' ' + t);
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 
-mongoose.connection.once('open', () => console.log(log('[DATABASE]') + ' Database is ready.'))
+mongoose.connection.once('open', () => log('Database is ready.'))
 
-const connect = async () => {
+export = async () : Promise<typeof mongoose> => {
     if (!process.env.MONGODB_URI) {
-        console.log(log('[DATABASE]') + ' No URI present. The scraping process will not be executed.');
         throw new Error('No URI present, this bot will not work!')
     }
     else {
@@ -23,4 +22,3 @@ const connect = async () => {
     }
 }
 
-module.exports = connect

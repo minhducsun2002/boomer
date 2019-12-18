@@ -1,0 +1,1 @@
+export = (a : Number) => a <= 1 ? '' : 's'

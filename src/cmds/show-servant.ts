@@ -1,21 +1,24 @@
-const { Command } = require('discord-akairo');
-const { RichEmbed } = require('discord.js');
+import { Command } from 'discord-akairo';
+import { RichEmbed, Message } from 'discord.js';
 
-const { ServantModel: model } = require('../db/model');
+import { constructQuery, SearchParameters } from '../lib/search';
+import sentence from '../lib/sentence';
+import plural from '../lib/plural';
 
-const plural = require('../lib/plural');
+import { ERROR_COLOR, SUCCESS_COLOR, INDETERMINATE_COLOR } from '../constants/colors'
 
-const ERROR_COLOR = '#FF0000';
-const INDETERMINATE_COLOR = '#FFFF00';
-const SUCCESS_COLOR = '#00FF00';
+const commandName = 'servant-info';
+const aliases = ['servant', 'servant-info', 's'];
 
 const maxLevel = [59, 64, 69, 79, 89];
 
-module.exports = class extends Command {
+interface commandArguments { query?: String; img?: Number; _class?: String; }
+
+export = class extends Command {
     constructor() {
-        super('servant-info', {
-            aliases: ['servant', 'servant-info', 's'],
-            args : [{
+        super(commandName, {
+            aliases,
+            args: [{
                 id: 'query',
                 match: 'rest',
                 description: 'Search query. Can be a servant ID.',
@@ -27,93 +30,58 @@ module.exports = class extends Command {
                 description: 'Toggle whether an art is shown (a non-zero value shows), and which stage to show.',
                 type: 'integer',
                 default: 0
-            },{
+            }, {
                 id: '_class',
                 match: 'option',
                 description: 'Filtering by class',
                 flag: ['-c', '-c=', '/c:', '--class=', '/class:']
-            },{
-                id: 'alias',
-                match: 'flag',
-                description: 'Toggle alias(es) display.',
-                flag: ['-a', '/a', '--alias', '/alias']
             }],
             typing: true,
-            description: 'Servant details'
-        });
+            description: 'Show servant details.'
+        })
     }
 
-    async exec(msg, { query, img, _class, alias }) {
-        const embed = new RichEmbed().setDescription(':hourglass: Querying database...')
-        const out = await msg.channel.send(embed);
+    async exec(msg: Message, { query, img, _class }: commandArguments) {
+        const wait = new RichEmbed().setDescription(':hourglass: Querying database...')
+        const err = new RichEmbed().setColor(ERROR_COLOR);
+        const out = await msg.channel.send(wait) as Message;
 
-        if (!query && !_class) return out.edit(
-            '', 
-            embed.setColor(ERROR_COLOR)
-                .setDescription(':frowning: Where is your query?')
-        )
+        if (!query && !_class) return out.edit('',err.setDescription(':frowning: Where is your query?'))
 
-        // process query here
+        const q = Number.isInteger(+query)
+            ? { id: +query }
+            : { name: query, class: [_class].filter(Boolean) } as SearchParameters
 
-        let results;
-
-        if (Number.isInteger(+query)) {
-            results = model.find({ id: query });
-        }
-        else {
-            const stringMatch = { $regex: escape(query), $options: "i" };
-            results = model.find({ 
-                $and: [{
-                    $or : [
-                        { name: stringMatch },
-                        // search by name...
-                        { 
-                            alias: {
-                                $elemMatch: {...stringMatch}
-                            } 
-                        }
-                        // and by alias
-                    ]
-                },(_class ? { class : { $regex: escape(_class), $options: "i" } } : {})]
-            });
-        }
-
-        results = await results.limit(1).exec()
-
+        const results = await constructQuery(q).exec();
         if (!results.length) 
-            return out.edit(
-                '', 
-                embed.setDescription(':disappointed: Sorry, I could not find anything.')
-                    .setColor(ERROR_COLOR)
-            )
+            return out.edit('', err.setDescription(':disappointed: Sorry, I could not find anything.'))
 
-        let [result] = results;
         await out.edit(
             '',
-            embed.setDescription(`:hourglass: Found record for **${result.name}**. Please wait...`)
-                .setColor(INDETERMINATE_COLOR)
+            wait.setColor(INDETERMINATE_COLOR)
+                .setDescription(`:hourglass: Found record for **${results[0].name}**. Please wait...`)
         )
 
-        const { name, rarity, class: __class, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
+        const [{ name, rarity, class: __class, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
             criticalStat: [starAbsorption, starGen], traits, gender, attribute, alignment, growth,
             noblePhantasm: { length: npUpgradesCount }, activeSkill, alias: _alias
-        } = result;
+        }] = results;
 
         let { name: npName, extendedName: npExtName, 
             rank: npRank, detail: npDetail, overchargeDetail: npOverDetail,
             condition: npCondition, class: npClass
-        } = result.noblePhantasm.pop()
+        } = results[0].noblePhantasm.pop()
 
         const resultEmbed = new RichEmbed()
             .setColor(SUCCESS_COLOR)
-            .setAuthor(`${rarity}☆ ${__class.sentence()}`)
+            .setAuthor(`${rarity}☆ ${sentence(__class)}`)
             .setTitle(`${id}. **${name}**`)
             .addField(
                 'HP/ATK',
                 `- Base : ${hp[0]}/${atk[0]}`
-                + `\n- Maximum : ${hp[maxLevel[rarity - 1]]}/${atk[maxLevel[rarity - 1]]}`
+                + `\n- Maximum : ${hp[maxLevel[+rarity - 1]]}/${atk[maxLevel[+rarity - 1]]}`
                 + `\n- Maximum (grailed) : ${hp.pop()}/${atk.pop()}`,
                 true
             )
@@ -133,19 +101,15 @@ module.exports = class extends Command {
             .addField('Traits', traits.join(', '), true)
             .addField(
                 'Gender / Attribute / Alignment', 
-                `${gender.sentence()} / ${attribute.sentence()} / ${
-                    alignment.split(' ').map(a => a.sentence()).join(' ')
+                `${sentence(gender)} / ${sentence(attribute)} / ${
+                    alignment.split(' ').map(a=>sentence(a)).join(' ')
                 }`,
                 true
+            ).addField(
+                'Aliases',
+                _alias.filter(a=>a!==name).join(', '),
+                true
             )
-
-        if (alias) resultEmbed.addField(
-            'Aliases',
-            _alias.filter(a=>a!==name).join(', '),
-            true
-        )
-
-        resultEmbed
             .addBlankField()
             .addField(
                 'Active skill',
@@ -168,7 +132,7 @@ module.exports = class extends Command {
                 + (npCondition ? `\n_${npCondition}_` : '')
             )
 
-        if (img && img > 0 && img < 5) resultEmbed.setImage(arts[--img]);
+        if (img && img > 0 && img < 5) resultEmbed.setImage(arts[(+img) - 1].toString());
 
         await out.edit('', resultEmbed)
     }
