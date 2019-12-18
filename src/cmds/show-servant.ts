@@ -66,7 +66,7 @@ export = class extends Command {
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
             criticalStat: [starAbsorption, starGen], traits, gender, attribute, alignment, growth,
-            noblePhantasm: { length: npUpgradesCount }, activeSkill, alias: _alias
+            noblePhantasm: { length: npUpgradesCount }, activeSkill, alias: _alias, passiveSkill
         }] = results;
 
         let { name: npName, extendedName: npExtName, 
@@ -121,6 +121,10 @@ export = class extends Command {
                         + `\n_${condition}_`
                     )
                 }).join('\n\n')
+            )
+            .addField(
+                'Passive skill',
+                passiveSkill.map(({ name, detail, rank }) => `**${name}** [__${rank}__]\n${detail}`).join('\n\n')
             )
             .addBlankField()
             .addField(
