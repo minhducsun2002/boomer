@@ -107,7 +107,7 @@ export = class extends Command {
                 true
             ).addField(
                 'Aliases',
-                _alias.filter(a=>a!==name).join(', '),
+                _alias.filter(a=>a!==name).join(', ') || '(none)',
                 true
             )
             .addBlankField()
