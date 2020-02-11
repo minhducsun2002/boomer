@@ -1,6 +1,7 @@
 import dotenv = require('dotenv'); dotenv.config();
 import { AkairoClient, CommandHandler } from 'discord-akairo';
 import { log } from './lib/logger';
+import { join } from 'path'
 
 import plural = require('./lib/plural');
 
@@ -15,7 +16,7 @@ class Bot extends AkairoClient {
         blockBots: false,
         prefix: JSON.parse(process.env.PREFIX),
         allowMention: true,
-        directory: './src/cmds'
+        directory: join(__dirname, 'cmds')
     })
 }
 
@@ -23,13 +24,13 @@ const client : Bot = new Bot();
 if (process.env.NODE_ENV === 'development') client.on('debug', log.info)
 
 client.on('ready', () => {
-    log.success(`Logged in as ${client.user.tag}. Ready to serve ${client.guilds.size} guild${plural(client.guilds.size)}.`);
+    log.success(`Logged in as ${client.user.tag}. Ready to serve ${client.guilds.cache.size} guild${plural(client.guilds.cache.size)}.`);
     if (process.env.NODE_ENV === 'development')
         client.user.setPresence({
             status: 'dnd',
-            game: { name: 'debugging mode' }
+            activity: { name: 'debugging mode' }
         })
-    else client.user.setPresence({ status: 'idle', game: {} })
+    else client.user.setPresence({ status: 'idle' })
 })
 
 

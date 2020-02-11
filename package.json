@@ -2,27 +2,30 @@
   "name": "boomer",
   "version": "0.0.1",
   "description": "FGO database exposed by a bot scraping GamePress.",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "build": "rimraf dist/ && tsc",
     "dev": "ts-node-dev --respawn --no-notify --prefer-ts --transpile-only src/index.ts"
   },
   "author": "Minh Duc Vo <minhducsun2002@gmail.com>",
   "license": "CC-BY-4.0",
   "dependencies": {
-    "@types/mongoose": "^5.5.34",
     "chalk": "^3.0.0",
     "discord-akairo": "git+https://github.com/discord-akairo/discord-akairo.git#cb458b3a9b8b8fd944dd9c0ebed89268c5cd91f5",
-    "discord.js": "^11.5.1",
+    "discord.js": "git+https://github.com/discordjs/discord.js.git#bbdbc4cfa789383b7b3dbecf5e6b8401ea2dd998",
     "dotenv": "^8.2.0",
     "escape-string-regexp": "^2.0.0",
     "mongoose": "^5.7.11",
-    "timezonecomplete": "^5.11.0",
-    "ts-node": "^8.5.4",
-    "typescript": "^3.7.3"
+    "timezonecomplete": "^5.11.0"
   },
   "devDependencies": {
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3",
+    "@types/mongoose": "^5.5.34",
     "@types/node": "^12.12.17",
+    "@types/ws": "^7.2.1",
+    "rimraf": "^3.0.2",
     "ts-node-dev": "^1.0.0-pre.44"
   }
 }

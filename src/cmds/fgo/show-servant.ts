@@ -1,5 +1,5 @@
 import { Command } from 'discord-akairo';
-import { RichEmbed, Message } from 'discord.js';
+import { MessageEmbed, Message } from 'discord.js';
 
 import { constructQuery, SearchParameters } from '../../lib/search';
 import sentence from '../../lib/sentence';
@@ -42,8 +42,8 @@ export = class extends Command {
     }
 
     async exec(msg: Message, { query, img, _class }: commandArguments) {
-        const wait = new RichEmbed().setDescription(':hourglass: Querying database...')
-        const err = new RichEmbed().setColor(ERROR_COLOR);
+        const wait = new MessageEmbed().setDescription(':hourglass: Querying database...')
+        const err = new MessageEmbed().setColor(ERROR_COLOR);
         const out = await msg.channel.send(wait) as Message;
 
         if (!query && !_class) return out.edit('',err.setDescription(':frowning: Where is your query?'))
@@ -74,7 +74,7 @@ export = class extends Command {
             condition: npCondition, class: npClass
         } = results[0].noblePhantasm.pop()
 
-        const resultEmbed = new RichEmbed()
+        const resultEmbed = new MessageEmbed()
             .setColor(SUCCESS_COLOR)
             .setAuthor(`${rarity}☆ ${sentence(__class)}`)
             .setTitle(`${id}. **${name}**`)

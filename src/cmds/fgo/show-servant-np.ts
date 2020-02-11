@@ -1,5 +1,5 @@
 import { Command } from 'discord-akairo';
-import { RichEmbed, Message } from 'discord.js';
+import { MessageEmbed, Message } from 'discord.js';
 
 import { constructQuery, SearchParameters } from '../../lib/search';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
@@ -31,8 +31,8 @@ export = class extends Command {
     }
 
     async exec(msg: Message, { query, _class } : commandArgument) {
-        const wait = new RichEmbed().setDescription(':hourglass: Querying database...')
-        const errEmbed = new RichEmbed().setColor(ERROR_COLOR);
+        const wait = new MessageEmbed().setDescription(':hourglass: Querying database...')
+        const errEmbed = new MessageEmbed().setColor(ERROR_COLOR);
         const out = await msg.channel.send(wait) as Message;
 
         if (!query) return out.edit('', errEmbed.setDescription(':frowning: Where is your query?'));
@@ -50,7 +50,7 @@ export = class extends Command {
 
         const [{ name, id, noblePhantasm: np }] = results;
 
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setColor(SUCCESS_COLOR)
             .setAuthor(`${id}. ${name}`)
             .setTitle(`Noble Phantasm${plural(np.length)}`)

@@ -1,5 +1,5 @@
 import { Command } from 'discord-akairo';
-import { RichEmbed, Message } from 'discord.js';
+import { MessageEmbed, Message } from 'discord.js';
 
 import sentence from '../../lib/sentence';
 import { constructQuery } from '../../lib/search';
@@ -26,9 +26,9 @@ export = class extends Command {
     }
 
     async exec (msg: Message, { query } : commandArguments) {
-        const wait = new RichEmbed().setDescription(':hourglass: Querying database...')
+        const wait = new MessageEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(wait) as Message;
-        const err = new RichEmbed().setColor(ERROR_COLOR);
+        const err = new MessageEmbed().setColor(ERROR_COLOR);
 
         if (!query) return out.edit('', err.setDescription(':frowning: Where is your query?'))
 
@@ -49,7 +49,7 @@ export = class extends Command {
 
         const [{ id, name, activeSkill }] = results
 
-        let embed = new RichEmbed().setColor(SUCCESS_COLOR).setTimestamp()
+        let embed = new MessageEmbed().setColor(SUCCESS_COLOR).setTimestamp()
             .setAuthor(`${id}. ${name}`)
             .setTitle('Active skills')
         

@@ -1,5 +1,5 @@
 import { Command } from 'discord-akairo';
-import { RichEmbed, Message } from 'discord.js';
+import { MessageEmbed, Message } from 'discord.js';
 
 import { constructQuery } from '../../lib/search';
 import { ERROR_COLOR, INDETERMINATE_COLOR, SUCCESS_COLOR } from '../../constants/colors';
@@ -59,7 +59,7 @@ export = class extends Command {
     }
 
     async exec(msg: Message, { query, trait, looseTrait, _class, gender, alignment, attribute }: commandArguments) {
-        const wait = new RichEmbed().setDescription(':hourglass: Querying database...')
+        const wait = new MessageEmbed().setDescription(':hourglass: Querying database...')
         const out = await msg.channel.send(wait) as Message;
         const errEmbed = wait.setColor(ERROR_COLOR)
 
@@ -91,7 +91,7 @@ export = class extends Command {
                 )
         )
 
-        let result = new RichEmbed()
+        let result = new MessageEmbed()
             .setTitle(`Found ${results.length} servant${results.length > 1 ? 's' : ''}.`)
             .setTimestamp()
             .setDescription(results.slice(0, MAX_RESULTS).map(
