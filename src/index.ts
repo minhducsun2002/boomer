@@ -1,16 +1,14 @@
 import dotenv = require('dotenv'); dotenv.config();
 import { AkairoClient, CommandHandler } from 'discord-akairo';
-import chalk = require('chalk');
+import { log } from './lib/logger';
 
 import plural = require('./lib/plural');
-
-let log : Function = (t : String) => console.log(chalk.bgGreen.white('[Bot]') + ' ' + t);
 
 class Bot extends AkairoClient {
     constructor() {
         super({ ownerID: [process.env.OWNER] });
         this.mainHandler.loadAll();
-        log(`Loaded ${this.mainHandler.modules.size} command(s).`)
+        log.success(`Loaded ${this.mainHandler.modules.size} command(s).`)
     }
 
     mainHandler = new CommandHandler(this, {
@@ -22,11 +20,10 @@ class Bot extends AkairoClient {
 }
 
 const client : Bot = new Bot();
-if (process.env.NODE_ENV === 'development')
-    client.on('debug', info => console.log(`${chalk.bgBlue.white('[Debug]')} ${info}`))
+if (process.env.NODE_ENV === 'development') client.on('debug', log.info)
 
 client.on('ready', () => {
-    log(`Logged in as ${client.user.tag}. Ready to serve ${client.guilds.size} guild${plural(client.guilds.size)}.`);
+    log.success(`Logged in as ${client.user.tag}. Ready to serve ${client.guilds.size} guild${plural(client.guilds.size)}.`);
     if (process.env.NODE_ENV === 'development')
         client.user.setPresence({
             status: 'dnd',
@@ -37,6 +34,6 @@ client.on('ready', () => {
 
 
 require('./db/index')().then(() => {
-    log('Successfully connected to database.');
+    log.success('Successfully connected to database.');
     client.login(process.env.DISCORD_TOKEN)
 })
