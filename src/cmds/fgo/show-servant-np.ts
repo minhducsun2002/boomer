@@ -1,10 +1,10 @@
 import { Command } from 'discord-akairo';
 import { RichEmbed, Message } from 'discord.js';
 
-import { constructQuery, SearchParameters } from '../lib/search';
-import { ERROR_COLOR, SUCCESS_COLOR } from '../constants/colors';
-import plural from '../lib/plural';
-import sentence from '../lib/sentence';
+import { constructQuery, SearchParameters } from '../../lib/search';
+import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
+import plural from '../../lib/plural';
+import sentence from '../../lib/sentence';
 
 const commandName = 'servant-np';
 const aliases = ['servant-np', 'np', 'snp'];

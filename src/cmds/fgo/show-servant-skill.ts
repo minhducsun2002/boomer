@@ -1,10 +1,10 @@
 import { Command } from 'discord-akairo';
 import { RichEmbed, Message } from 'discord.js';
 
-import sentence from '../lib/sentence';
-import { constructQuery } from '../lib/search';
+import sentence from '../../lib/sentence';
+import { constructQuery } from '../../lib/search';
 
-import { ERROR_COLOR, SUCCESS_COLOR, INDETERMINATE_COLOR } from '../constants/colors'
+import { ERROR_COLOR, SUCCESS_COLOR, INDETERMINATE_COLOR } from '../../constants/colors'
 
 const commandName = 'servant-skills';
 const aliases = ['servant-skills', 'sk', 'sks', 'ssks', 'skills', 'skill'];

@@ -1,11 +1,11 @@
 import { Command } from 'discord-akairo';
 import { RichEmbed, Message } from 'discord.js';
 
-import { constructQuery, SearchParameters } from '../lib/search';
-import sentence from '../lib/sentence';
-import plural from '../lib/plural';
+import { constructQuery, SearchParameters } from '../../lib/search';
+import sentence from '../../lib/sentence';
+import plural from '../../lib/plural';
 
-import { ERROR_COLOR, SUCCESS_COLOR, INDETERMINATE_COLOR } from '../constants/colors'
+import { ERROR_COLOR, SUCCESS_COLOR, INDETERMINATE_COLOR } from '../../constants/colors'
 
 const commandName = 'servant-info';
 const aliases = ['servant', 'servant-info', 's'];
