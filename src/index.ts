@@ -8,6 +8,7 @@ import plural = require('./lib/plural');
 class Bot extends AkairoClient {
     constructor() {
         super({ ownerID: [process.env.OWNER] });
+        this.mainHandler.on('load', ({ id }) => log.success(`Loaded module : ${id}`))
         this.mainHandler.loadAll();
         log.success(`Loaded ${this.mainHandler.modules.size} command(s).`)
     }
