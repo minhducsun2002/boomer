@@ -21,7 +21,8 @@ export = class extends Command {
                 description: 'Search query',
                 type: 'string'
             }],
-            typing: true
+            typing: true,
+            description: "Show a servant's skills."
         })
     }
 

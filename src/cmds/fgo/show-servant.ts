@@ -37,7 +37,7 @@ export = class extends Command {
                 flag: ['-c', '-c=', '/c:', '--class=', '/class:']
             }],
             typing: true,
-            description: 'Show servant details.'
+            description: 'Show a servant\'s details.'
         })
     }
 

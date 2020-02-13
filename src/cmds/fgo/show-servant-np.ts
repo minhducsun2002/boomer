@@ -26,7 +26,8 @@ export = class extends Command {
                 flag: ['-c', '-c=', '/c:', '--class=', '/class:'],
                 multipleFlags: true
             }],
-            typing: true
+            typing: true,
+            description: "Show servant's Noble Phantasm."
         })
     }
 
