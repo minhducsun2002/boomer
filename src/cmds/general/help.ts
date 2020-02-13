@@ -27,6 +27,7 @@ export = class extends GeneralCommand {
         let out : MessageEmbed | string = new MessageEmbed().setAuthor('', this.client.user.avatarURL()).setColor(SUCCESS_COLOR)
 
         let prefix = (handler.prefixes.size ? [...handler.prefixes.entries()][0][0] : handler.prefix) as string;
+        if (Array.isArray(prefix)) [prefix] = prefix;
         if (q) {
             // check if category name
             if (handler.findCategory(q)) {
@@ -42,8 +43,8 @@ export = class extends GeneralCommand {
                 const cmd = handler.findCommand(q);
                 out = out
                     .setTitle(`\`${prefix}${cmd.aliases[0]}\`${
-                        aliases.length > 1
-                        ? `\n(${aliases.slice(1).map(a => `\`${prefix}${a}\``).join(', ')})`
+                        (cmd.aliases.length > 1)
+                        ? `\n(${cmd.aliases.slice(1).map(a => `\`${prefix}${a}\``).join(', ')})`
                         : ''
                     }`)
                     .setDescription(cmd.description)
