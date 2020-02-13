@@ -1,8 +1,8 @@
-import { Command } from 'discord-akairo';
 import { MessageEmbed, Message } from 'discord.js';
 
 import sentence from '../../lib/sentence';
 import { constructQuery } from '../../lib/search';
+import { FgoCommand } from './baseCommand';
 
 import { ERROR_COLOR, SUCCESS_COLOR, INDETERMINATE_COLOR } from '../../constants/colors'
 
@@ -11,7 +11,7 @@ const aliases = ['servant-skills', 'sk', 'sks', 'ssks', 'skills', 'skill'];
 
 interface commandArguments { query?: String; }
 
-export = class extends Command {
+export = class extends FgoCommand {
     constructor() {
         super(commandName, {
             aliases,

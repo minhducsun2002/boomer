@@ -1,11 +1,11 @@
-import { Command } from 'discord-akairo';
 import { MessageEmbed, Message } from 'discord.js';
 import { Duration, TimeUnit } from 'timezonecomplete';
+import { GeneralCommand } from './baseCommand'
 
 const commandName = 'uptime';
 const aliases = [commandName, 'up']
 
-export = class extends Command {
+export = class extends GeneralCommand {
     constructor() {
         super(commandName, {
             aliases,

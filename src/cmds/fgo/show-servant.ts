@@ -1,9 +1,9 @@
-import { Command } from 'discord-akairo';
 import { MessageEmbed, Message } from 'discord.js';
 
 import { constructQuery, SearchParameters } from '../../lib/search';
 import sentence from '../../lib/sentence';
 import plural from '../../lib/plural';
+import { FgoCommand } from './baseCommand';
 
 import { ERROR_COLOR, SUCCESS_COLOR, INDETERMINATE_COLOR } from '../../constants/colors'
 
@@ -14,7 +14,7 @@ const maxLevel = [59, 64, 69, 79, 89];
 
 interface commandArguments { query?: String; img?: Number; _class?: String; }
 
-export = class extends Command {
+export = class extends FgoCommand {
     constructor() {
         super(commandName, {
             aliases,

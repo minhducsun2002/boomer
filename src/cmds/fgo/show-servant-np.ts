@@ -1,17 +1,17 @@
-import { Command } from 'discord-akairo';
 import { MessageEmbed, Message } from 'discord.js';
 
 import { constructQuery, SearchParameters } from '../../lib/search';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import plural from '../../lib/plural';
 import sentence from '../../lib/sentence';
+import { FgoCommand } from './baseCommand';
 
 const commandName = 'servant-np';
 const aliases = ['servant-np', 'np', 'snp'];
 
 interface commandArgument { query?: String; _class?: String[]; }
 
-export = class extends Command {
+export = class extends FgoCommand {
     constructor() {
         super(commandName, {
             aliases,

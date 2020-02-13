@@ -1,10 +1,10 @@
-import { Command } from 'discord-akairo';
 import { MessageEmbed, Message } from 'discord.js';
 
 import { constructQuery } from '../../lib/search';
 import { ERROR_COLOR, INDETERMINATE_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import plural from '../../lib/plural';
 import sentence from '../../lib/sentence';
+import { FgoCommand } from './baseCommand';
 
 const commandName = 'search-servants-name-only';
 const aliases = ['search-servants-name', 'ss', 'ssn', 'ssno'];
@@ -21,7 +21,7 @@ interface commandArguments {
 
 const MAX_RESULTS = 15;
 
-export = class extends Command {
+export = class extends FgoCommand {
     constructor() {
         super(commandName, {
             aliases,
