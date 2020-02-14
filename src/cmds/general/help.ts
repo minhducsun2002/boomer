@@ -24,7 +24,12 @@ export = class extends GeneralCommand {
     async exec(m: Message, { q } : Arg) {
         const handler = (this.client as any).cmdHandler as CommandHandler;
         // I am not supposed to do this, but yikes
-        let out : MessageEmbed | string = new MessageEmbed().setAuthor('', this.client.user.avatarURL()).setColor(SUCCESS_COLOR)
+        let out : MessageEmbed | string = new MessageEmbed()
+            .setAuthor(
+                `${this.client.user.username}#${this.client.user.discriminator}`,
+                this.client.user.avatarURL()
+            )
+            .setColor(SUCCESS_COLOR)
 
         let prefix = (handler.prefixes.size ? [...handler.prefixes.entries()][0][0] : handler.prefix) as string;
         if (Array.isArray(prefix)) [prefix] = prefix;
