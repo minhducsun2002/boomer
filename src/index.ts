@@ -1,22 +1,23 @@
-import dotenv = require('dotenv'); dotenv.config();
+import { config } from 'dotenv'; config();
 import { AkairoClient, CommandHandler } from 'discord-akairo';
 import { log } from './lib/logger';
-import { join } from 'path'
+import { join } from 'path';
 
+import cfg from './config';
 import plural = require('./lib/plural');
 
 class Bot extends AkairoClient {
     constructor() {
-        super({ ownerID: [process.env.OWNER] });
+        super({ ownerID: cfg.get('owner') });
         this.cmdHandler.on('load', ({ id }) => log.success(`Loaded module : ${id}`))
         this.cmdHandler.loadAll();
-        log.success(`Loaded ${this.cmdHandler.modules.size} command(s).`)
+        log.success(`Loaded ${this.cmdHandler.modules.size} module(s).`);
     }
 
     cmdHandler = new CommandHandler(this, {
         blockBots: false,
-        prefix: JSON.parse(process.env.PREFIX),
-        allowMention: true,
+        prefix: cfg.get('prefix'),
+        allowMention: cfg.get('pingAsPrefix') ?? true,
         directory: join(__dirname, 'cmds')
     })
 }
