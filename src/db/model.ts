@@ -1,4 +1,4 @@
-import { Schema, Document, model, Model } from 'mongoose';
+import { Schema, Document } from 'mongoose';
 
 export interface ServantStat { hp: Number[], atk: Number[] }
 const ServantStatModel: Schema<ServantStat> = new Schema({ hp: [Number], atk: [Number] })

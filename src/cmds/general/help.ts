@@ -16,7 +16,8 @@ export = class extends GeneralCommand {
             description: 'You know nothing? This will help.',
             args: [{
                 id: 'q',
-                type: 'string'
+                type: 'string',
+                match: 'rest'
             }]
         })
     }

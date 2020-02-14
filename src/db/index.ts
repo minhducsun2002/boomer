@@ -4,7 +4,10 @@ import { createConnection, Connection, Model } from 'mongoose'; import mongoose 
 // TypeError: mongoose_1.createConnection is not a function
 import { log } from '../lib/logger';
 import cfg from '../config';
+
+// models
 import { Servant, ServantSchema } from './model';
+import { mstSvtSchema, mstSvtDocument } from './master/mstSvt';
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
@@ -27,3 +30,7 @@ connections
     .set('master_JP', master.JP)
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
+export const mstSvtModel = {
+    NA: connections.get('master_NA').model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
+    JP: connections.get('master_JP').model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>
+}
