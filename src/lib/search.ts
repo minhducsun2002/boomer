@@ -1,7 +1,5 @@
-import { ServantModel } from "../db/model";
+import { ServantModel } from '../db/index'
 import escape from "escape-string-regexp";
-
-import { inspect } from "util"
 
 export interface SearchParameters {
     name?: String;

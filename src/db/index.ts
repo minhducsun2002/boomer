@@ -1,23 +1,29 @@
-import dotenv = require('dotenv'); dotenv.config();
-import mongoose = require('mongoose');
+import { config } from 'dotenv'; config();
+import { createConnection, Connection, Model } from 'mongoose'; import mongoose from 'mongoose';
+// yikes, 
+// TypeError: mongoose_1.createConnection is not a function
 import { log } from '../lib/logger';
+import cfg from '../config';
+import { Servant, ServantSchema } from './model';
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
+mongoose.set('useUnifiedTopology', true);
 
-// mongoose.connection.once('open', () => log.success('Database is ready.'))
+export const connections = new Map<string, Connection>()
 
-export = async () : Promise<typeof mongoose> => {
-    if (!process.env.MONGODB_URI) {
-        throw new Error('No URI present, this bot will not work!')
-    }
-    else {
-        return mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-            .catch(err => {
-                log.error('Connection failed.')
-                log.error(err)
-                throw err;
-            })
-    }
+const main = createConnection(cfg.get('database:main'))
+    .on('open', () => log.success(`Successfully connected to main database.`));
+const master = {
+    NA: createConnection(cfg.get('database:masterData:NA'))
+        .on('open', () => log.success(`Successfully connected to master (NA) database.`)),
+    JP: createConnection(cfg.get('database:masterData:JP'))
+        .on('open', () => log.success(`Successfully connected to master (JP) database.`))
 }
 
+connections
+    .set('main', main)
+    .set('master_NA', master.NA)
+    .set('master_JP', master.JP)
+
+export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)

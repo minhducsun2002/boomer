@@ -137,7 +137,7 @@ export interface Servant extends Document {
 
     releaseDate: String
 }
-const ServantModel_ : Schema<Servant> = new Schema({
+export const ServantSchema : Schema<Servant> = new Schema({
     name: String,
     alias: [String],
     class: String,
@@ -179,5 +179,3 @@ const ServantModel_ : Schema<Servant> = new Schema({
 
     releaseDate: String
 })
-
-export const ServantModel : Model<Servant> = model('Servant', ServantModel_);

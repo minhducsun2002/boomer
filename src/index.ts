@@ -4,7 +4,8 @@ import { log } from './lib/logger';
 import { join } from 'path';
 
 import cfg from './config';
-import plural = require('./lib/plural');
+import plural from './lib/plural';
+import './db/';
 
 class Bot extends AkairoClient {
     constructor() {
@@ -35,8 +36,4 @@ client.on('ready', () => {
     else client.user.setPresence({ status: 'idle' })
 })
 
-
-require('./db/index')().then(() => {
-    log.success('Successfully connected to database.');
-    client.login(process.env.DISCORD_TOKEN)
-})
+client.login(process.env.DISCORD_TOKEN);
