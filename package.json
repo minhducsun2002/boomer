@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "FGO database exposed by a bot scraping GamePress.",
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/minhducsun2002/boomer"
+  },
   "scripts": {
     "start": "node dist/index.js",
     "build": "rimraf dist/ && tsc",
@@ -11,6 +15,7 @@
   "author": "Minh Duc Vo <minhducsun2002@gmail.com>",
   "license": "CC-BY-4.0",
   "dependencies": {
+    "@octokit/rest": "^16.43.1",
     "chalk": "^3.0.0",
     "discord-akairo": "git+https://github.com/discord-akairo/discord-akairo.git#cb458b3a9b8b8fd944dd9c0ebed89268c5cd91f5",
     "discord.js": "git+https://github.com/discordjs/discord.js.git#bbdbc4cfa789383b7b3dbecf5e6b8401ea2dd998",
