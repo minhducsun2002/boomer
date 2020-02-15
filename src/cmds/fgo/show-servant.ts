@@ -1,11 +1,11 @@
 import { MessageEmbed, Message } from 'discord.js';
-
 import { constructQuery, SearchParameters } from '../../lib/search';
+import { constructQuery as mstSvtConstructQuery } from '../../lib/experimental/search'
 import sentence from '../../lib/sentence';
 import plural from '../../lib/plural';
 import { FgoCommand } from './baseCommand';
 
-import { ERROR_COLOR, SUCCESS_COLOR, INDETERMINATE_COLOR } from '../../constants/colors'
+import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors'
 
 const commandName = 'servant-info';
 const aliases = ['servant', 'servant-info', 's'];
@@ -56,18 +56,18 @@ export = class extends FgoCommand {
         if (!results.length) 
             return out.edit('', err.setDescription(':disappointed: Sorry, I could not find anything.'))
 
-        await out.edit(
-            '',
-            wait.setColor(INDETERMINATE_COLOR)
-                .setDescription(`:hourglass: Found record for **${results[0].name}**. Please wait...`)
-        )
 
-        const [{ name, rarity, class: __class, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
+        const [{ rarity, class: __class, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
-            criticalStat: [starAbsorption, starGen], traits, gender, attribute, alignment, growth,
+            criticalStat: [starAbsorption], traits, gender, attribute, alignment, growth,
             noblePhantasm: { length: npUpgradesCount }, activeSkill, alias: _alias, passiveSkill
         }] = results;
+
+        const [{
+            name, baseSvtId,
+            starRate: starGen
+        }] = await mstSvtConstructQuery({ collectionNo: id as number }).NA.exec()
 
         let { name: npName, extendedName: npExtName, 
             rank: npRank, detail: npDetail, overchargeDetail: npOverDetail,
@@ -77,7 +77,7 @@ export = class extends FgoCommand {
         const resultEmbed = new MessageEmbed()
             .setColor(SUCCESS_COLOR)
             .setAuthor(`${rarity}☆ ${sentence(__class)}`)
-            .setTitle(`${id}. **${name}**`)
+            .setTitle(`${id}. **${name}** (\`${baseSvtId}\`)`)
             .addField(
                 'HP/ATK',
                 `- Base : ${hp[0]}/${atk[0]}`
@@ -95,7 +95,7 @@ export = class extends FgoCommand {
             )
             .addBlankField()
             .addField('NP generation', `- Per hit : ${npPerATK}\n- When attacked : ${npPerHit}`, true)
-            .addField('Critical stars', `- Star weighting : ${starAbsorption}\n- Star generation : ${starGen}`, true)
+            .addField('Critical stars', `- Star weighting : ${starAbsorption}\n- Star generation : ${(starGen / 10).toFixed(1)}%`, true)
             .addField('Growth', growth, true)
             .addBlankField()
             .addField('Traits', traits.join(', '), true)

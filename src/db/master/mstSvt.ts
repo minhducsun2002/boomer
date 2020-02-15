@@ -67,6 +67,8 @@ export interface mstSvt {
     baseSvtId: number;
     /** Quests related to this object */
     relateQuestIds: number[];
+    /** Star generation weight (i.e. 100 for Altria, meaning 10%) */
+    starRate: number;
 }
 
 export interface mstSvtDocument extends mstSvt, Document { id: number; }
@@ -84,5 +86,6 @@ export const mstSvtSchema : Schema<mstSvt> = new Schema({
     cardIds: [Number],
     genderType: Number,
     id: Number, baseSvtId: Number,
-    relateQuestIds: [Number]
+    relateQuestIds: [Number],
+    starRate: Number
 })
