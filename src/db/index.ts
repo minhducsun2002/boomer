@@ -6,8 +6,8 @@ import { log } from '../lib/logger';
 import cfg from '../config';
 
 // models
-import { Servant, ServantSchema } from './model';
-import { mstSvtSchema, mstSvtDocument } from './master/mstSvt';
+import { Servant, ServantSchema } from './fgo/model';
+import { mstSvtSchema, mstSvtDocument } from './fgo/master/mstSvt';
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);

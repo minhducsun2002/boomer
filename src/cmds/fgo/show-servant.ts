@@ -1,6 +1,6 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { constructQuery, SearchParameters } from '../../lib/search';
-import { constructQuery as mstSvtConstructQuery } from '../../lib/experimental/search'
+import { constructQuery, SearchParameters } from '../../lib/fgo/search';
+import { constructQuery as mstSvtConstructQuery } from '../../lib/fgo/mstSvt';
 import sentence from '../../lib/sentence';
 import plural from '../../lib/plural';
 import { FgoCommand } from './baseCommand';

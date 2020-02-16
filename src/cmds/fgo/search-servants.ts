@@ -1,6 +1,6 @@
 import { MessageEmbed, Message } from 'discord.js';
 
-import { constructQuery } from '../../lib/search';
+import { constructQuery } from '../../lib/fgo/search';
 import { ERROR_COLOR, INDETERMINATE_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import plural from '../../lib/plural';
 import sentence from '../../lib/sentence';

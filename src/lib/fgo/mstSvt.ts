@@ -1,5 +1,5 @@
 import { mstSvtModel } from '../../db';
-import { mstSvt as _ } from '../../db/master/mstSvt';
+import { mstSvt as _ } from '../../db/fgo/master/mstSvt';
 import { truthify } from '../removeNull';
 
 export type mstSvt = _;
