@@ -1,42 +1,5 @@
 import { Schema, Document } from 'mongoose';
-
-/** Object type */
-export enum SvtType {
-    NORMAL = 1,
-    /** Only Mash gets to have Heroine type, I guess */
-    HEROINE,
-    COMBINE_MATERIAL,
-    ENEMY,
-    ENEMY_COLLECTION,
-    SERVANT_EQUIP,
-    STATUS_UP,
-    SVT_EQUIP_MATERIAL,
-    ENEMY_COLLECTION_DETAIL,
-    ALL,
-    COMMAND_CODE
-}
-
-/** Card type */
-export enum CardType { ARTS = 1, BUSTER = 2, QUICK = 3 };
-/** Gender type */
-export enum GenderType { Male = 1, Female = 2 }
-
-/** Servant class type */
-export enum ClassType {
-    Saber = 1,
-    Archer = 2,
-    Lancer = 3,
-    Rider = 4,
-    Caster = 5,
-    Assassin = 6,
-    Berserker = 7,
-    Shielder = 8,
-    Ruler = 9,
-    AlterEgo = 10,
-    Avenger = 11,
-    MoonCancer = 23,
-    Foreigner = 25
-}
+import { SvtType, GenderType, CardType, ClassType } from '../../../constants/fgo';
 
 export interface mstSvt {
     name: string;
@@ -69,6 +32,10 @@ export interface mstSvt {
     relateQuestIds: number[];
     /** Star generation weight (i.e. 100 for Altria, meaning 10%) */
     starRate: number;
+    /** Maximum level */
+    rewardLv: number;
+    /** Class */
+    classId: ClassType;
 }
 
 export interface mstSvtDocument extends mstSvt, Document { id: number; }
@@ -87,5 +54,7 @@ export const mstSvtSchema : Schema<mstSvt> = new Schema({
     genderType: Number,
     id: Number, baseSvtId: Number,
     relateQuestIds: [Number],
-    starRate: Number
+    starRate: Number,
+    rewardLv: Number,
+    classId: Number
 })

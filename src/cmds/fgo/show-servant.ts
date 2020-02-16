@@ -1,4 +1,5 @@
 import { MessageEmbed, Message } from 'discord.js';
+import { Class } from '../../constants/fgo/strings'
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { constructQuery as mstSvtConstructQuery } from '../../lib/fgo/mstSvt';
 import sentence from '../../lib/sentence';
@@ -57,7 +58,7 @@ export = class extends FgoCommand {
             return out.edit('', err.setDescription(':disappointed: Sorry, I could not find anything.'))
 
 
-        const [{ rarity, class: __class, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
+        const [{ rarity, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
             criticalStat: [starAbsorption], traits, gender, attribute, alignment, growth,
@@ -65,8 +66,8 @@ export = class extends FgoCommand {
         }] = results;
 
         const [{
-            name, baseSvtId,
-            starRate: starGen
+            name, baseSvtId, classId,
+            starRate: starGen, collectionNo
         }] = await mstSvtConstructQuery({ collectionNo: id as number }).NA.exec()
 
         let { name: npName, extendedName: npExtName, 
@@ -76,8 +77,8 @@ export = class extends FgoCommand {
 
         const resultEmbed = new MessageEmbed()
             .setColor(SUCCESS_COLOR)
-            .setAuthor(`${rarity}☆ ${sentence(__class)}`)
-            .setTitle(`${id}. **${name}** (\`${baseSvtId}\`)`)
+            .setAuthor(`${rarity}☆ ${Class[classId]}`)
+            .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`)
             .addField(
                 'HP/ATK',
                 `- Base : ${hp[0]}/${atk[0]}`
