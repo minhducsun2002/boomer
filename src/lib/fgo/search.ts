@@ -1,4 +1,4 @@
-import { ServantModel } from '../../db/index'
+import { FGO } from '../../db/index'; const { ServantModel } = FGO;
 import escape from "escape-string-regexp";
 
 export interface SearchParameters {

@@ -1,6 +1,8 @@
-import { mstSvtModel } from '../../db';
+import { FGO } from '../../db/index'
 import { mstSvt as _ } from '../../db/fgo/master/mstSvt';
 import { truthify } from '../removeNull';
+
+const { mstSvtModel } = FGO;
 
 export type mstSvt = _;
 export function constructQuery(opt: Partial<mstSvt>, limit: number = 1) {
