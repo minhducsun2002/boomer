@@ -1,8 +1,7 @@
 import { MessageEmbed, Message } from 'discord.js';
 import { Attribute, Gender } from '../../constants/fgo/strings'
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
-import { constructQuery as mstSvtConstructQuery } from '../../lib/fgo/mstSvt';
-import { constructQuery as mstClassConstructQuery } from '../../lib/fgo/mstClass';
+import { constructQuery as c } from '../../lib/fgo/';
 import sentence from '../../lib/sentence';
 import plural from '../../lib/plural';
 import { FgoCommand } from './baseCommand';
@@ -69,8 +68,8 @@ export = class extends FgoCommand {
         const [{
             name, baseSvtId, classId, attri, genderType,
             starRate: starGen, collectionNo
-        }] = await mstSvtConstructQuery({ collectionNo: id as number }).NA.exec()
-        const [{ name: className }] = await mstClassConstructQuery({ id: classId }).NA.exec()
+        }] = await c.mstSvt({ collectionNo: id as number }).NA.exec()
+        const [{ name: className }] = await c.mstClass({ id: classId }).NA.exec()
 
         let { name: npName, extendedName: npExtName, 
             rank: npRank, detail: npDetail, overchargeDetail: npOverDetail,
