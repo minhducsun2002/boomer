@@ -1,0 +1,17 @@
+import { Schema, Document } from 'mongoose';
+import { ClassType, Attribute, AttackRate } from '../../../constants/fgo';
+export interface mstClass {
+    id: ClassType;
+    attri: Attribute | number;
+    name: string;
+    attackRate: AttackRate;
+}
+
+export interface mstClassDocument extends Document, mstClass { id: ClassType }
+
+export const mstClassSchema : Schema<mstClass> = new Schema({
+    id: Number,
+    attri: Number,
+    name: String,
+    attackRate: Number
+})

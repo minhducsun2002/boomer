@@ -1,27 +1,23 @@
 import { createConnection, Connection, Model } from 'mongoose';
-import mongoose from 'mongoose';
-// yikes, 
-// TypeError: mongoose_1.createConnection is not a function
 import { log } from '../../lib/logger';
 import cfg from '../../config';
 
-// models
-import { Servant, ServantSchema } from '../fgo/model';
-import { mstSvtSchema, mstSvtDocument } from '../fgo/master/mstSvt';
+function a (s: string) { return `[F/GO] ${s}` }
 
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useFindAndModify', false);
-mongoose.set('useUnifiedTopology', true);
+// models
+import { Servant, ServantSchema } from './model';
+import { mstSvtSchema, mstSvtDocument } from './master/mstSvt';
+import { mstClassSchema, mstClassDocument } from './master/mstClass'
 
 export const connections = new Map<string, Connection>()
 
 const main = createConnection(cfg.get('database:main'))
-    .on('open', () => log.success(`Successfully connected to main database.`));
+    .on('open', () => log.success(a(`Successfully connected to main database.`)));
 const master = {
     NA: createConnection(cfg.get('database:masterData:NA'))
-        .on('open', () => log.success(`Successfully connected to master (NA) database.`)),
+        .on('open', () => log.success(a(`Successfully connected to master (NA) database.`))),
     JP: createConnection(cfg.get('database:masterData:JP'))
-        .on('open', () => log.success(`Successfully connected to master (JP) database.`))
+        .on('open', () => log.success(a(`Successfully connected to master (JP) database.`)))
 }
 
 connections
@@ -30,7 +26,11 @@ connections
     .set('master_JP', master.JP)
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
-export const mstSvtModel = {
-    NA: connections.get('master_NA').model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
-    JP: connections.get('master_JP').model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>
+export const NA = {
+    mstSvt: master.NA.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
+    mstClass: master.NA.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>
+}
+export const JP = {
+    mstSvt: master.JP.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
+    mstClass: master.JP.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>
 }

@@ -36,6 +36,7 @@ export enum ClassType {
     Foreigner = 25
 }
 
+/** Servant attribute */
 export enum Attribute {
     STAR = 4,
     BEAST = 5,
@@ -43,3 +44,6 @@ export enum Attribute {
     EARTH = 3,
     HEAVEN = 2,
 }
+
+/** Base attack multiplier for servant (class-agnostic) */
+export type AttackRate = number;

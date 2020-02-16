@@ -1,7 +1,8 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { Class, Attribute, Gender } from '../../constants/fgo/strings'
+import { Attribute, Gender } from '../../constants/fgo/strings'
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { constructQuery as mstSvtConstructQuery } from '../../lib/fgo/mstSvt';
+import { constructQuery as mstClassConstructQuery } from '../../lib/fgo/mstClass';
 import sentence from '../../lib/sentence';
 import plural from '../../lib/plural';
 import { FgoCommand } from './baseCommand';
@@ -61,7 +62,7 @@ export = class extends FgoCommand {
         const [{ rarity, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
-            criticalStat: [starAbsorption], traits, gender, alignment, growth,
+            criticalStat: [starAbsorption], traits, alignment, growth,
             noblePhantasm: { length: npUpgradesCount }, activeSkill, alias: _alias, passiveSkill
         }] = results;
 
@@ -69,6 +70,7 @@ export = class extends FgoCommand {
             name, baseSvtId, classId, attri, genderType,
             starRate: starGen, collectionNo
         }] = await mstSvtConstructQuery({ collectionNo: id as number }).NA.exec()
+        const [{ name: className }] = await mstClassConstructQuery({ id: classId }).NA.exec()
 
         let { name: npName, extendedName: npExtName, 
             rank: npRank, detail: npDetail, overchargeDetail: npOverDetail,
@@ -77,7 +79,7 @@ export = class extends FgoCommand {
 
         const resultEmbed = new MessageEmbed()
             .setColor(SUCCESS_COLOR)
-            .setAuthor(`${rarity}☆ ${Class[classId]}`)
+            .setAuthor(`${rarity}☆ ${className}`)
             .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`)
             .addField(
                 'HP/ATK',
