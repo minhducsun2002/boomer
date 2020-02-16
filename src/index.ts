@@ -7,9 +7,11 @@ import cfg from './config';
 import plural from './lib/plural';
 import './db/';
 
+const owner = cfg.get('owner')
+
 class Bot extends AkairoClient {
     constructor() {
-        super({ ownerID: cfg.get('owner') });
+        super({ ownerID: Array.isArray(owner) ? owner : [owner] });
         this.cmdHandler.on('load', ({ id }) => log.success(`Loaded module : ${id}`))
         this.cmdHandler.loadAll();
         log.success(`Loaded ${this.cmdHandler.modules.size} module(s).`);
@@ -37,3 +39,5 @@ client.on('ready', () => {
 })
 
 client.login(process.env.DISCORD_TOKEN);
+
+export default Bot;

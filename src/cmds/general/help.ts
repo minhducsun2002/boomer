@@ -2,7 +2,8 @@ import { CommandHandler } from 'discord-akairo';
 import { Message, MessageEmbed } from 'discord.js';
 import { GeneralCommand } from './baseCommand';
 
-import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
+import { SUCCESS_COLOR } from '../../constants/colors';
+import Bot from '../..';
 
 const commandName = 'help', aliases = [commandName];
 
@@ -23,7 +24,7 @@ export = class extends GeneralCommand {
     }
 
     async exec(m: Message, { q } : Arg) {
-        const handler = (this.client as any).cmdHandler as CommandHandler;
+        const handler = (this.client as Bot).cmdHandler as CommandHandler;
         // I am not supposed to do this, but yikes
         let out : MessageEmbed | string = new MessageEmbed()
             .setAuthor(
