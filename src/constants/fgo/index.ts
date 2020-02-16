@@ -35,3 +35,11 @@ export enum ClassType {
     MoonCancer = 23,
     Foreigner = 25
 }
+
+export enum Attribute {
+    STAR = 4,
+    BEAST = 5,
+    HUMAN = 1,
+    EARTH = 3,
+    HEAVEN = 2,
+}

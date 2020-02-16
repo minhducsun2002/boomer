@@ -1,5 +1,5 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { Class } from '../../constants/fgo/strings'
+import { Class, Attribute, Gender } from '../../constants/fgo/strings'
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { constructQuery as mstSvtConstructQuery } from '../../lib/fgo/mstSvt';
 import sentence from '../../lib/sentence';
@@ -61,12 +61,12 @@ export = class extends FgoCommand {
         const [{ rarity, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
-            criticalStat: [starAbsorption], traits, gender, attribute, alignment, growth,
+            criticalStat: [starAbsorption], traits, gender, alignment, growth,
             noblePhantasm: { length: npUpgradesCount }, activeSkill, alias: _alias, passiveSkill
         }] = results;
 
         const [{
-            name, baseSvtId, classId,
+            name, baseSvtId, classId, attri, genderType,
             starRate: starGen, collectionNo
         }] = await mstSvtConstructQuery({ collectionNo: id as number }).NA.exec()
 
@@ -102,7 +102,7 @@ export = class extends FgoCommand {
             .addField('Traits', traits.join(', '), true)
             .addField(
                 'Gender / Attribute / Alignment', 
-                `${sentence(gender)} / ${sentence(attribute)} / ${
+                `${Gender[genderType].join(' + ')} / ${Attribute[attri]} / ${
                     alignment.split(' ').map(a=>sentence(a)).join(' ')
                 }`,
                 true
