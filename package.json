@@ -1,7 +1,7 @@
 {
   "name": "boomer",
   "version": "0.0.1",
-  "description": "FGO database exposed by a bot scraping GamePress.",
+  "description": "A Discord bot for some games.",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
