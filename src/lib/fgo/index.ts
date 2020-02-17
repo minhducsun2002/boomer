@@ -4,6 +4,7 @@ import { constructQuery as mstAttriRelation } from './mstAttriRelation';
 import { constructQuery as mstQuest } from './mstQuest';
 import { constructQuery as mstSpot } from './mstSpot';
 import { constructQuery as mstWar } from './mstWar';
+import { constructQuery as mstSvtCard } from './mstSvtCard';
 export const constructQuery = {
-    mstClass, mstSvt, mstAttriRelation, mstQuest, mstSpot, mstWar
+    mstClass, mstSvt, mstAttriRelation, mstQuest, mstSpot, mstWar, mstSvtCard
 }

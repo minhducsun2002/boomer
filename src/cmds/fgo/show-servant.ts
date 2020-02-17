@@ -1,5 +1,6 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { Attribute, Gender } from '../../constants/fgo/strings'
+import { Attribute, Gender } from '../../constants/fgo/strings';
+import { CardType as Card } from '../../constants/fgo'
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { constructQuery as c } from '../../lib/fgo/';
 import sentence from '../../lib/sentence';
@@ -52,17 +53,18 @@ export = class extends FgoCommand {
 
 
         const [{ rarity, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit],
-            cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
-            dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
-            criticalStat: [starAbsorption], traits, alignment, growth,
+            criticalStat: [starAbsorption], traits, alignment, 
             noblePhantasm: { length: npUpgradesCount }, activeSkill, passiveSkill
         }] = results;
 
         const [{
-            name, baseSvtId, classId, attri, genderType,
+            name, baseSvtId, classId, attri, genderType, cardIds,
             starRate: starGen, collectionNo, relateQuestIds
         }] = await c.mstSvt({ collectionNo: id as number }).NA.exec()
         const [{ name: className }] = await c.mstClass({ id: classId }).NA.exec()
+        const dmg = (await c.mstSvtCard({ svtId: baseSvtId }).NA.limit(4).exec())
+            .sort((a, b) => a.cardId - b.cardId)
+            .map(a => a.normalDamage)
 
         let { name: npName, extendedName: npExtName, 
             rank: npRank, detail: npDetail, overchargeDetail: npOverDetail,
@@ -82,16 +84,16 @@ export = class extends FgoCommand {
             )
             .addField(
                 'Cards / Damage distribution by %',
-                `- Buster : ${_cardBuster} / ${_dmgBuster.join('-')}`
-                + `\n- Arts : ${_cardArts} / ${_dmgArts.join('-')}`
-                + `\n- Quick : ${_cardQuick} / ${_dmgQuick.join('-')}`
-                + `\n- Extra : 1 / ${_dmgExtra.join('-')}`,
+                // -1 due to array from 0
+                `- Buster : ${cardIds.reduce((b, a) => a === Card.BUSTER ? b + 1 : b, 0)} / ${dmg[Card.BUSTER - 1].join('-')}`
+                + `\n- Arts : ${cardIds.reduce((b, a) => a === Card.ARTS ? b + 1 : b, 0)} / ${dmg[Card.ARTS - 1].join('-')}`
+                + `\n- Quick : ${cardIds.reduce((b, a) => a === Card.QUICK ? b + 1 : b, 0)} / ${dmg[Card.QUICK - 1].join('-')}`
+                + `\n- Extra : 1 / ${dmg[Card.EXTRA - 1].join('-')}`,
                 true
             )
             .addBlankField()
             .addField('NP generation', `- Per hit : ${npPerATK}\n- When attacked : ${npPerHit}`, true)
             .addField('Critical stars', `- Star weighting : ${starAbsorption}\n- Star generation : ${(starGen / 10).toFixed(1)}%`, true)
-            .addField('Growth', growth, true)
             .addBlankField()
             .addField('Traits', traits.join(', '), true)
             .addField(

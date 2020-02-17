@@ -15,7 +15,7 @@ export enum SvtType {
 }
 
 /** Card type */
-export enum CardType { ARTS = 1, BUSTER = 2, QUICK = 3 };
+export enum CardType { ARTS = 1, BUSTER = 2, QUICK = 3, EXTRA = 4 };
 /** Gender type */
 export enum GenderType { Male = 1, Female = 2 }
 
@@ -57,3 +57,5 @@ export type Chapter = number;
 export type War = number;
 /** Spot ID */
 export type Spot = number;
+/** Damage distribution */
+export type DamageDistribution = number[]

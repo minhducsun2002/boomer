@@ -12,6 +12,7 @@ import { mstAttriRelationSchema, mstAttriRelationDocument } from './master/mstAt
 import { mstQuestSchema, mstQuestDocument } from './master/mstQuest';
 import { mstSpotSchema, mstSpotDocument } from './master/mstSpot';
 import { mstWarSchema, mstWarDocument } from './master/mstWar';
+import { mstSvtCardSchema, mstSvtCard, mstSvtCardDocument } from './master/mstSvtCard';
 
 export const connections = new Map<string, Connection>()
 
@@ -38,7 +39,9 @@ export const NA = {
     mstQuest: master.NA.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
     mstSpot: master.NA.model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
     mstWar: master.NA.model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
+    mstSvtCard: master.NA.model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>
 }
+
 export const JP = {
     mstSvt: master.JP.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
     mstClass: master.JP.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
@@ -46,4 +49,5 @@ export const JP = {
     mstQuest: master.JP.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
     mstSpot: master.JP.model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
     mstWar: master.JP.model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
+    mstSvtCard: master.NA.model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>
 }
