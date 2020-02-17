@@ -13,7 +13,7 @@ const aliases = ['servant', 'servant-info', 's'];
 
 const maxLevel = [59, 64, 69, 79, 89];
 
-interface commandArguments { query?: String; img?: Number; _class?: String; }
+interface commandArguments { query?: String; img?: Number; }
 
 export = class extends FgoCommand {
     constructor() {
@@ -25,13 +25,6 @@ export = class extends FgoCommand {
                 description: 'Search query. Can be a servant ID.',
                 type: 'string'
             }, {
-                id: 'img',
-                match: 'option',
-                flag: ['-i', '-i=', '/i:', '--image=', '/image:'],
-                description: 'Toggle whether an art is shown (a non-zero value shows), and which stage to show.',
-                type: 'integer',
-                default: 0
-            }, {
                 id: '_class',
                 match: 'option',
                 description: 'Filtering by class',
@@ -42,7 +35,7 @@ export = class extends FgoCommand {
         })
     }
 
-    async exec(msg: Message, { query, img, _class }: commandArguments) {
+    async exec(msg: Message, { query, _class }: commandArguments) {
         const wait = new MessageEmbed().setDescription(':hourglass: Querying database...')
         const err = new MessageEmbed().setColor(ERROR_COLOR);
         const out = await msg.channel.send(wait) as Message;
@@ -137,8 +130,6 @@ export = class extends FgoCommand {
                 + `\n- ${npOverDetail.split('\n').filter(a=>!!a).map(a=>`__${a}__`).join('\n- ')}`
                 + (npCondition ? `\n_${npCondition}_` : '')
             )
-
-        if (img && img > 0 && img < 5) resultEmbed.setImage(arts[(+img) - 1].toString());
 
         await out.edit('', resultEmbed)
     }
