@@ -9,7 +9,9 @@ import { Servant, ServantSchema } from './model';
 import { mstSvtSchema, mstSvtDocument } from './master/mstSvt';
 import { mstClassSchema, mstClassDocument } from './master/mstClass';
 import { mstAttriRelationSchema, mstAttriRelationDocument } from './master/mstAttriRelation';
-import { mstQuestSchema, mstQuestDocument } from './master/mstQuest'
+import { mstQuestSchema, mstQuestDocument } from './master/mstQuest';
+import { mstSpotSchema, mstSpotDocument } from './master/mstSpot';
+import { mstWarSchema, mstWarDocument } from './master/mstWar';
 
 export const connections = new Map<string, Connection>()
 
@@ -33,11 +35,15 @@ export const NA = {
     mstSvt: master.NA.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
     mstClass: master.NA.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
     mstAttriRelation: master.NA.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
-    mstQuest: master.NA.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>
+    mstQuest: master.NA.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
+    mstSpot: master.NA.model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
+    mstWar: master.NA.model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
 }
 export const JP = {
     mstSvt: master.JP.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
     mstClass: master.JP.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
     mstAttriRelation: master.JP.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
-    mstQuest: master.JP.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>
+    mstQuest: master.JP.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
+    mstSpot: master.JP.model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
+    mstWar: master.JP.model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
 }

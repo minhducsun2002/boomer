@@ -21,11 +21,20 @@ export = class extends FgoCommand {
         })
     }
 
-    private prepare (data: mstQuest) {
-        let { id, name, noticeAt, openedAt, closedAt, actConsume, recommendLv, chapterId } = data;
+    private async prepare (data: mstQuest) {
+        let { id, name, noticeAt, openedAt, closedAt, actConsume, recommendLv, spotId } = data;
+        let [spot] = await c.mstSpot({ id: spotId }).NA.select('name warId').exec();
+        let [war] = spot ? await c.mstWar({ id: spot.warId }).NA.select('name').exec() : [null]
         return new MessageEmbed()
+            .setColor(SUCCESS_COLOR)
             .setTitle(`${name} (\`${id}\`)`)
             .setDescription(`${actConsume} AP | Recommended level : ${recommendLv}`)
+            .addField(
+                'Place',
+                spot 
+                ? `**${war.name}** | ${spot.name}`
+                : 'N/A'
+            )
             .addField(
                 `Availability`,
                 [
@@ -41,6 +50,6 @@ export = class extends FgoCommand {
             .setDescription(`Sorry, couldn't find anything that matched.`)
         let a = +q;
         let [data] = await c.mstQuest(isNaN(a) ? { name: q } : { id: a }).NA.exec();
-        m.channel.send('', data ? this.prepare(data) : err)
+        m.channel.send('', data ? (await this.prepare(data)) : err)
     }
 }

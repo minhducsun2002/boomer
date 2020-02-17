@@ -53,3 +53,7 @@ export type AP = number;
 export type Level = number;
 /** Chapter ID */
 export type Chapter = number;
+/** War ID */
+export type War = number;
+/** Spot ID */
+export type Spot = number;
