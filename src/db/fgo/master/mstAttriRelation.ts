@@ -3,6 +3,9 @@ import { Schema, Document } from 'mongoose'
 export interface mstAttriRelation {
     atkAttri: Attribute;
     defAttri: Attribute;
+    /** Damage multiplier used.
+     * @see https://grandorder.wiki/Attributes
+     */
     attackRate: AttackRate;
 }
 

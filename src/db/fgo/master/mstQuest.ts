@@ -8,6 +8,7 @@ export interface mstQuest {
     name: string;
     chapterId: Chapter;
     noticeAt: number; openedAt: number; closedAt: number;
+    /** mstSpot */
     spotId: Spot;
 }
 
