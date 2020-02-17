@@ -1,5 +1,5 @@
 import { Schema, Document } from 'mongoose';
-import { SvtType, GenderType, CardType, ClassType, Attribute } from '../../../constants/fgo';
+import { SvtType, GenderType, CardType, ClassType, Attribute, Level } from '../../../constants/fgo';
 
 export interface mstSvt {
     name: string;
@@ -33,7 +33,7 @@ export interface mstSvt {
     /** Star generation weight (i.e. 100 for Altria, meaning 10%) */
     starRate: number;
     /** Maximum level */
-    rewardLv: number;
+    rewardLv: Level;
     /** Class */
     classId: ClassType;
     /** Attribute */

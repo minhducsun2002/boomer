@@ -13,7 +13,7 @@ const aliases = ['servant', 'servant-info', 's'];
 
 const maxLevel = [59, 64, 69, 79, 89];
 
-interface commandArguments { query?: String; img?: Number; }
+interface commandArguments { query?: string; _class: string }
 
 export = class extends FgoCommand {
     constructor() {
@@ -51,16 +51,16 @@ export = class extends FgoCommand {
             return out.edit('', err.setDescription(':disappointed: Sorry, I could not find anything.'))
 
 
-        const [{ rarity, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit], arts,
+        const [{ rarity, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit],
             cardSet: { buster: _cardBuster, quick: _cardQuick, arts: _cardArts },
             dmgDistribution: { buster: _dmgBuster, quick: _dmgQuick, arts: _dmgArts, extra: _dmgExtra },
             criticalStat: [starAbsorption], traits, alignment, growth,
-            noblePhantasm: { length: npUpgradesCount }, activeSkill, alias: _alias, passiveSkill
+            noblePhantasm: { length: npUpgradesCount }, activeSkill, passiveSkill
         }] = results;
 
         const [{
             name, baseSvtId, classId, attri, genderType,
-            starRate: starGen, collectionNo
+            starRate: starGen, collectionNo, relateQuestIds
         }] = await c.mstSvt({ collectionNo: id as number }).NA.exec()
         const [{ name: className }] = await c.mstClass({ id: classId }).NA.exec()
 
@@ -101,8 +101,8 @@ export = class extends FgoCommand {
                 }`,
                 true
             ).addField(
-                'Aliases',
-                _alias.filter(a=>a!==name).join(', ') || '(none)',
+                'Related quests (ID)',
+                relateQuestIds.map(a => `\`${a}\``).join(', '),
                 true
             )
             .addBlankField()

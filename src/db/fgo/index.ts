@@ -8,7 +8,8 @@ function a (s: string) { return `[F/GO] ${s}` }
 import { Servant, ServantSchema } from './model';
 import { mstSvtSchema, mstSvtDocument } from './master/mstSvt';
 import { mstClassSchema, mstClassDocument } from './master/mstClass';
-import { mstAttriRelationSchema, mstAttriRelationDocument } from './master/mstAttriRelation'
+import { mstAttriRelationSchema, mstAttriRelationDocument } from './master/mstAttriRelation';
+import { mstQuestSchema, mstQuestDocument } from './master/mstQuest'
 
 export const connections = new Map<string, Connection>()
 
@@ -27,13 +28,16 @@ connections
     .set('master_JP', master.JP)
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
+
 export const NA = {
     mstSvt: master.NA.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
     mstClass: master.NA.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
-    mstAttriRelation: master.NA.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>
+    mstAttriRelation: master.NA.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
+    mstQuest: master.NA.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>
 }
 export const JP = {
     mstSvt: master.JP.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
     mstClass: master.JP.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
-    mstAttriRelation: master.JP.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>
+    mstAttriRelation: master.JP.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
+    mstQuest: master.JP.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>
 }

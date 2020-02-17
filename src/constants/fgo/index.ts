@@ -47,3 +47,9 @@ export enum Attribute {
 
 /** Base attack multiplier for servant (class-agnostic) */
 export type AttackRate = number;
+/** Action Points */
+export type AP = number;
+/** Servant level */
+export type Level = number;
+/** Chapter ID */
+export type Chapter = number;
