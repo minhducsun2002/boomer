@@ -102,7 +102,7 @@ export = class extends FgoCommand {
                 true
             ).addField(
                 'Related quests (ID)',
-                relateQuestIds.map(a => `\`${a}\``).join(', '),
+                relateQuestIds.map(a => `\`${a}\``).join(', ') || 'None',
                 true
             )
             .addBlankField()
