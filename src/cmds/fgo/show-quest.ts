@@ -5,7 +5,7 @@ import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import { mstQuest } from '../../db/fgo/master/mstQuest';
 
 const commandName = 'show-quests';
-const aliases = [commandName, 'quests', 'quest', 'sq']
+const aliases = [commandName, 'quests', 'quest', 'sq', 'q']
 
 interface a { q?: string }
 
