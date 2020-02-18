@@ -12,7 +12,7 @@ const client = new Octokit({
 const commandName = 'changelog';
 const aliases = [commandName, 'changes'];
 
-const max = 5;
+const max = 10;
 
 export = class extends GeneralCommand {
     constructor() {
@@ -31,7 +31,7 @@ export = class extends GeneralCommand {
 
       
         const out = new MessageEmbed()
-            .setTitle(`Latest ${data.length} commit(s)`)
+            .setTitle(`Latest ${data.length} commit(s) from \`${owner}/${repo}\``)
             .setURL(`https://github.com/${owner}/${repo}`)
             .setDescription(
                 data.map(({ html_url, sha, commit: { message }, committer: { login, html_url: c_url } }) => {
