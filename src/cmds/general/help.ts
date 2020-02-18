@@ -41,8 +41,12 @@ export = class extends GeneralCommand {
                 const cat = handler.findCategory(q);
                 out = out
                     .setDescription(`The following command(s) belong to the **${cat.id}** category :`)
-                cat.forEach(({ description, aliases: [call] }) => out = (out as MessageEmbed).addField(
-                    `\`${prefix}${call}\``,
+                cat.forEach(({ description, aliases: [call, ...calls] }) => out = (out as MessageEmbed).addField(
+                    `\`${prefix}${call}\`${
+                        calls.length
+                        ? ` (${calls.map(a => `\`${prefix}${a}\``).join(', ')})`
+                        : ''
+                    }`,
                     description || 'No description specified.'
                 ))
             }
