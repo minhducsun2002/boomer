@@ -3,7 +3,7 @@ import { GeneralCommand } from './baseCommand';
 import Bot from '../..'
 
 const commandName = 'info';
-const aliases = [commandName];
+const aliases = [commandName, 'i'];
 
 export = class extends GeneralCommand {
     constructor() {
