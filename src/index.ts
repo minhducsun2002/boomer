@@ -10,7 +10,7 @@ import './db/';
 
 const instanceIdLength = +cfg.get('instanceIdLength') || 4;
 
-const owner = cfg.get('owner')
+const owner = cfg.get('owner'), p = cfg.get('prefix');
 
 class Bot extends AkairoClient {
     constructor() {
@@ -21,6 +21,8 @@ class Bot extends AkairoClient {
     }
 
     private _instanceId = r(256, 32).slice(0, instanceIdLength);
+
+    locked = false;
 
     get instanceId() {
         return this._instanceId
@@ -34,7 +36,7 @@ class Bot extends AkairoClient {
 
     cmdHandler = new CommandHandler(this, {
         blockBots: false,
-        prefix: cfg.get('prefix'),
+        prefix: Array.isArray(p) ? p : [p],
         allowMention: cfg.get('pingAsPrefix') ?? true,
         directory: join(__dirname, 'cmds')
     })
