@@ -2,6 +2,7 @@ import { config } from 'dotenv'; config();
 import { AkairoClient, CommandHandler } from 'discord-akairo';
 import { log } from './lib/logger';
 import { join } from 'path';
+import r from 'csprng';
 
 import cfg from './config';
 import plural from './lib/plural';
@@ -16,6 +17,8 @@ class Bot extends AkairoClient {
         this.cmdHandler.loadAll();
         log.success(`Loaded ${this.cmdHandler.modules.size} module(s).`);
     }
+
+    instanceId = r(256, 32).slice(0, 4);
 
     cmdHandler = new CommandHandler(this, {
         blockBots: false,

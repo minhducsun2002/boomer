@@ -17,6 +17,7 @@
   "dependencies": {
     "@octokit/rest": "^16.43.1",
     "chalk": "^3.0.0",
+    "csprng": "^0.1.2",
     "discord-akairo": "git+https://github.com/discord-akairo/discord-akairo.git#cb458b3a9b8b8fd944dd9c0ebed89268c5cd91f5",
     "discord.js": "git+https://github.com/discordjs/discord.js.git#bbdbc4cfa789383b7b3dbecf5e6b8401ea2dd998",
     "dotenv": "^8.2.0",
@@ -26,6 +27,7 @@
     "timezonecomplete": "^5.11.0"
   },
   "devDependencies": {
+    "@types/csprng": "^0.1.1",
     "@types/mongoose": "^5.5.34",
     "@types/nconf": "^0.10.0",
     "@types/node": "^12.12.17",
