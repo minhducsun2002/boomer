@@ -8,6 +8,8 @@ import cfg from './config';
 import plural from './lib/plural';
 import './db/';
 
+const instanceIdLength = +cfg.get('instanceIdLength') || 4;
+
 const owner = cfg.get('owner')
 
 class Bot extends AkairoClient {
@@ -18,7 +20,17 @@ class Bot extends AkairoClient {
         log.success(`Loaded ${this.cmdHandler.modules.size} module(s).`);
     }
 
-    instanceId = r(256, 32).slice(0, 4);
+    private _instanceId = r(256, 32).slice(0, instanceIdLength);
+
+    get instanceId() {
+        return this._instanceId
+    }
+
+    set instanceId(s: string) {
+        if (typeof s !== 'string') throw new Error(`Instance ID must be string, got ${typeof s}`);
+        if (s.length !== instanceIdLength) throw new Error(`Instance ID must be ${instanceIdLength}, got ${s.length}`);
+        this._instanceId = s;
+    }
 
     cmdHandler = new CommandHandler(this, {
         blockBots: false,
