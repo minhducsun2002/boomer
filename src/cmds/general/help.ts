@@ -43,7 +43,7 @@ export = class extends GeneralCommand {
                     .setDescription(`The following command(s) belong to the **${cat.id}** category :`)
                 cat.forEach(({ description, aliases: [call] }) => out = (out as MessageEmbed).addField(
                     `\`${prefix}${call}\``,
-                    description
+                    description || 'No description specified.'
                 ))
             }
             else if (handler.findCommand(q)) {
