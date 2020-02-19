@@ -24,7 +24,7 @@ export = class extends OwnerCommand {
             c.locked = !c.locked;
             m.channel.send(`This instance is now ${c.locked ? 'locked' : 'unlocked'}. Call \`${
                 (this.handler.prefix as string[])[0]
-            }${commandName} ${c.instanceId}\` again to ${c.locked ? 'unlock' : 'lock'}`)
+            }${commandName} ${c.instanceId}\` again to ${c.locked ? 'unlock' : 'lock'}.`)
         }
     }
 }
