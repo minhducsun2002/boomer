@@ -13,7 +13,7 @@ export = class extends GeneralCommand {
         })
     }
 
-    async exec(m : Message) {
+    async exec({ guild, channel } : Message) {
         const [r, u] = process.env.npm_package_repository_url.split('/').filter(a=>a).reverse()
 
         const { instanceId, user, ownerID, users } = this.client as Bot;
@@ -21,7 +21,7 @@ export = class extends GeneralCommand {
         const out = new MessageEmbed()
             .setTitle(`Hello, I am ${user.username}!`)
             .setDescription(
-                `${user.username === m.guild.me.nickname ? '' : `_looks like someone named me ${user} instead_\n`}` +
+                `${(guild.me.nickname && (user.username !== guild.me.nickname)) ? `_looks like someone named me ${user} instead_\n` : ''}` +
                 [
                     `I'm currently being maintained by ${owner.username}#${owner.discriminator}. Call him if you need anything. :wink:`,
                     `You may want to type \`b!help\` if you wish to know what I can do.`,
@@ -30,6 +30,6 @@ export = class extends GeneralCommand {
             )
             .setTimestamp()
             .setFooter(`Instance ID : ${instanceId}`)
-        m.channel.send('', out)
+        channel.send('', out)
     }
 }
