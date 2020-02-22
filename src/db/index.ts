@@ -3,5 +3,7 @@ mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
 
-import * as _FGO from './fgo';
+import _FGO = require('./fgo')
 export const FGO = _FGO;
+import _AL = require('./al')
+export const AL = _AL
