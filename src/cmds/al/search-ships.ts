@@ -11,7 +11,7 @@ export = class extends AlCommand {
     constructor() {
         super(commandName, {
             aliases,
-            description: `Search for ships`,
+            description: `Search for ships. There might be duplicates - that is how the game treats LBs`,
             args: [{
                 id: 'query',
                 match: 'rest',
@@ -36,7 +36,7 @@ export = class extends AlCommand {
             .setTimestamp()
             .setDescription(
                 r.slice(0, MAX)
-                    .map(({ name, english_name, id }) => `\`${id}\` **${name}** (${english_name})`)
+                    .map(({ name, english_name, id, star }) => `\`${id}\` ${star} :star: **${name}** (${english_name})`)
                     .join('\n')
             )
             .setColor(SUCCESS_COLOR)

@@ -15,6 +15,8 @@ export interface ship_data_statistics {
     id: number;
     /** Base ID of this ship. Maybe ID for the default skin? */
     skin_id: number;
+    /** star, maybe different for each LB? */
+    star: number;
 }
 
 export interface doc extends ship_data_statistics, Document { id: number };
@@ -27,5 +29,6 @@ export const schema : Schema<doc> = new Schema({
     armor_type: Number,
     equipment_proficiency: [Number],
     tag_list: [String],
-    id: Number, skin_id: Number
+    id: Number, skin_id: Number,
+    star: Number
 })
