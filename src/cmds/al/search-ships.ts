@@ -35,7 +35,9 @@ export = class extends AlCommand {
             .setTitle(`Found ${r.length} ship${r.length > 1 ? 's' : ''}.`)
             .setTimestamp()
             .setDescription(
-                r.slice(0, MAX).map(({ name, english_name }) => `**${name}** (${english_name})`).join('\n')
+                r.slice(0, MAX)
+                    .map(({ name, english_name, id }) => `\`${id}\` **${name}** (${english_name})`)
+                    .join('\n')
             )
             .setColor(SUCCESS_COLOR)
         if (r.length > 20)
