@@ -6,3 +6,12 @@ export enum Armor {
 
 /** Equipment proficiency. Should at maximum be 200%, I guess */
 export type Proficiency = number;
+
+/** Ship type ID */
+export type ShipType = number;
+
+/** Group ID (maybe representing one ship) */
+export type Group = number;
+
+/** Ship level */
+export type Level = number;

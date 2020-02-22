@@ -1,6 +1,6 @@
 import { createConnection, Connection, Model } from 'mongoose';
 import { log } from '../../lib/logger';
-import { ship_data_statistics } from './models'
+import { ship_data_statistics, ship_data_by_type, ship_data_template } from './models'
 
 import cfg from '../../config';
 
@@ -19,7 +19,9 @@ locales.forEach(locale => {
 });
 
 const g = (locale: string) => ({
-    ship_data_statistics: connections.get(locale).model(ship_data_statistics.name, ship_data_statistics.schema, ship_data_statistics.name) as Model<ship_data_statistics.doc>   
+    ship_data_statistics: connections.get(locale).model(ship_data_statistics.name, ship_data_statistics.schema, ship_data_statistics.name) as Model<ship_data_statistics.doc>,
+    ship_data_by_type: connections.get(locale).model(ship_data_by_type.name, ship_data_by_type.schema, ship_data_by_type.name) as Model<ship_data_by_type.doc>,
+    ship_data_template: connections.get(locale).model(ship_data_template.name, ship_data_template.schema, ship_data_template.name) as Model<ship_data_template.doc>
 })
 
 export const models = {
@@ -28,5 +30,7 @@ export const models = {
 }
 
 export type interfaces = {
-    ship_data_statistics: ship_data_statistics._interface
+    ship_data_statistics: ship_data_statistics._interface,
+    ship_data_by_type: ship_data_by_type._interface,
+    ship_data_template: ship_data_template._interface
 }
