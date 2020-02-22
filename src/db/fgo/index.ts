@@ -4,6 +4,24 @@ import cfg from '../../config';
 
 function a (s: string) { return `[F/GO] ${s}` }
 
+export const connections = new Map<string, Connection>()
+
+const prefix = 'database:fgo'
+
+const main = createConnection(cfg.get(`${prefix}:main`))
+    .on('open', () => log.success(a(`Successfully connected to main database.`)));
+const master = {
+    NA: createConnection(cfg.get(`${prefix}:masterData:NA`))
+        .on('open', () => log.success(a(`Successfully connected to master (NA) database.`))),
+    JP: createConnection(cfg.get(`${prefix}:masterData:JP`))
+        .on('open', () => log.success(a(`Successfully connected to master (JP) database.`)))
+}
+
+connections
+    .set('main', main)
+    .set('master_NA', master.NA)
+    .set('master_JP', master.JP)
+
 // models
 import { Servant, ServantSchema } from './model';
 import { mstSvtSchema, mstSvtDocument } from './master/mstSvt';
@@ -12,23 +30,7 @@ import { mstAttriRelationSchema, mstAttriRelationDocument } from './master/mstAt
 import { mstQuestSchema, mstQuestDocument } from './master/mstQuest';
 import { mstSpotSchema, mstSpotDocument } from './master/mstSpot';
 import { mstWarSchema, mstWarDocument } from './master/mstWar';
-import { mstSvtCardSchema, mstSvtCard, mstSvtCardDocument } from './master/mstSvtCard';
-
-export const connections = new Map<string, Connection>()
-
-const main = createConnection(cfg.get('database:main'))
-    .on('open', () => log.success(a(`Successfully connected to main database.`)));
-const master = {
-    NA: createConnection(cfg.get('database:masterData:NA'))
-        .on('open', () => log.success(a(`Successfully connected to master (NA) database.`))),
-    JP: createConnection(cfg.get('database:masterData:JP'))
-        .on('open', () => log.success(a(`Successfully connected to master (JP) database.`)))
-}
-
-connections
-    .set('main', main)
-    .set('master_NA', master.NA)
-    .set('master_JP', master.JP)
+import { mstSvtCardSchema,  mstSvtCardDocument } from './master/mstSvtCard';
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
 
