@@ -11,7 +11,8 @@ interface _ {
     id: im['id'][],
     name: im['name'],
     group_type: im['group_type'],
-    star: im['star'][]
+    star: im['star'][],
+    type: im['type']
 }
 export type _interface = _
 
@@ -24,7 +25,15 @@ const l = (l : keyof typeof m) =>
             // group by group ID
             // pushing ship IDs with stars too
             // we don't need map (ID -> star) for now
-            { $group: { _id: "$group_type", name: { $last: "$name" }, id: { $push: "$id" }, star: { $push: "$star" } } },
+            {
+                $group: {
+                    _id: "$group_type",
+                    name: { $last: "$name" },
+                    id: { $push: "$id" },
+                    star: { $push: "$star" },
+                    type: { $last: "$type" }
+                } 
+            },
             // standardizing as schema defined
             { $replaceRoot: { newRoot: { $mergeObjects: [{ group_type: "$_id" }, "$$ROOT"] } } },
             // remove _id

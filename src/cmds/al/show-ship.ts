@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { AlCommand } from './baseCommand';
-import { ship_data_statistics } from '../../lib/al/index';
+import { ship_data_statistics, ship_data_by_type, ship_data_template } from '../../lib/al/index';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import { Armor } from '../../constants/al/strings'
 
@@ -31,8 +31,8 @@ export = class extends AlCommand {
         ).limit(1).exec();
         if (!r.length) return m.channel.send('', err.setDescription(`:frowning: Sorry, nothing matched.`))
         const [{ name, english_name, armor_type, tag_list, id }] = r;
-        let [{ type }] = await q.ship_data_template['en-US']({ id }).exec();
-        const [{ type_name }] = await q.ship_data_by_type['en-US']({ ship_type: type }).exec();
+        let [{ type }] = await ship_data_template.c['en-US']({ id }).exec() as ship_data_template._interface[]
+        const [{ type_name }] = await ship_data_by_type.c['en-US']({ ship_type: type }).exec();
         const out = new MessageEmbed().setColor(SUCCESS_COLOR)
             .setAuthor(type_name)
             .setTitle(`${name} (${english_name})`)
