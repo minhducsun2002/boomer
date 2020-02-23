@@ -15,3 +15,6 @@ export type Group = number;
 
 /** Ship level */
 export type Level = number;
+
+/** Rarity code */
+export type Rarity = number;

@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { AlCommand } from './baseCommand';
-import { ship_data_statistics, ship_data_by_type, ship_data_template } from '../../lib/al/index';
+import { ship_data_statistics, ship_data_by_type, ship_data_template, gametip } from '../../lib/al/';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import { Armor } from '../../constants/al/strings'
 
@@ -31,13 +31,14 @@ export = class extends AlCommand {
             isNaN(+query) ? { name: query } : { group_type: +query }
         ).limit(1).exec() as ship_data_template._interface[]
         if (!r.length) return m.channel.send('', err.setDescription(`:frowning: Sorry, nothing matched.`))
-        const [{ name, type, group_type, star, id }] = r;
+        const [{ name, type, group_type, id }] = r;
         // english name stays the same for all records
         // same with tag_list
-        let [{ english_name, tag_list, armor_type }] = await ship_data_statistics.c["en-US"]({ id: id[0] }).exec()
+        let [{ english_name, tag_list, armor_type, rarity }] = await ship_data_statistics.c["en-US"]({ id: id[0] }).exec()
+        let [{ tip }] = await gametip.c['en-US']({ id: `index_rare${rarity}` });
         const [{ type_name }] = await ship_data_by_type.c['en-US']({ ship_type: type }).exec();
         const out = new MessageEmbed().setColor(SUCCESS_COLOR)
-            .setAuthor(type_name)
+            .setAuthor(`${tip} ${type_name}`)
             .setTitle(`\`${group_type}\` ${name} (${english_name})`)
             .addField(`Tags`, tag_list.map(a => `- ${a}`).join('\n') || 'None', true)
             .addField(`Armour type`, Armor[armor_type], true)

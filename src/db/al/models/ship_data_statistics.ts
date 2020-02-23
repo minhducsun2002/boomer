@@ -1,5 +1,5 @@
 import { Schema, Document } from 'mongoose'
-import { Armor, Proficiency } from '../../../constants/al';
+import { Armor, Proficiency, Rarity } from '../../../constants/al';
 export interface ship_data_statistics {
     /** Ship name */
     name: string;
@@ -17,6 +17,8 @@ export interface ship_data_statistics {
     skin_id: number;
     /** star, maybe different for each LB? */
     star: number;
+    /** rarity code */
+    rarity: Rarity;
 }
 
 export interface doc extends ship_data_statistics, Document { id: number };
@@ -30,5 +32,5 @@ export const schema : Schema<doc> = new Schema({
     equipment_proficiency: [Number],
     tag_list: [String],
     id: Number, skin_id: Number,
-    star: Number
+    star: Number, rarity: Number
 })
