@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { AlCommand } from './baseCommand';
-import { q } from '../../lib/al/index';
+import { ship_data_template, interfaces as i } from '../../lib/al/';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 
 const commandName = 'search-ships';
@@ -25,18 +25,21 @@ export = class extends AlCommand {
         const err = new MessageEmbed().setColor(ERROR_COLOR);
         if (!query) return m.channel.send('', err.setDescription(':frowning: Where is your query?'))
 
-        const r = await q.ship_data_statistics["en-US"]({
+        const r = (await ship_data_template.c["en-US"]({
             name: query
-        }, MAX + 1).exec();
+        }, MAX + 1).exec()) as i['ship_data_template'][]
 
         if (!r.length) return m.channel.send('', err.setDescription(`:frowning: No match found, sorry.`))
 
         const out = new MessageEmbed()
-            .setTitle(`Found ${r.length} ship${r.length > 1 ? 's' : ''}.`)
+            .setTitle(`Found ${Math.min(r.length, MAX)} ship${r.length > 1 ? 's' : ''}.`)
             .setTimestamp()
             .setDescription(
                 r.slice(0, MAX)
-                    .map(({ name, english_name, id, star }) => `\`${id}\` ${star} :star: **${name}** (${english_name})`)
+                    .map(({ name, star, group_type }) => `\`${group_type}\` ${
+                        // star
+                        star.reduce((a, b) => Math.max(a, b))
+                    } :star: **${name}**`)
                     .join('\n')
             )
             .setColor(SUCCESS_COLOR)

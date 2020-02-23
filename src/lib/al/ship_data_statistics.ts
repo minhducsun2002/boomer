@@ -6,10 +6,10 @@ const a: Function = (s: String): String => escape(s.toString()).replace(/\s/i, "
 
 const { models: m } = AL;
 
-type im = i['ship_data_statistics']
+export type _interface = i['ship_data_statistics']
 
 const l = (l : keyof typeof m) =>
-    (opts : Partial<im>, limit : number = 1) => {
+    (opts : Partial<_interface>, limit : number = 1) => {
         let { name, english_name: en } = opts;
         if (name) (opts as any).name = { $regex: name ? a(name) : "", $options: "i" };
         if (en) (opts as any).english_name = { $regex: en ? a(en) : "", $options: "i" }

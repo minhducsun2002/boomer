@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { AlCommand } from './baseCommand';
-import { q } from '../../lib/al/index';
+import { ship_data_statistics } from '../../lib/al/index';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import { Armor } from '../../constants/al/strings'
 
@@ -26,7 +26,7 @@ export = class extends AlCommand {
 
         if (!query) return m.channel.send('', err.setDescription(':frowning: Where is your query?'))
 
-        const r = await q.ship_data_statistics['en-US'](
+        const r = await ship_data_statistics.c['en-US'](
             isNaN(+query) ? { name: query } : { id: +query }
         ).limit(1).exec();
         if (!r.length) return m.channel.send('', err.setDescription(`:frowning: Sorry, nothing matched.`))

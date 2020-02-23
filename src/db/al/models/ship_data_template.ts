@@ -11,6 +11,8 @@ export interface ship_data_template {
     group_type: Group;
     /** ID of this record */
     id: number;
+    /** Star count */
+    star: number;
 }
 
 export interface doc extends ship_data_template, Document { id: number };
@@ -18,5 +20,5 @@ export interface doc extends ship_data_template, Document { id: number };
 export const name = 'ship_data_template';
 export type _interface = ship_data_template
 export const schema : Schema<doc> = new Schema({
-    name: String, max_level: Number, type: Number, group_type: Number
+    name: String, max_level: Number, type: Number, group_type: Number, star: Number
 })
