@@ -23,13 +23,15 @@ const ll = (l : keyof typeof m) =>
         if (name) (opts as any).name = { $regex: name ? a(name) : "", $options: "i" };
 
         return m[l].ship_data_template.aggregate([
+            // carry out the query on them
+            { $match: opts },
             // group by group ID
             // pushing ship IDs with stars too
             // we don't need map (ID -> star) for now
             {
                 $group: {
                     _id: "$group_type",
-                    name: { $last: "$name" },
+                    name: { $min: "$name" },
                     id: { $push: "$id" },
                     star: { $push: "$star" },
                     type: { $last: "$type" }
@@ -40,9 +42,7 @@ const ll = (l : keyof typeof m) =>
             // remove _id
             { $project: { _id: 0 } },
             // sort star & id for ease
-            { $sort: { star: 1 } }, { $sort: { id: 1 } },
-            // carry out the query on them
-            { $match: opts }
+            { $sort: { star: 1 } }, { $sort: { id: 1 } }
         ]).limit(limit)
 
     }
