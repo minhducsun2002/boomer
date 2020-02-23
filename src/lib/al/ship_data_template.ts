@@ -16,7 +16,8 @@ interface _ {
 }
 export type _interface = _
 
-const l = (l : keyof typeof m) =>
+// special query
+const ll = (l : keyof typeof m) =>
     (opts : Partial<im>, limit : number = 1) => {
         let { name } = opts;
         if (name) (opts as any).name = { $regex: name ? a(name) : "", $options: "i" };
@@ -45,6 +46,20 @@ const l = (l : keyof typeof m) =>
         ]).limit(limit)
 
     }
+
+const l = (l : keyof typeof m) =>
+    (opts : Partial<im>, limit : number = 1) => {
+        let { name } = opts;
+        if (name) (opts as any).name = { $regex: name ? a(name) : "", $options: "i" };
+
+        return m[l].ship_data_template.find(opts).limit(limit)
+
+    }
+
+export const cc = {
+    'en-US': ll('en-US'),
+    'zh-CN': ll('zh-CN')
+}
 
 export const c = {
     'en-US': l('en-US'),

@@ -25,7 +25,7 @@ export = class extends AlCommand {
         const err = new MessageEmbed().setColor(ERROR_COLOR);
         if (!query) return m.channel.send('', err.setDescription(':frowning: Where is your query?'))
 
-        const r = (await ship_data_template.c["en-US"]({
+        const r = (await ship_data_template.cc["en-US"]({
             name: query
         }, MAX + 1).exec()) as i['ship_data_template'][]
 

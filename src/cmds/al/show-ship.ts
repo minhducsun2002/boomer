@@ -26,16 +26,19 @@ export = class extends AlCommand {
 
         if (!query) return m.channel.send('', err.setDescription(':frowning: Where is your query?'))
 
-        const r = await ship_data_statistics.c['en-US'](
-            isNaN(+query) ? { name: query } : { id: +query }
-        ).limit(1).exec();
+        const r = await ship_data_template.cc['en-US'](
+            // group_type since I expose/recognize only group type
+            isNaN(+query) ? { name: query } : { group_type: +query }
+        ).limit(1).exec() as ship_data_template._interface[]
         if (!r.length) return m.channel.send('', err.setDescription(`:frowning: Sorry, nothing matched.`))
-        const [{ name, english_name, armor_type, tag_list, id }] = r;
-        let [{ type }] = await ship_data_template.c['en-US']({ id }).exec() as ship_data_template._interface[]
+        const [{ name, type, group_type, star, id }] = r;
+        // english name stays the same for all records
+        // same with tag_list
+        let [{ english_name, tag_list, armor_type }] = await ship_data_statistics.c["en-US"]({ id: id[0] }).exec()
         const [{ type_name }] = await ship_data_by_type.c['en-US']({ ship_type: type }).exec();
         const out = new MessageEmbed().setColor(SUCCESS_COLOR)
             .setAuthor(type_name)
-            .setTitle(`${name} (${english_name})`)
+            .setTitle(`\`${group_type}\` ${name} (${english_name})`)
             .addField(`Tags`, tag_list.map(a => `- ${a}`).join('\n') || 'None', true)
             .addField(`Armour type`, Armor[armor_type], true)
 
