@@ -26,6 +26,14 @@ spec:
           volumeMounts:
           - name: production
             mountPath: "/app/config"
+          env:
+          - name: DISCORD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: pepper-production-token
+                key: DISCORD_TOKEN
+          - name: NODE_ENV
+            value: production
 
 ---
 
