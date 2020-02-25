@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pepper
+  labels:
+    name: pepper
+    app: pepper
+spec:
+  selector:
+    matchLabels:
+      app: pepper
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pepper
+    spec:
+      volumes:
+        - name: production
+          secret:
+            secretName: pepper-production
+      containers:
+        - name: pepper
+          image: minhducsun2002/pepper:latest
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: production
+            mountPath: "/app/config"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pepper
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
+spec:
+  type: ClusterIP  
+  ports:
+  - name: "pepper"
+    port: 8890
+  selector:
+    app: pepper
