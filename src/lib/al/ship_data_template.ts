@@ -12,7 +12,8 @@ interface _ {
     name: im['name'],
     group_type: im['group_type'],
     star: im['star'][],
-    type: im['type']
+    type: im['type'],
+    english_name: i['ship_data_statistics']['english_name']
 }
 export type _interface = _
 
@@ -25,6 +26,10 @@ const ll = (l : keyof typeof m) =>
         return m[l].ship_data_template.aggregate([
             // carry out the query on them
             { $match: opts },
+            // get record from ship_data_statistics for english name
+            // TODO : searches include prefix
+            { $lookup: { from: "ship_data_statistics", localField: "id", foreignField: "id", as: "stats" } },
+            { $unwind: "$stats" },
             // group by group ID
             // pushing ship IDs with stars too
             // we don't need map (ID -> star) for now
@@ -32,9 +37,10 @@ const ll = (l : keyof typeof m) =>
                 $group: {
                     _id: "$group_type",
                     name: { $min: "$name" },
-                    id: { $push: "$id" },
+                    // id: { $push: "$id" },
                     star: { $push: "$star" },
-                    type: { $last: "$type" }
+                    type: { $last: "$type" },
+                    english_name: { $last: "$stats.english_name" }
                 } 
             },
             // standardizing as schema defined
@@ -42,7 +48,9 @@ const ll = (l : keyof typeof m) =>
             // remove _id
             { $project: { _id: 0 } },
             // sort star & id for ease
-            { $sort: { star: 1 } }, { $sort: { id: 1 } }
+            { $sort: { star: 1 } }, 
+            // { $sort: { id: 1 } }
+            // disable sorting id for now, it is pretty much unneeded
         ]).limit(limit)
 
     }

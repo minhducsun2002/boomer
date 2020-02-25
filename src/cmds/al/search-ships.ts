@@ -36,10 +36,10 @@ export = class extends AlCommand {
             .setTimestamp()
             .setDescription(
                 r.slice(0, MAX)
-                    .map(({ name, star, group_type }) => `\`${group_type}\` ${
+                    .map(({ name, star, group_type, english_name }) => `\`${group_type}\` ${
                         // star
                         star.reduce((a, b) => Math.max(a, b))
-                    } :star: **${name}**`)
+                    } :star: **${name}** (${english_name})`)
                     .join('\n')
             )
             .setColor(SUCCESS_COLOR)
