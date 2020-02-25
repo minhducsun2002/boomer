@@ -17,4 +17,52 @@ export type Group = number;
 export type Level = number;
 
 /** Rarity code */
-export type Rarity = number;
+export enum Rarity {
+    Gray = 2,
+    Blue = 3,
+    Purple = 4,
+    Gold = 5,
+    SSR = 6
+}
+
+
+
+// nations & factions
+// I am hardcoding this, as the game does the same.
+// model/const/nation.lua
+export const NationKey = {
+    [0]: 'word_shipNation_other',
+    [1]: 'word_shipNation_baiYing',
+    [2]: "word_shipNation_huangJia",
+    [3]: "word_shipNation_chongYing",
+    [4]: "word_shipNation_tieXue",
+    [5]: "word_shipNation_dongHuang",
+    [6]: "word_shipNation_saDing",
+    [7]: "word_shipNation_beiLian",
+    [8]: "word_shipNation_ziyou",
+    [9]: "word_shipNation_weixi",
+    [101]: "word_shipNation_np",
+    [102]: "word_shipNation_bili",
+    [103]: "word_shipNation_um",
+    [104]: "word_shipNation_ai",
+    [105]: "word_shipNation_holo"
+}
+
+export const FactionKey = {
+    [0] : "guild_faction_unknown",
+    [1]: "guild_faction_blhx",
+    [2]: "guild_faction_blhx",
+    [3]: "guild_faction_cszz",
+    [4]: "guild_faction_cszz",
+    [5]: "guild_faction_blhx",
+    [6]: "guild_faction_cszz",
+    [7]: "guild_faction_blhx",
+    [8]: "guild_faction_blhx",
+    [9]: "guild_faction_cszz",
+    [101] : "guild_faction_unknown",
+    [102] : "guild_faction_unknown",
+    [103] : "guild_faction_unknown",
+    [104] : "guild_faction_unknown",
+    [105] : "guild_faction_unknown"
+
+}
