@@ -13,6 +13,9 @@ export type ShipType = number;
 /** Group ID (maybe representing one ship) */
 export type Group = number;
 
+/** Numeric code shown to users, I think? */
+export type code = number;
+
 /** Ship level */
 export type Level = number;
 
