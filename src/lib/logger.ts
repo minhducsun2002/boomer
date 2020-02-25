@@ -18,6 +18,8 @@ export class log {
     }
 
     private static log(s: string) {
-        console.log(`[${new Date().toJSON()}] ${s}`)
+        let _ = s.split('\n'), d = `[${new Date().toJSON()}]`; 
+        console.log(`${d} | ${_[0]}`);
+        _.slice(1).forEach(a => console.log(`${' '.repeat(d.length)} | ${a}`))
     }
 }
