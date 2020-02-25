@@ -37,7 +37,7 @@ const ll = (l : keyof typeof m) =>
                 $group: {
                     _id: "$group_type",
                     name: { $min: "$name" },
-                    // id: { $push: "$id" },
+                    id: { $push: "$id" },
                     star: { $push: "$star" },
                     type: { $last: "$type" },
                     english_name: { $last: "$stats.english_name" }
@@ -49,8 +49,7 @@ const ll = (l : keyof typeof m) =>
             { $project: { _id: 0 } },
             // sort star & id for ease
             { $sort: { star: 1 } }, 
-            // { $sort: { id: 1 } }
-            // disable sorting id for now, it is pretty much unneeded
+            { $sort: { id: 1 } }
         ]).limit(limit)
 
     }
