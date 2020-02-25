@@ -3,5 +3,5 @@ import { join } from 'path';
 
 export default file(join(
     join(process.cwd(), 'config'),
-    (process.env.NODE_ENV ?? 'development') + '.json'
+    (process.env.NODE_ENV ?? 'production') + '.json'
 ))
