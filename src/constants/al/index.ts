@@ -80,3 +80,9 @@ export const FactionKey = {
     [105] : "guild_faction_unknown"
 
 }
+
+export const ArmorKey = {
+    [Armor.HEAVY]: 'word_heavyarmor',
+    [Armor.LIGHT]: 'word_lightArmor',
+    [Armor.MEDIUM]: 'word_mediumArmor',
+}

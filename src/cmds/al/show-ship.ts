@@ -2,8 +2,8 @@ import { Message, MessageEmbed } from 'discord.js';
 import { AlCommand } from './baseCommand';
 import { ship_data_statistics, ship_data_by_type, ship_data_template, gametip, ship_data_group } from '../../lib/al/';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import { Armor } from '../../constants/al/strings';
-import { NationKey, FactionKey } from '../../constants/al'
+import { NationKey, FactionKey, ArmorKey } from '../../constants/al';
+import { chunk } from '../../lib/chunk';
 
 const commandName = 'show-ship';
 const aliases = [commandName, 'sh'];
@@ -43,33 +43,52 @@ export = class extends AlCommand {
             [{ tip: faction }],
             [{ type_name }],
             [{ code, description }],
-            [{ tip: rarity }]
+            [{ tip: rarity }],
+            [{ tip: armorType }]
         ] = await Promise.all([
             gametip.c['en-US']({ id: NationKey[nationality] }).exec(),
             gametip.c['en-US']({ id: FactionKey[nationality] }).exec(),
             ship_data_by_type.c['en-US']({ ship_type: type }).exec(),
             ship_data_group.c['en-US']({ group_type }).exec(),
-            gametip.c['en-US']({ id: `index_rare${_rare}` }).exec()
+            gametip.c['en-US']({ id: `index_rare${_rare}` }).exec(),
+            gametip.c['en-US']({ id: ArmorKey[armor_type] }).exec()
         ])
 
-        const bases = (await Promise.all(id.map(
-            id => ship_data_statistics.c['en-US']({ id }).select(`attrs star`).exec()
-        ))).map(([a]) => a).sort((a, b) => a.star - b.star)
+        // ship with smallest ID always has smallest star
+        const [{ attrs: [hp, fp, trp, aa, av, rld, _, acc, eva, spd, luk, asw], star }] =
+            await ship_data_statistics.c['en-US']({ id: Math.min(...id) }).select('star attrs').exec()
+
+        // prepare output
+        let __ = [
+            ['Health', hp], ['Firepower', fp], ['Torpedo', trp], ['Anti-air', aa],
+            ['Aviation', av], ['Reload', rld], ['Accuracy', acc], ['Evasion', eva],
+            ['Speed', spd], ['Luck', luk], ['Anti-sub', asw]
+        ]
+        let maxLabel = Math.max(...__.map(([a] : [string]) => a.length)),
+            maxValue = Math.max(...__.map(([a, b] : [string, number]) => `${b}`.length))
+
 
         const out = new MessageEmbed().setColor(SUCCESS_COLOR)
             .setAuthor(`${rarity} ${type_name}`)
             .setTitle(`\`${group_type}\` ${code}. ${english_name} - ${cn}`)
             .addField(`Nation`, `${faction}/${nation}`, true)
-            .addField(`Armour type`, Armor[armor_type], true)
+            .addField(`Armour type`, armorType, true)
             .addField(`Obtainable through`, description.slice(0).map(([a]) => `- ${a}`).join('\n'))
             .addField(
-                `Base stats`,
-                bases.map(
-                    ({ attrs: [hp, fp, trp, aa, av, rld, _, acc, eva, spd, luk, asw], star }) => 
-                        `${star}★ \`HP\`**${hp}** \`FP\`**${fp}** \`TRP\`**${trp}** \`AA\`**${aa}**`
-                        + ` \`AV\`**${av}** \`RLD\`**${rld}** \`ACC\`**${acc}** \`EVA\`**${eva}**`
-                        + ` \`SPD\`**${spd}** \`LUK\`**${luk}** \`ASW\`**${asw}**`
+                `Base stats (${star}★)`,
+                '```'
+                + chunk(
+                    __.map(([label, value] : [string, number]) => [
+                        `${label}${' '.repeat(maxLabel - label.length)}`,
+                        `${' '.repeat(maxValue - `${value}`.length)}${value}`
+                    ]),
+                    3
+                ).map(
+                    record => record
+                        .map(([l, v]) => `${l} : ${v}`)
+                        .join(' | ')
                 ).join('\n')
+                + '```'
             )
             // .addField(`Tags`, tag_list.map(a => `- ${a}`).join('\n') || 'None', true)
 
