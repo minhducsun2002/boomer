@@ -52,12 +52,25 @@ export = class extends AlCommand {
             gametip.c['en-US']({ id: `index_rare${_rare}` }).exec()
         ])
 
+        const bases = (await Promise.all(id.map(
+            id => ship_data_statistics.c['en-US']({ id }).select(`attrs star`).exec()
+        ))).map(([a]) => a).sort((a, b) => a.star - b.star)
+
         const out = new MessageEmbed().setColor(SUCCESS_COLOR)
             .setAuthor(`${rarity} ${type_name}`)
             .setTitle(`\`${group_type}\` ${code}. ${english_name} - ${cn}`)
             .addField(`Nation`, `${faction}/${nation}`, true)
             .addField(`Armour type`, Armor[armor_type], true)
             .addField(`Obtainable through`, description.slice(0).map(([a]) => `- ${a}`).join('\n'))
+            .addField(
+                `Base stats`,
+                bases.map(
+                    ({ attrs: [hp, fp, trp, aa, av, rld, _, acc, eva, spd, luk, asw], star }) => 
+                        `${star}★ \`HP\`**${hp}** \`FP\`**${fp}** \`TRP\`**${trp}** \`AA\`**${aa}**`
+                        + ` \`AV\`**${av}** \`RLD\`**${rld}** \`ACC\`**${acc}** \`EVA\`**${eva}**`
+                        + ` \`SPD\`**${spd}** \`LUK\`**${luk}** \`ASW\`**${asw}**`
+                ).join('\n')
+            )
             // .addField(`Tags`, tag_list.map(a => `- ${a}`).join('\n') || 'None', true)
 
         m.channel.send(out);

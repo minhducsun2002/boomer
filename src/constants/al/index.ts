@@ -28,7 +28,18 @@ export enum Rarity {
     SSR = 6
 }
 
-
+/** stats */
+export type HP = number; 
+export type FP = number;
+export type TRP = number;
+export type AA = number;
+export type AV = number;
+export type RLD = number;
+export type ACC = number;
+export type EVA = number;
+export type SPD = number;
+export type LUK = number;
+export type ASW = number;
 
 // nations & factions
 // I am hardcoding this, as the game does the same.

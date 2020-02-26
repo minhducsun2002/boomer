@@ -1,5 +1,7 @@
 import { Schema, Document } from 'mongoose'
-import { Armor, Proficiency, Rarity, NationKey } from '../../../constants/al';
+import { Armor, Proficiency, Rarity, NationKey,
+    HP, FP, LUK, TRP, AA, AV, RLD, ACC, EVA, SPD, ASW
+} from '../../../constants/al';
 export interface ship_data_statistics {
     /** Ship name */
     name: string;
@@ -21,6 +23,8 @@ export interface ship_data_statistics {
     rarity: Rarity;
     /** nationality */
     nationality: keyof typeof NationKey;
+    /** Stats */
+    attrs: [HP, FP, TRP, AA, AV, RLD, number, ACC, EVA, SPD, LUK, ASW]
 }
 
 export interface doc extends ship_data_statistics, Document { id: number };
@@ -34,5 +38,6 @@ export const schema : Schema<doc> = new Schema({
     equipment_proficiency: [Number],
     tag_list: [String],
     id: Number, skin_id: Number,
-    star: Number, rarity: Number, nationality: Number
+    star: Number, rarity: Number, nationality: Number,
+    attrs: [Number]
 })
