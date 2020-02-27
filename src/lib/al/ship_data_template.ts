@@ -13,7 +13,7 @@ interface _ {
     group_type: im['group_type'],
     star: im['star'][],
     type: im['type'],
-    english_name: i['ship_data_statistics']['english_name']
+    english_name: i['ship_data_statistics']['english_name'][]
 }
 export type _interface = _
 
@@ -21,13 +21,24 @@ export type _interface = _
 const ll = (l : keyof typeof m) =>
     (opts : Partial<im>, limit : number = 1) => {
         let { name } = opts;
-        if (name) (opts as any).name = { $regex: name ? a(name) : "", $options: "i" };
+        if (name) {
+            delete opts.name;
+            (opts as any) = {
+                $and: [
+                    {
+                        $or: [{
+                            name: { $regex: a(name), $options: "i" },
+                        }, {
+                            english_name: { $regex: a(name), $options: "i" }
+                        }]
+                    },
+                    opts
+                ]
+            }
+        }
 
         return m[l].ship_data_template.aggregate([
-            // carry out the query on them
-            { $match: opts },
             // get record from ship_data_statistics for english name
-            // TODO : searches include prefix
             { $lookup: { from: "ship_data_statistics", localField: "id", foreignField: "id", as: "stats" } },
             { $unwind: "$stats" },
             // group by group ID
@@ -40,16 +51,17 @@ const ll = (l : keyof typeof m) =>
                     id: { $push: "$id" },
                     star: { $push: "$star" },
                     type: { $last: "$type" },
-                    english_name: { $last: "$stats.english_name" }
+                    english_name: { $push: "$stats.english_name" }
                 } 
             },
+            { $match: opts },
             // standardizing as schema defined
             { $replaceRoot: { newRoot: { $mergeObjects: [{ group_type: "$_id" }, "$$ROOT"] } } },
             // remove _id
             { $project: { _id: 0 } },
             // sort star & id for ease
             { $sort: { star: 1 } }, 
-            { $sort: { id: 1 } }
+            { $sort: { id: 1 } },
         ]).limit(limit)
 
     }
