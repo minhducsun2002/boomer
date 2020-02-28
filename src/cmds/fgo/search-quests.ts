@@ -31,7 +31,7 @@ export = class extends FgoCommand {
                 : `:frowning: Where's your query?`
             )
         if (!q) return m.channel.send(err);
-        const data = await c.mstQuest({ name: q }).NA.limit(20).select('name id').exec();
+        const data = await c.mstQuest({ name: q }).NA.limit(MAX).select('name id').exec();
         if (!data.length) return m.channel.send(err);
         m.channel.send(
             new MessageEmbed()
