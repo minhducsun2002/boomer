@@ -31,25 +31,23 @@ import { mstQuestSchema, mstQuestDocument } from './master/mstQuest';
 import { mstSpotSchema, mstSpotDocument } from './master/mstSpot';
 import { mstWarSchema, mstWarDocument } from './master/mstWar';
 import { mstSvtCardSchema,  mstSvtCardDocument } from './master/mstSvtCard';
+import { mstSvtCommentSchema,  mstSvtCommentDocument } from './master/mstSvtComment';
+import { mstSvtSkillSchema,  mstSvtSkillDocument } from './master/mstSvtSkill';
+import { mstSkillDetailSchema,  mstSkillDetailDocument } from './master/mstSkillDetail';
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
 
-export const NA = {
-    mstSvt: master.NA.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
-    mstClass: master.NA.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
-    mstAttriRelation: master.NA.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
-    mstQuest: master.NA.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
-    mstSpot: master.NA.model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
-    mstWar: master.NA.model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
-    mstSvtCard: master.NA.model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>
-}
+const _ = (s : keyof typeof master) => ({
+    mstSvt: master[s].model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
+    mstClass: master[s].model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
+    mstAttriRelation: master[s].model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
+    mstQuest: master[s].model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
+    mstSpot: master[s].model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
+    mstWar: master[s].model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
+    mstSvtCard: master[s].model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>,
+    mstSvtComment: master[s].model('mstSvtComment', mstSvtCommentSchema, 'mstSvtComment') as Model<mstSvtCommentDocument>,
+    mstSvtSkill: master[s].model('mstSvtSkill', mstSvtSkillSchema, 'mstSvtSkill') as Model<mstSvtSkillDocument>,
+    mstSkillDetail: master[s].model('mstSkillDetail', mstSkillDetailSchema, 'mstSkillDetail') as Model<mstSkillDetailDocument>
+})
 
-export const JP = {
-    mstSvt: master.JP.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
-    mstClass: master.JP.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
-    mstAttriRelation: master.JP.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
-    mstQuest: master.JP.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
-    mstSpot: master.JP.model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
-    mstWar: master.JP.model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
-    mstSvtCard: master.NA.model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>
-}
+export const NA = _('NA'), JP = _('JP')
