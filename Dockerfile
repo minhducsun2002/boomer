@@ -2,7 +2,10 @@ FROM node:13.8.0-alpine3.11
 
 WORKDIR /app
 
-COPY . /app
+COPY package.json .
+COPY tsconfig.json .
+COPY src/ src/
+
 RUN apk add --no-cache git
 RUN npm install
 RUN npm run build
