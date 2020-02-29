@@ -34,19 +34,3 @@ spec:
                 key: DISCORD_TOKEN
           - name: NODE_ENV
             value: production
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: pepper
-  annotations:
-    dev.okteto.com/auto-ingress: "true"
-spec:
-  type: ClusterIP  
-  ports:
-  - name: "pepper"
-    port: 8890
-  selector:
-    app: pepper
