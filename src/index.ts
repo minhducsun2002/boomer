@@ -11,6 +11,13 @@ import './db/';
 const instanceIdLength = +cfg.get('instanceIdLength') || 4;
 
 const owner = cfg.get('owner'), p = cfg.get('prefix'), dev = process.env.NODE_ENV === 'development';
+let prefixes : string[] = [];
+
+// compute all prefixes
+for (let key in p) {
+    let _ : string[] = p[key];
+    prefixes = prefixes.concat(..._);
+}
 
 class Bot extends AkairoClient {
     constructor() {
@@ -45,7 +52,7 @@ class Bot extends AkairoClient {
 
     cmdHandler = new CommandHandler(this, {
         blockBots: false,
-        prefix: Array.isArray(p) ? p : [p],
+        prefix: prefixes,
         allowMention: cfg.get('pingAsPrefix') ?? true,
         directory: join(__dirname, 'cmds')
     })
