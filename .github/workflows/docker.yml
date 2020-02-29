@@ -2,6 +2,7 @@ name: Build Docker image
 on: [push]
 jobs:
   build:
+    name: Build image
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
