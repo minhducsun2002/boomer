@@ -42,22 +42,26 @@ export = class extends GeneralCommand {
                 const cat = handler.findCategory(q);
                 out = out
                     .setDescription(`The following command(s) belong to the **${cat.id}** category :`)
-                cat.forEach(({ description, aliases: [call, ...calls] }) => out = (out as MessageEmbed).addField(
-                    `\`${prefix}${call}\`${
-                        calls.length
-                        ? ` (${calls.map(a => `\`${prefix}${a}\``).join(', ')})`
-                        : ''
-                    }`,
-                    description || 'No description specified.'
-                ))
+                cat.forEach(({ description, aliases: [call, ...calls], prefix: _p }) => {
+                    let __ = _p ?? prefix;
+                    return out = (out as MessageEmbed).addField(
+                        `\`${__}${call}\`${
+                            calls.length
+                            ? ` (${calls.map(a => `\`${__}${a}\``).join(', ')})`
+                            : ''
+                        }`,
+                        description || 'No description specified.'
+                    );
+                })
             }
             else if (handler.findCommand(q)) {
                 const cmd = handler.findCommand(q) as BotCommand;
-                const mainCall = `${prefix}${cmd.aliases[0]}`, args = (cmd.args as ArgumentOptions[])
+                let _p = cmd.prefix ?? prefix;
+                const mainCall = `${_p}${cmd.aliases[0]}`, args = (cmd.args as ArgumentOptions[])
                 out = out
                     .setTitle(`\`${mainCall}\`${
                         (cmd.aliases.length > 1)
-                        ? `\n(${cmd.aliases.slice(1).map(a => `\`${prefix}${a}\``).join(', ')})`
+                        ? `\n(${cmd.aliases.slice(1).map(a => `\`${_p}${a}\``).join(', ')})`
                         : ''
                     }`)
                     .setDescription(cmd.description)
