@@ -91,10 +91,10 @@ export = class extends FgoCommand {
                 + `\n- Extra : 1 / ${dmg[Card.EXTRA - 1].join('-')}`,
                 true
             )
-            .addBlankField()
+            .addField('\u200b', '\u200b')
             .addField('NP generation', `- Per hit : ${npPerATK}\n- When attacked : ${npPerHit}`, true)
             .addField('Critical stars', `- Star weighting : ${starAbsorption}\n- Star generation : ${(starGen / 10).toFixed(1)}%`, true)
-            .addBlankField()
+            .addField('\u200b', '\u200b')
             .addField('Traits', traits.join(', '), true)
             .addField(
                 'Gender / Attribute / Alignment', 
@@ -107,7 +107,7 @@ export = class extends FgoCommand {
                 relateQuestIds.map(a => `\`${a}\``).join(', ') || 'None',
                 true
             )
-            .addBlankField()
+            .addField('\u200b', '\u200b')
             .addField(
                 'Active skill',
                 activeSkill.map(a => {
@@ -123,7 +123,7 @@ export = class extends FgoCommand {
                 'Passive skill',
                 passiveSkill.map(({ name, detail, rank }) => `**${name}** [__${rank}__]\n${detail}`).join('\n\n')
             )
-            .addBlankField()
+            .addField('\u200b', '\u200b')
             .addField(
                 'Noble Phantasm ' + (npUpgradesCount > 1 ? `(${npUpgradesCount} upgrade${plural(npUpgradesCount)})` : ''),
                 `**${npName}** __${npRank}__ (${npClass})`

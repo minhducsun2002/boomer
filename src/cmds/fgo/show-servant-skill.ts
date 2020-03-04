@@ -55,7 +55,7 @@ export = class extends FgoCommand {
             .setTitle('Active skills')
         
         activeSkill.forEach((skillArray, i) => {
-            if (i) embed = embed.addBlankField()
+            if (i) embed = embed.addField('\u200b', '\u200b')
             skillArray.forEach(({ name, rank, detail, condition, records, cooldown }) => {
                 embed = embed.addField(
                     `**${name}** __[${rank}]__ (${
