@@ -23,6 +23,7 @@
     "dotenv": "^8.2.0",
     "escape-string-regexp": "^2.0.0",
     "mongoose": "^5.7.11",
+    "mongoose-cache": "^0.1.5",
     "nconf": "^0.10.0",
     "timezonecomplete": "^5.11.0"
   },

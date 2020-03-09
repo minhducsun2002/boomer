@@ -6,7 +6,9 @@ export type _interface = i['gametip']
 
 const l = (l : keyof typeof m) =>
     (opts : Partial<_interface>, limit : number = 1) => {
-        return m[l].gametip.find(opts).limit(limit) 
+        let _ = m[l].gametip.find(opts).limit(limit);
+        type out = typeof _;
+        return (_ as any).cache() as out;
     }
 
 export const c = {

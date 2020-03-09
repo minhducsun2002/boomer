@@ -1,4 +1,8 @@
 import mongoose from 'mongoose';
+
+// let's patch
+require('mongoose-cache').install(mongoose, { max: 50, maxAge: 1000 * 45 }, mongoose.Aggregate)
+
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);

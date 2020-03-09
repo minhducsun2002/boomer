@@ -37,7 +37,7 @@ const ll = (l : keyof typeof m) =>
             }
         }
 
-        return m[l].ship_data_template.aggregate([
+        let __ = m[l].ship_data_template.aggregate([
             // get record from ship_data_statistics for english name
             { $lookup: { from: "ship_data_statistics", localField: "id", foreignField: "id", as: "stats" } },
             { $unwind: "$stats" },
@@ -63,6 +63,7 @@ const ll = (l : keyof typeof m) =>
             { $sort: { star: 1 } }, 
             { $sort: { id: 1 } },
         ]).limit(limit)
+        return (__ as any).cache() as typeof __
 
     }
 
@@ -72,7 +73,6 @@ const l = (l : keyof typeof m) =>
         if (name) (opts as any).name = { $regex: name ? a(name) : "", $options: "i" };
 
         return m[l].ship_data_template.find(opts).limit(limit)
-
     }
 
 export const cc = {
