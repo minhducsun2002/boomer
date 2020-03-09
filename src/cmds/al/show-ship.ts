@@ -4,6 +4,7 @@ import { ship_data_statistics, ship_data_by_type, ship_data_template, gametip, s
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import { NationKey, FactionKey, ArmorKey } from '../../constants/al';
 import { chunk } from '../../lib/chunk';
+import { ALEmotes as _e } from '../../config/al';
 
 const commandName = 'show-ship';
 const aliases = [commandName, 'sh'];
@@ -58,16 +59,6 @@ export = class extends AlCommand {
         const [{ attrs: [hp, fp, trp, aa, av, rld, _, acc, eva, spd, luk, asw], star }] =
             await ship_data_statistics.c['en-US']({ id: Math.min(...id) }).select('star attrs').exec()
 
-        // prepare output
-        let __ = [
-            ['Health', hp], ['Firepower', fp], ['Torpedo', trp], ['Anti-air', aa],
-            ['Aviation', av], ['Reload', rld], ['Accuracy', acc], ['Evasion', eva],
-            ['Speed', spd], ['Luck', luk], ['Anti-sub', asw]
-        ]
-        let maxLabel = Math.max(...__.map(([a] : [string]) => a.length)),
-            maxValue = Math.max(...__.map(([a, b] : [string, number]) => `${b}`.length))
-
-
         const out = new MessageEmbed().setColor(SUCCESS_COLOR)
             .setAuthor(`${rarity} ${type_name}`)
             .setTitle(`\`${group_type}\` ${code}. ${english_name} - ${cn}`)
@@ -76,19 +67,10 @@ export = class extends AlCommand {
             .addField(`Obtainable through`, description.slice(0).map(([a]) => `- ${a}`).join('\n'))
             .addField(
                 `Base stats (${star}★)`,
-                '```'
-                + chunk(
-                    __.map(([label, value] : [string, number]) => [
-                        `${label}${' '.repeat(maxLabel - label.length)}`,
-                        `${' '.repeat(maxValue - `${value}`.length)}${value}`
-                    ]),
-                    3
-                ).map(
-                    record => record
-                        .map(([l, v]) => `${l} : ${v}`)
-                        .join(' | ')
-                ).join('\n')
-                + '```'
+                `${_e.duration} ${hp} ${_e.firepower} ${fp} ${_e.torpedo} ${trp}`
+                + ` ${_e.antiAir} ${aa} ${_e.aviation} ${av} ${_e.refill} ${rld}`
+                + ` ${_e.accuracy} ${acc} ${_e.evasion} ${eva} \`SPD\` ${spd}`
+                + ` ${_e.luck} ${luk} ${_e.asw} ${asw}`
             )
             // .addField(`Tags`, tag_list.map(a => `- ${a}`).join('\n') || 'None', true)
 
