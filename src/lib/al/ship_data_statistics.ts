@@ -28,12 +28,19 @@ const l = (l : keyof typeof m) =>
 
 const ll = (l : keyof typeof m) =>
     (opts : Partial<im>, limit : number = 1) => {
-        let { name, english_name: en } = opts;
+        let { name } = opts;
+
+        // name & english_name are ORed
         if (name) (opts as any).name = { $regex: name ? a(name) : "", $options: "i" };
-        if (en) (opts as any).english_name = { $regex: en ? a(en) : "", $options: "i" };
+        let ___ = [opts.name && { name: opts.name }, opts.name && { english_name: opts.name }]
+            .filter(a=>a);
+        delete opts.name, opts.english_name;
+        let out : any = {
+            $and : [opts, (name && { $or: ___ })].filter(a=>a)
+        }
 
         return m[l].ship_data_statistics.aggregate([
-            { $match: opts },
+            { $match: out },
             { $lookup: { from: "ship_data_template", localField: "id", foreignField: "id", as: "t" } },
             { $unwind: "$t" },
             { 
@@ -47,7 +54,7 @@ const ll = (l : keyof typeof m) =>
                 } 
             },
             { $replaceRoot: { newRoot: { $mergeObjects: [{ group_type: "$_id" }, "$$ROOT"] } } }
-        ])
+        ]).limit(limit)
     }
 
 export const c = {

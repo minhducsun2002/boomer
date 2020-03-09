@@ -27,6 +27,8 @@ export = class extends AlCommand {
 
         const r = (await ship_data_statistics.cc["en-US"]({
             name: query
+            // single query
+            // cc() will handle this
         }, MAX + 1).exec()) as i['ship_data_template'][]
 
         if (!r.length) return m.channel.send('', err.setDescription(`:frowning: No match found, sorry.`))
