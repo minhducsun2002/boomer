@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 // let's patch
-require('mongoose-cache').install(mongoose, { max: 50, maxAge: 1000 * 45 }, mongoose.Aggregate)
+// 30 days?
+require('mongoose-cache').install(mongoose, { max: 300, maxAge: 1000 * 60 * 60 * 30 }, mongoose.Aggregate)
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);

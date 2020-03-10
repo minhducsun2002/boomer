@@ -72,7 +72,8 @@ const l = (l : keyof typeof m) =>
         let { name } = opts;
         if (name) (opts as any).name = { $regex: name ? a(name) : "", $options: "i" };
 
-        return m[l].ship_data_template.find(opts).limit(limit)
+        let _ = m[l].ship_data_template.find(opts).limit(limit);
+        return (_ as any).cache() as typeof _;
     }
 
 export const cc = {

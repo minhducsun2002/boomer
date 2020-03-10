@@ -35,11 +35,9 @@ const ll = (l : keyof typeof m) =>
         let ___ = [opts.name && { name: opts.name }, opts.name && { english_name: opts.name }]
             .filter(a=>a);
         delete opts.name, opts.english_name;
-        let out : any = {
-            $and : [opts, (name && { $or: ___ })].filter(a=>a)
-        }
+        let out : any = { $and : [opts, (name && { $or: ___ })].filter(a=>a) }
 
-        return m[l].ship_data_statistics.aggregate([
+        let __ = m[l].ship_data_statistics.aggregate([
             { $match: out },
             { $lookup: { from: "ship_data_template", localField: "id", foreignField: "id", as: "t" } },
             { $unwind: "$t" },
@@ -55,6 +53,7 @@ const ll = (l : keyof typeof m) =>
             },
             { $replaceRoot: { newRoot: { $mergeObjects: [{ group_type: "$_id" }, "$$ROOT"] } } }
         ]).limit(limit)
+        return (__ as any).cache() as typeof __;
     }
 
 export const c = {
