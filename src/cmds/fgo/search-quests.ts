@@ -37,7 +37,7 @@ export = class extends FgoCommand {
             new MessageEmbed()
                 .setTitle(`Found ${data.length} quest${p(data.length)}.`)
                 .setDescription(
-                    data.map(({ name, id }) => `\`${id}\` **${name}**`).join('\n')
+                    data.map(({ name, id }) => `\`${id}\` **${name.replace(/\n/g, ' ')}**`).join('\n')
                 )
         )
     }
