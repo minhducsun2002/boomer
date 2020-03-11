@@ -33,8 +33,8 @@ export = class extends FgoCommand {
             
             let out = new MessageEmbed()
                 .setColor(SUCCESS_COLOR)
-                .setTitle(`Found ${Math.min(MAX_QUEST, _.length)} spot${p(_.length)}`)
-                .setDescription(_.map(({ name, id }) => `\`${id}\` **${name}**`).join())
+                .setTitle(`Found ${Math.min(MAX_QUEST, _.length)} spot${p(_.length)}.`)
+                .setDescription(_.map(({ name, id }) => `\`${id}\` **${name}**`).join('\n'))
             m.channel.send(out)
         }
         catch (e) {
