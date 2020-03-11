@@ -27,7 +27,6 @@ export = class extends FgoCommand {
         let [spot] = await c.mstSpot({ id: spotId }).NA.select('name warId').exec();
         let [war] = spot ? await c.mstWar({ id: spot.warId }).NA.select('name').exec() : [null];
         let [consume] = await c.mstQuestConsumeItem({ questId: id }).NA.exec();
-        console.log(await c.mstQuestConsumeItem({ questId: id }).NA.exec())
         let items = consume 
             ? (await Promise.all(consume.itemIds.map(id => {
                 let _ = c.mstItem({ id }).NA;
