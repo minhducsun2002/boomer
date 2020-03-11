@@ -7,7 +7,7 @@ export interface mstItem {
     /** Item desc */
     detail: string;
     /** self-explanatory? */
-    sellQp: number;
+    isSell: boolean; sellQp: number;
     /** timestamps */
     startedAt: number; endedAt: number;
 }
@@ -15,5 +15,7 @@ export interface mstItem {
 export interface mstItemDocument extends Document, mstItem { id: Item }
 
 export const mstItemSchema : Schema<mstItem> = new Schema({
-    id: Number, sellQp: Number, name: String, detail: String, startedAt: Number, endedAt: Number
+    id: Number, sellQp: Number, isSell: Boolean,
+    name: String, detail: String,
+    startedAt: Number, endedAt: Number,
 })
