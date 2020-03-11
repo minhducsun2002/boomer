@@ -25,8 +25,16 @@ export = class extends FgoCommand {
     private async prepare (data: mstQuest) {
         let { id, name, noticeAt, openedAt, closedAt, actConsume, recommendLv, spotId } = data;
         let [spot] = await c.mstSpot({ id: spotId }).NA.select('name warId').exec();
-        let [war] = spot ? await c.mstWar({ id: spot.warId }).NA.select('name').exec() : [null]
-        return new MessageEmbed()
+        let [war] = spot ? await c.mstWar({ id: spot.warId }).NA.select('name').exec() : [null];
+        let [consume] = await c.mstQuestConsumeItem({ questId: id }).NA.exec();
+        console.log(await c.mstQuestConsumeItem({ questId: id }).NA.exec())
+        let items = consume 
+            ? (await Promise.all(consume.itemIds.map(id => {
+                let _ = c.mstItem({ id }).NA;
+                return ((_ as any).cache() as typeof _).select('name id').limit(1).exec()
+            }))).map(([a]) => a)
+            : [];
+        let out =  new MessageEmbed()
             .setColor(SUCCESS_COLOR)
             .setTitle(`${name} (\`${id}\`)`)
             .setDescription(`${actConsume} AP | Recommended level : ${recommendLv}`)
@@ -44,6 +52,13 @@ export = class extends FgoCommand {
                     `\`Closed\`|\`${new Date(closedAt * 1000).toLocaleString()}\``,
                 ].join('\n')
             )
+
+        if (items.length) out.addField(
+            'Consumed items',
+            consume.nums.map((count, i) => `- ${count} × **${items[i].name}** (\`${items[i].id}\`)`).join('\n')
+        )
+        
+        return out;
     }
 
     async exec(m: Message, { q }: a) {

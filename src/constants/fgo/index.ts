@@ -58,4 +58,6 @@ export type War = number;
 /** Spot ID */
 export type Spot = number;
 /** Damage distribution */
-export type DamageDistribution = number[]
+export type DamageDistribution = number[];
+/** Item ID */
+export type Item = number;

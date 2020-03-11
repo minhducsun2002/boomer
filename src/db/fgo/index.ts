@@ -34,6 +34,8 @@ import { mstSvtCardSchema,  mstSvtCardDocument } from './master/mstSvtCard';
 import { mstSvtCommentSchema,  mstSvtCommentDocument } from './master/mstSvtComment';
 import { mstSvtSkillSchema,  mstSvtSkillDocument } from './master/mstSvtSkill';
 import { mstSkillDetailSchema,  mstSkillDetailDocument } from './master/mstSkillDetail';
+import { mstItemSchema,  mstItemDocument } from './master/mstItem';
+import { mstQuestConsumeItemSchema,  mstQuestConsumeItemDocument } from './master/mstQuestConsumeItem';
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
 
@@ -47,7 +49,9 @@ const _ = (s : keyof typeof master) => ({
     mstSvtCard: master[s].model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>,
     mstSvtComment: master[s].model('mstSvtComment', mstSvtCommentSchema, 'mstSvtComment') as Model<mstSvtCommentDocument>,
     mstSvtSkill: master[s].model('mstSvtSkill', mstSvtSkillSchema, 'mstSvtSkill') as Model<mstSvtSkillDocument>,
-    mstSkillDetail: master[s].model('mstSkillDetail', mstSkillDetailSchema, 'mstSkillDetail') as Model<mstSkillDetailDocument>
+    mstSkillDetail: master[s].model('mstSkillDetail', mstSkillDetailSchema, 'mstSkillDetail') as Model<mstSkillDetailDocument>,
+    mstItem: master[s].model('mstItem', mstItemSchema, 'mstItem') as Model<mstItemDocument>,
+    mstQuestConsumeItem: master[s].model('mstQuestConsumeItem', mstQuestConsumeItemSchema, 'mstQuestConsumeItem') as Model<mstQuestConsumeItemDocument>
 })
 
 export const NA = _('NA'), JP = _('JP')

@@ -8,7 +8,9 @@ import { constructQuery as mstSvtCard } from './mstSvtCard';
 import { constructQuery as mstSvtComment } from './mstSvtComment';
 import { constructQuery as mstSvtSkill } from './mstSvtSkill';
 import { constructQuery as mstSkillDetail } from './mstSkillDetail';
+import { constructQuery as mstItem } from './mstItem';
+import { constructQuery as mstQuestConsumeItem } from './mstQuestConsumeItem'
 export const constructQuery = {
     mstClass, mstSvt, mstAttriRelation, mstQuest, mstSpot, mstWar, mstSvtCard, mstSvtComment, mstSvtSkill,
-    mstSkillDetail
+    mstSkillDetail, mstItem, mstQuestConsumeItem
 }
