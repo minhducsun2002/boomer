@@ -17,7 +17,8 @@ export = class extends FgoCommand {
                 id: 'q',
                 match: 'rest'
             }],
-            description: 'View information of a quest.'
+            description: 'View information of a quest.',
+            typing: true
         })
     }
 
