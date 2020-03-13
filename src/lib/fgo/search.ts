@@ -22,7 +22,7 @@ export interface SearchParameters {
  * Sanitize strings.
  * @param s String to sanitize
  */
-const a: Function = (s: String): String => escape(s.toString()).replace(/\s/i, " ");
+const a = (s: String): String => escape(s.toString()).replace(/\s/i, " ");
 
 export { a as sanitize };
 
@@ -74,5 +74,5 @@ export function constructQuery(parameters: SearchParameters, limit: number = 1) 
         ]
     }
 
-    return ServantModel.find(query).limit(limit);
+    return ServantModel.find(query as any).limit(limit);
 }
