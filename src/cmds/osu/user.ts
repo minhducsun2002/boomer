@@ -74,7 +74,7 @@ export = class extends OsuCommand {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
         try {
-            const _ = await axios.get(`https://osu.ppy.sh/u/${encodeURIComponent(user)}`, {  });
+            const _ = await axios.get(`https://osu.ppy.sh/u/${encodeURIComponent(user)}/osu`);
             if (_.status === 404) return m.channel.send(err);
             if (_.status !== 200) throw new Error(`Expected status 200, got status ${_.status}`);
             const dom = cheerio.load(_.data);
