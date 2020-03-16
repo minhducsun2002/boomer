@@ -57,6 +57,8 @@ interface osuUserExtra {
     }[]
 }
 
+const modes = ['osu', 'taiko', 'fruits', 'mania'];
+
 export = class extends OsuCommand {
     constructor() {
         super(commandName, {
@@ -66,15 +68,23 @@ export = class extends OsuCommand {
                 id: 'user',
                 match: 'rest',
                 description: 'Username to search.'
+            }, {
+                id: 'mode',
+                match: 'option',
+                description: 'Gamemode to show. Can be `osu`, `taiko`, `fruits`, `mania`.',
+                flag: ['/']
             }]
         })
     }
 
-    async exec(m : Message, { user } = { user: '' }) {
+    async exec(m : Message, { user, mode } = { user: '', mode: '' }) {
+        user = user.trim();
+        if (!modes.includes(mode)) mode = modes[0];
+        // check mode
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
         try {
-            const _ = await axios.get(`https://osu.ppy.sh/u/${encodeURIComponent(user)}/osu`);
+            const _ = await axios.get(`https://osu.ppy.sh/u/${encodeURIComponent(user)}/${mode}`);
             if (_.status === 404) return m.channel.send(err);
             if (_.status !== 200) throw new Error(`Expected status 200, got status ${_.status}`);
             const dom = cheerio.load(_.data);
@@ -90,29 +100,35 @@ export = class extends OsuCommand {
             } = userdata;
             let [score] : osuUserExtra['scoresBest'] =
                 JSON.parse(dom('#json-extras').contents().first().text()).scoresBest;
-            let { beatmapset, beatmap, perfect, mods } = score,
-                [_w, _d, _h, _m, _s] = [
-                    Math.floor((play_time / (3600 * 24 * 7))),
-                    Math.floor((play_time % (3600 * 24 * 7)) / 86400),
-                    Math.floor((play_time % 86400) / 3600),
-                    Math.floor((play_time % 3600) / 60),
-                    Math.floor(play_time % 60)
-                ]
+            let [_w, _d, _h, _m, _s] = [
+                Math.floor((play_time / (3600 * 24 * 7))),
+                Math.floor((play_time % (3600 * 24 * 7)) / 86400),
+                Math.floor((play_time % 86400) / 3600),
+                Math.floor((play_time % 3600) / 60),
+                Math.floor(play_time % 60)
+            ]
 
-            let { ar, drain, difficulty_rating, accuracy, cs } = beatmap;
             let out = new MessageEmbed()
                 .setTimestamp().setColor(SUCCESS_COLOR)
                 .setTitle(`[${level}] ${username}`)
                 .setURL(`https://osu.ppy.sh/users/${id}`)
                 .setDescription(
-                    `**${pp}**pp (#**${rank.global}** globally | #**${rank.country}** in :flag_${cc.toLowerCase()}:).`
+                    `**${pp}**pp${
+                        rank.global
+                        ? ` (#**${rank.global}** globally | #**${rank.country}** in :flag_${cc.toLowerCase()}:)`
+                        : ``
+                    }.`
                     + `\n Total accuracy : **${(+hit_accuracy).toFixed(3)}%** | Max combo : **${maximum_combo}**x`
                     + `\nJoined ${new Date(join_date).toLocaleString('en-US')}.`
                 )
                 .addField('Scores', `${ranked_score} ranked\n${total_score} total`, true)
                 .addField('Ranks', `**${ssh}** XH | **${ss}** X\n**${sh}** SH | **${s}** S\n**${a}** A`, true)
                 .addField(`Play time`,`${play_count} times | ${_w}w ${_d}d ${_h}h ${_m}m ${_s}s`)
-                .addField(
+            
+            if (score) {
+                let { beatmapset, beatmap, perfect, mods } = score,
+                    { ar, drain, difficulty_rating, accuracy, cs } = beatmap;
+                out.addField(
                     `Best performance`,
                     `[**${score.rank}**] **${score.pp}**pp (**${
                         (score.accuracy * 100).toFixed(3)
@@ -121,11 +137,13 @@ export = class extends OsuCommand {
                     + (mods.length ? `+${mods.join('')}` : '')
                     + `\n${difficulty_rating} :star: - \`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${accuracy}** \`HP\`**${drain}**`
                 )
+            }
 
             if (avatar_url.startsWith(`https://`)) out.setThumbnail(avatar_url);
             m.channel.send(out)
         }
-        catch {
+        catch (e) {
+            console.log(e)
             m.channel.send(err.setDescription(`Sorry, an error occurred.`));
         }
     }
