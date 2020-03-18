@@ -7,7 +7,7 @@ import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors'
 const commandName = 'user';
 const aliases = [commandName, 'u'];
 
-interface osuUser {
+export interface osuUser {
     id: number;
     username: string;
     join_date: ReturnType<Date['toJSON']>;
@@ -33,7 +33,7 @@ interface osuUser {
     }
 }
 
-interface osuUserExtra {
+export interface osuUserExtra {
     scoresBest: {
         id: number;
         user_id: number;
@@ -59,7 +59,7 @@ interface osuUserExtra {
 
 const modes = ['osu', 'taiko', 'fruits', 'mania'];
 
-export = class extends OsuCommand {
+export default class extends OsuCommand {
     constructor() {
         super(commandName, {
             aliases,
@@ -84,7 +84,9 @@ export = class extends OsuCommand {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
         try {
-            const _ = await axios.get(`https://osu.ppy.sh/u/${encodeURIComponent(user)}/${mode}`);
+            const _ = await axios.get(`https://osu.ppy.sh/u/${encodeURIComponent(user)}/${mode}`, {
+                validateStatus: () => true
+            });
             if (_.status === 404) return m.channel.send(err);
             if (_.status !== 200) throw new Error(`Expected status 200, got status ${_.status}`);
             const dom = cheerio.load(_.data);
