@@ -54,7 +54,7 @@ class Bot extends AkairoClient {
         blockBots: false,
         prefix: prefixes,
         allowMention: cfg.get('pingAsPrefix') ?? true,
-        directory: join(__dirname, 'cmds')
+        directory: join(__dirname, 'commands')
     })
 }
 
