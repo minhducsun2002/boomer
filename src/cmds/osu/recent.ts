@@ -6,6 +6,7 @@ import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
 import type { osuUser, osuUserExtra } from './user';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { chunk } from '../../lib/chunk';
+import { log } from '../../lib/logger';
 
 const commandName = 'recent';
 const aliases = [commandName, 'recentplay', 'rp'];
@@ -95,7 +96,6 @@ export = class extends OsuCommand {
                                         + (perfect ? ` (FC)` : '')
                                     + `\n[Link](https://osu.ppy.sh/beatmaps/${beatmap.id}) ([download](https://osu.ppy.sh/beatmaps/${beatmap.id}/download))`
                                 ))
-                                console.log(out.footer)
                                 return out;
                             })
                     )
@@ -109,7 +109,7 @@ export = class extends OsuCommand {
                 )
         }
         catch (e) {
-            console.log(e)
+            log.error(String(e));
             m.channel.send(err.setDescription(`Sorry, an error occurred.`));
         }
     }
