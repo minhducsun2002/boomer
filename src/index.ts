@@ -1,7 +1,8 @@
 import { config } from 'dotenv'; config();
-import { AkairoClient, CommandHandler, InhibitorHandler } from 'discord-akairo';
-import { log } from './lib/logger';
-import { join } from 'path';
+import { AkairoClient, CommandHandler, InhibitorHandler, ArgumentType } from 'discord-akairo';
+import { log, componentLog } from './lib/logger';
+import { highlight } from './lib/highlight';
+import { join, relative } from 'path';
 import r from 'csprng';
 
 import cfg from './config';
@@ -19,18 +20,49 @@ for (let key in p) {
     prefixes = prefixes.concat(..._);
 }
 
+
 class Bot extends AkairoClient {
     constructor() {
         super({ ownerID: Array.isArray(owner) ? owner : [owner] });
-        log.success(`Loaded ${
-            this.cmdHandler.on('load', ({ id }) => log.success(`Loaded module : ${id}`)).loadAll().modules.size
+        // override logger for specific parts
+        const logs = {
+            command : new componentLog('Command', 'ff70ff', '000000'),
+            inhibitor : new componentLog('Inhibitor', '00ffff', '000000'),
+        }
+
+        logs.command.info(`Loading commands from ${highlight.blueBright(this.cmdHandler.directory)}...`)
+        logs.command.info(`Loaded ${
+            this.cmdHandler
+                .on(
+                    'load', 
+                    ({ id, categoryID, filepath, handler: { directory } }) =>
+                        logs.command.success(
+                            `${highlight.bgYellowBright.black(`[${categoryID}]`)} `
+                            + highlight.blueBright(`./${relative(directory, filepath)}`)
+                            + ` -> ${highlight.yellowBright(`${id}`)}`
+                        )
+                )
+                .loadAll()
+                .modules.size
         } commands.`);
-        log.success(`Loaded ${
-            this.inhibitorHandler.on('load', ({ id }) => log.success(`Loaded inhibitor : ${id}`)).loadAll().modules.size
+        logs.inhibitor.success(`Loaded ${
+            this.inhibitorHandler
+                .on(
+                    'load',
+                    ({ id, filepath, handler: { directory } }) => 
+                        logs.inhibitor.success(
+                            highlight.blueBright(`./${relative(directory, filepath)}`)
+                            + ` -> ${highlight.yellowBright(`${id}`)}`
+                        )
+                )
+                .loadAll()
+                .modules.size
         } inhibitor(s).`)
 
         this.cmdHandler.useInhibitorHandler(this.inhibitorHandler);
-        log.success(`Setup command handler to use inhibitors from ${this.inhibitorHandler.directory}.`)
+        log.success(`Setup command handler to use inhibitors from ${
+            highlight.blueBright(this.inhibitorHandler.directory)
+        }.`)
     }
 
     private _instanceId = r(256, 32).slice(0, instanceIdLength);
