@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "module": "commonjs",
+        "lib": ["ES2019.Array"],
         "allowJs": false,
         "alwaysStrict": true,
         "declaration": false,

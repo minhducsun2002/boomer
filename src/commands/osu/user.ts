@@ -57,7 +57,7 @@ export interface osuUserExtra {
     }[]
 }
 
-const modes = ['osu', 'taiko', 'fruits', 'mania'];
+export const modes = ['osu', 'taiko', 'fruits', 'mania'];
 
 export default class extends OsuCommand {
     constructor() {
