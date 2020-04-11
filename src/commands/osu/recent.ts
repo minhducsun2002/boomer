@@ -84,8 +84,8 @@ export = class extends OsuCommand {
                                     .setURL(`https://osu.ppy.sh/users/${id}`)
                                     .setColor(SUCCESS_COLOR)
                                     .setFooter(`Page ${i + 1}/${c.length}`)
-                                s.forEach(({ accuracy, mods, perfect, rank, max_combo, beatmap, beatmapset, pp }) => out.addField(
-                                    `${beatmapset.artist} - ${beatmapset.title} [${beatmap.version}]`
+                                s.forEach(({ accuracy, mods, perfect, rank, max_combo, beatmap: b, beatmapset: s, pp }) => out.addField(
+                                    `${s.artist} - ${s.title} [${b.version}]`
                                     + (mods.length ? `+${mods.join('')}` : ''),
                                     `[**${rank}**] ${
                                         // multiple formatting
@@ -94,7 +94,8 @@ export = class extends OsuCommand {
                                         : `**${(accuracy * 100).toFixed(3)}**% - **${max_combo}**x`
                                     }`
                                         + (perfect ? ` (FC)` : '')
-                                    + `\n[Link](https://osu.ppy.sh/beatmaps/${beatmap.id}) ([download](https://osu.ppy.sh/beatmaps/${beatmap.id}/download))`
+                                    + `\n[Link](https://osu.ppy.sh/beatmaps/${b.id}) ([download](https://osu.ppy.sh/beatmaps/${b.id}/download))`
+                                    + `\n${b.difficulty_rating} :star: - \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}**`
                                 ))
                                 return out;
                             })
