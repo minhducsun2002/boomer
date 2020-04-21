@@ -57,7 +57,7 @@ export = class extends GeneralCommand {
             else if (handler.findCommand(q)) {
                 const cmd = handler.findCommand(q) as BotCommand;
                 let _p = cmd.prefix ?? prefix;
-                const mainCall = `${_p}${cmd.aliases[0]}`, args = (cmd.args as ArgumentOptions[])
+                const mainCall = `${_p}${cmd.aliases[0]}`, args = ((cmd.args || []) as ArgumentOptions[]) 
                 out = out
                     .setTitle(`\`${mainCall}\`${
                         (cmd.aliases.length > 1)
@@ -67,11 +67,12 @@ export = class extends GeneralCommand {
                     .setDescription(cmd.description)
                     .addField(
                         `Syntax`,
-                        `\`${mainCall} ${
-                            args.map(({ id, match, multipleFlags }) => `[${id}:${match}${multipleFlags ? '+' : ''}]`).join(' ')
-                        }\`\n\n${
-                            args.map(({ id, description }) => `- \`${id}\` ${description}`).join('\n')
-                        }`
+                        `\`${
+                            `${mainCall} ${
+                                args.map(({ id, match, multipleFlags }) => `[${id}:${match}${multipleFlags ? '+' : ''}]`).join(' ')
+                            }`.trim()
+                        }\`` +
+                        `\n\n${args.map(({ id, description }) => `- \`${id}\` ${description}`).join('\n')}`
                     )
                 if (args.filter(a => a.match === 'flag' || a.match === 'option').length) {
                     const f = args.filter(a => a.match === 'flag' || a.match === 'option');
