@@ -94,7 +94,9 @@ const client : Bot = new Bot();
 if (dev) client.on('debug', log.info)
 
 client.on('ready', () => {
-    log.success(`Logged in as ${client.user.tag}. Ready to serve ${client.guilds.cache.size} guild${plural(client.guilds.cache.size)}.`);
+    log.success(`Logged in as ${
+        highlight.bgBlue.yellowBright(client.user.tag)
+    }. Ready to serve ${client.guilds.cache.size} guild${plural(client.guilds.cache.size)}.`);
     client.user.setPresence({
         status: dev ? 'dnd' : 'idle',
         activity: { name: `ID : ${client.instanceId}` }
