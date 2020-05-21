@@ -129,8 +129,8 @@ export default class extends OsuCommand {
                         .setURL(`https://osu.ppy.sh/beatmapsets/${id}`)
                         .setDescription(
                             `Mapped by **[${creator}](https://osu.ppy.sh/users/${user_id})**. `
-                            + (!ranked ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
-                            + (ranked
+                            + (!(ranked > 0) ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
+                            + ((ranked > 0)
                                 ? `Ranked **${new Date(ranked_date).toLocaleString('en-US')}**.`
                                 : `Last updated **${new Date(last_updated).toLocaleString('en-US')}**`)
                         )
@@ -166,16 +166,16 @@ export default class extends OsuCommand {
                     .run({ idle: 20000, dispose: true })
 
             } else {
-                let [{ version, difficulty_rating, max_combo, ar, accuracy, cs, drain, total_length, mode_int, bpm, id }] =
+                let [{ version, difficulty_rating, max_combo, ar, accuracy, cs, drain, total_length, mode_int, bpm, id: map_id }] =
                     beatmaps.filter(a => a.id === _id);
                 m.channel.send(
                     new MessageEmbed()
                         .setTitle(`${artist} - ${title} [${version}]`)
-                        .setURL(`https://osu.ppy.sh/beatmaps/${id}`)
+                        .setURL(`https://osu.ppy.sh/beatmapsets/${id}#${modes[mode_int]}/${map_id}`)
                         .setDescription(
                             `Mapped by **[${creator}](https://osu.ppy.sh/users/${user_id})**. `
-                            + (!ranked ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
-                            + (ranked
+                            + (!(ranked > 0) ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
+                            + ((ranked > 0)
                                 ? `Ranked **${new Date(ranked_date).toString()}**.`
                                 : `Last updated **${new Date(last_updated)}**`)
                         )
