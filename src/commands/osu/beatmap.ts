@@ -60,7 +60,8 @@ export default class extends OsuCommand {
                 match: 'flag',
                 description: `Force parsing the ID (if an ID is passed) as a set ID, not a map ID`,
                 flag: ['/']
-            }]
+            }],
+            typing: true
         })
     }
 
