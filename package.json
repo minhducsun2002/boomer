@@ -30,6 +30,7 @@
     "mongoose": "^5.7.11",
     "mongoose-cache": "^0.1.5",
     "nconf": "^0.10.0",
+    "ojsama": "^1.2.5",
     "timezonecomplete": "^5.11.0"
   },
   "devDependencies": {

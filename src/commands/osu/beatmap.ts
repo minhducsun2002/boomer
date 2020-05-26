@@ -66,7 +66,7 @@ export default class extends OsuCommand {
     }
 
     
-    private checkURL (url : string) : { set?: number; id?: number; mode?: string } {
+    public checkURL (url : string) : { set?: number; id?: number; mode?: string } {
         let valid = !!url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/(b|beatmapsets|beatmaps)\/(\d+)/);
         if (!valid) throw new TypeError(`Not a beatmap(set) URL`);
         let set = +(url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)/) || []).slice(1)[0];
