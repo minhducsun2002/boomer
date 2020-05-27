@@ -98,7 +98,7 @@ export = class extends OsuCommand {
                     )
                     .addField(`PP`, pp, true)
                     .addField(`Mods`, oj.modbits.string(oj.modbits.from_string(mods)) || 'None', true)
-                    .addField(`Combo`, `**${map.max_combo()}**x`, true)
+                    .addField(`Combo`, `**${combo ? combo : map.max_combo()}**x`, true)
                     .addField(`Accuracy`, `**${accuracy}**%`, true)
                     .addField(`Misses`, misses ? misses : 0, true)
             );
