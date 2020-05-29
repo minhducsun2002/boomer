@@ -80,7 +80,7 @@ export = class extends OsuCommand {
                         chunk(recents, MAX_VIEW)
                             .map((s, i, c) => {
                                 let out = new MessageEmbed()
-                                    .setTitle(`Recent plays of **${username}**`)
+                                    .setTitle(`Top plays of **${username}**`)
                                     .setURL(`https://osu.ppy.sh/users/${id}`)
                                     .setColor(SUCCESS_COLOR)
                                     .setFooter(`Page ${i + 1}/${c.length}`)
