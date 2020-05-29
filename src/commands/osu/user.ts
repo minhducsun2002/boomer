@@ -110,6 +110,15 @@ export default class extends OsuCommand {
                 Math.floor(play_time % 60)
             ]
 
+            if ((id === 13193514) && (pp < 2000)) {
+                m.channel.send(
+                    `con gà ${m.author.toString()} này, chưa đủ 2000pp đâu, farm thêm ${
+                        2000 - Math.ceil(pp)
+                    }pp đi rồi hẵng hỏi`
+                )
+                return;
+            }
+
             let out = new MessageEmbed()
                 .setTimestamp().setColor(SUCCESS_COLOR)
                 .setTitle(`[${level}] ${username}`)
