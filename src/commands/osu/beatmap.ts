@@ -121,7 +121,7 @@ export default class extends OsuCommand {
 
                 // start building embed for modes
                 let out = availableModes.map((m, ii, ___) => {
-                    let maps = beatmaps.filter(a => a.mode === m);
+                    let maps = beatmaps.filter(a => a.mode === m).sort((m1, m2) => m1.difficulty_rating - m2.difficulty_rating);
 
                     return chunk(maps, MAX_DIFF_PER_PAGE).map((chunked, i, _) => (
                         new MessageEmbed()
