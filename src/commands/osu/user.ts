@@ -110,7 +110,7 @@ export default class extends OsuCommand {
                 Math.floor(play_time % 60)
             ]
 
-            if ((id === 13193514) && (pp < 2000)) {
+            if ((id === 13193514) && (pp < 2000) && (m.author.id === '383990559070486529')) {
                 m.channel.send(
                     `con gà ${m.author.toString()} này, chưa đủ 2000pp đâu, farm thêm ${
                         2000 - Math.ceil(pp)
