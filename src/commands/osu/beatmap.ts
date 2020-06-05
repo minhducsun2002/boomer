@@ -110,7 +110,7 @@ export default class extends OsuCommand {
 
             let {
                 beatmaps, converts,
-                title, artist, id, status, creator, user_id,
+                title, artist, id: set_id, status, creator, user_id,
                 ranked, ranked_date, last_updated, covers
             } = __;
             beatmaps = beatmaps.concat(...converts);
@@ -126,13 +126,15 @@ export default class extends OsuCommand {
                     return chunk(maps, MAX_DIFF_PER_PAGE).map((chunked, i, _) => (
                         new MessageEmbed()
                         .setTitle(`${artist} - ${title}`)
-                        .setURL(`https://osu.ppy.sh/beatmapsets/${id}`)
+                        .setURL(`https://osu.ppy.sh/beatmapsets/${set_id}`)
                         .setDescription(
                             `Mapped by **[${creator}](https://osu.ppy.sh/users/${user_id})**. `
                             + (!(ranked > 0) ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
                             + ((ranked > 0)
                                 ? `Ranked **${new Date(ranked_date).toLocaleString('en-US')}**.`
-                                : `Last updated **${new Date(last_updated).toLocaleString('en-US')}**`)
+                                : `Last updated **${new Date(last_updated).toLocaleString('en-US')}**.`)
+                            + `\nDownload : [main site](https://osu.ppy.sh/beatmapsets/${set_id}/download) | `
+                            + `[Ripple mirror](https://storage.ripple.moe/d/${set_id})`
                         )
                         .setImage(covers["cover@2x"])
                         .setColor(SUCCESS_COLOR)
@@ -147,7 +149,7 @@ export default class extends OsuCommand {
                                     `${difficulty_rating} :star:${max_combo ? ` | **${max_combo}**x` : ''} | `
                                     + `${pad(2)(Math.floor(total_length / 60))}:${pad(2)(total_length % 60)} | `
                                     + `\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${accuracy}** \`HP\`**${drain}**\n`
-                                    + `[Link](https://osu.ppy.sh/beatmaps/${id}) ([download](https://osu.ppy.sh/beatmaps/${id}/download))`
+                                    + `[Link](https://osu.ppy.sh/beatmaps/${id})`
                             })
                         ))
                         .setFooter(
@@ -171,7 +173,7 @@ export default class extends OsuCommand {
                 m.channel.send(
                     new MessageEmbed()
                         .setTitle(`${artist} - ${title} [${version}]`)
-                        .setURL(`https://osu.ppy.sh/beatmapsets/${id}#${modes[mode_int]}/${map_id}`)
+                        .setURL(`https://osu.ppy.sh/beatmapsets/${set_id}#${modes[mode_int]}/${map_id}`)
                         .setDescription(
                             `Mapped by **[${creator}](https://osu.ppy.sh/users/${user_id})**. `
                             + (!(ranked > 0) ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
