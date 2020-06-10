@@ -45,6 +45,13 @@ class Bot extends AkairoClient {
                 .loadAll()
                 .modules.size
         } commands.`);
+
+        // while I am still lazy
+        this.cmdHandler.modules.forEach(a => {
+            if (a.id.startsWith('al-'))
+            this.cmdHandler.remove(a.id)
+        })
+
         logs.inhibitor.success(`Loaded ${
             this.inhibitorHandler
                 .on(
