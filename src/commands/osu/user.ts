@@ -4,6 +4,8 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors'
 
+import { modes } from '../../constants/osu';
+
 const commandName = 'user';
 const aliases = [commandName, 'u'];
 
@@ -57,8 +59,6 @@ export interface osuUserExtra {
     }[]
 }
 
-export const modes = ['osu', 'taiko', 'fruits', 'mania'];
-
 export default class extends OsuCommand {
     constructor() {
         super(commandName, {
@@ -71,7 +71,7 @@ export default class extends OsuCommand {
             }, {
                 id: 'mode',
                 match: 'option',
-                description: 'Gamemode to show. Can be `osu`, `taiko`, `fruits`, `mania`.',
+                description: `Gamemode to show. Can be ${modes.map(a => '`' + a + '`').join(', ')}.`,
                 flag: ['/']
             }]
         })
@@ -83,6 +83,8 @@ export default class extends OsuCommand {
         // check mode
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
+        if (!user)
+            return m.channel.send(err.setDescription(`Who do you want to search for?`));
         try {
             const _ = await axios.get(`https://osu.ppy.sh/u/${encodeURIComponent(user)}/${mode}`, {
                 validateStatus: () => true

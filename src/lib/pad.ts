@@ -1,0 +1,1 @@
+export const pad = (n: number) => (m: number) => `0`.repeat((n - `${m}`.length) > 0 ? n - `${m}`.length : 0) + `${m}`;

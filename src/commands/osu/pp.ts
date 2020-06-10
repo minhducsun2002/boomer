@@ -3,7 +3,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import map from './beatmap';
 import axios from 'axios';
 import oj from 'ojsama';
-import { mode_friendly } from './beatmap';
+import { mode_friendly } from '../../constants/osu';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 
 const commandName = 'pp', aliases : string[] = [commandName];

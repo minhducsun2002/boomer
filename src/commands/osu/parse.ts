@@ -4,7 +4,7 @@ import ojsama from 'ojsama';
 import { OsuCommand } from './baseCommand';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import { Replay } from '@minhducsun2002/node-osr-parser';
-import { mode_friendly } from './beatmap';
+import { mode_friendly } from '../../constants/osu';
 import { modToString, accuracy } from '../../lib/osu/utils';
 import Bot from '../../';
 

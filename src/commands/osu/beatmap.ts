@@ -6,7 +6,8 @@ import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { chunk } from '../../lib/chunk';
 import { log } from '../../lib/logger';
-import { modes } from './user';
+import { pad } from '../../lib/pad';
+import { modes, mode_friendly } from '../../constants/osu';
 
 const commandName = 'beatmap';
 const aliases = [commandName, 'map'];
@@ -40,9 +41,6 @@ export interface Beatmapset {
         slimcover: string; 'slimcover@2x': string;
     };
 }
-
-const pad = (n: number) => (m: number) => `0`.repeat((n - `${m}`.length) > 0 ? n - `${m}`.length : 0) + `${m}`;
-export const mode_friendly = ['osu!', 'osu!taiko', 'osu!catch', 'osu!mania'];
 
 const MAX_DIFF_PER_PAGE = 7;
 
