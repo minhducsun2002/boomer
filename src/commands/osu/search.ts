@@ -79,7 +79,7 @@ export = class extends OsuCommand {
                             .map(({ id, star, name, mode }) =>
                                 // `mapped by [${a.creator}](https://osu.ppy.sh/users/${a.creatorId})`
                                 `[${mode_friendly[+mode]}] `
-                                + `[__**${name}**__](https://osu.ppy.sh/b/${id})`
+                                + `[__**${name}**__](https://osu.ppy.sh/beatmaps/${id})`
                                 + ` (**${(+star).toFixed(2)}**:star:)`
                                 // + `| ${pad(2)(Math.floor(+length / 60))}:${pad(2)(+length % 60)} `
                                 // + `|\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${od}** \`HP\`**${hp}**`
