@@ -51,7 +51,7 @@ export = class extends OsuCommand {
         })
     }
 
-    async exec(m : Message, { beatmap: mapId, accuracy, combo, mods, misses } = { beatmap: '', accuracy: 0, combo: 0, mods: '', misses: 0 }) {
+    async exec(m : Message, { beatmap: mapId, accuracy, combo, mods, misses } = { beatmap: '', accuracy: 100, combo: 0, mods: '', misses: 0 }) {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, an error occurred.`)
         let _ = +mapId;
