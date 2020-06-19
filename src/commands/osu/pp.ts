@@ -20,7 +20,7 @@ export = class extends OsuCommand {
                 id: 'beatmap',
                 match: 'phrase',
                 type: 'string',
-                description: 'Beatmap ID, or URL'
+                description: 'Beatmap ID'
             }, {
                 id: 'accuracy',
                 match: 'phrase',
@@ -55,14 +55,17 @@ export = class extends OsuCommand {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, an error occurred.`)
         let _ = +mapId;
-        if (isNaN(_)) {
-            // try parsing as URL
-            try {
-                _ = this.check(mapId).id;
-            } catch { _ = null }
-        };
-        if (!_)
-            return m.channel.send(err.setDescription('You passed neither a beatmap ID, nor a beatmap URL!'));
+        // if (isNaN(_)) {
+        //     // try parsing as URL
+        //     try {
+        //         _ = this.check(mapId).id;
+        //     } catch { _ = null }
+        // };
+        // if (!_)
+        //     return m.channel.send(err.setDescription('You passed neither a beatmap ID, nor a beatmap URL!'));
+
+        if (isNaN(_))
+            return m.channel.send(err.setDescription('You passed an invalid beatmap ID!'));
         
         if (!((accuracy <= 100) || (accuracy >= 0))) accuracy = 100;
         if (!combo || isNaN(combo)) combo = undefined;
