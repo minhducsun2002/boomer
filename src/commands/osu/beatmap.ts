@@ -77,6 +77,20 @@ export default class extends OsuCommand {
         return { set, id, mode };
     }
 
+    public async getURL(id : number, set : boolean = false) {
+        const _ = await axios.get(
+            set ? `https://osu.ppy.sh/beatmapsets/${id}` : `https://osu.ppy.sh/beatmaps/${id}`,
+            { validateStatus: () => true }
+        );
+        if (_.status === 404) throw new Error(`Beatmap not found`);
+        if (_.status !== 200) throw new Error(
+            `Error getting beatmap : Expected status 200, got status ${_.status}`
+        );
+
+        const dom = cheerio.load(_.data);
+        return JSON.parse(dom('#json-beatmapset').contents().first().text()) as Beatmapset;
+    }
+
     async exec(m : Message, { beatmap, set } = { beatmap: '', set: false }) {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, an error occurred.`)
@@ -94,17 +108,7 @@ export default class extends OsuCommand {
             if (!_id) return m.channel.send(err.setDescription(`Sorry, couldn't find such beatmap(set).`))
         }
         try {
-            const _ = await axios.get(
-                set ? `https://osu.ppy.sh/beatmapsets/${_id}` : `https://osu.ppy.sh/beatmaps/${_id}`,
-                { validateStatus: () => true }
-            );
-            if (_.status === 404) return m.channel.send(err);
-            if (_.status !== 200) throw new Error(
-                `Error getting beatmap : Expected status 200, got status ${_.status}`
-            );
-
-            const dom = cheerio.load(_.data);
-            let __ : Beatmapset = JSON.parse(dom('#json-beatmapset').contents().first().text());
+            let __ = await this.getURL(_id, set);
 
             let {
                 beatmaps, converts,
@@ -176,7 +180,7 @@ export default class extends OsuCommand {
                             `Mapped by **[${creator}](https://osu.ppy.sh/users/${user_id})**. `
                             + (!(ranked > 0) ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
                             + ((ranked > 0)
-                                ? `Ranked **${new Date(ranked_date).toString()}**.`
+                                ? `Ranked **${new Date(ranked_date).toUTCString()}**.`
                                 : `Last updated **${new Date(last_updated)}**`)
                         )
                         .setImage(covers["cover@2x"])
