@@ -6,6 +6,7 @@ import { constructQuery as c } from '../../lib/fgo/';
 import sentence from '../../lib/sentence';
 import plural from '../../lib/plural';
 import { FgoCommand } from './baseCommand';
+import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors'
 
@@ -37,12 +38,13 @@ export = class extends FgoCommand {
         })
     }
 
-    async exec(msg: Message, { query, _class }: commandArguments) {
-        const wait = new MessageEmbed().setDescription(':hourglass: Querying database...')
+    async exec(m: Message, { query, _class }: commandArguments) {
         const err = new MessageEmbed().setColor(ERROR_COLOR);
-        const out = await msg.channel.send(wait) as Message;
 
-        if (!query && !_class) return out.edit('',err.setDescription(':frowning: Where is your query?'))
+        if (!query && !_class)
+            return m.channel.send(
+                err.setDescription(':frowning: Where is your query?')
+            )
 
         const q = Number.isInteger(+query)
             ? { id: +query }
@@ -50,7 +52,9 @@ export = class extends FgoCommand {
 
         const results = await constructQuery(q).exec();
         if (!results.length) 
-            return out.edit('', err.setDescription(':disappointed: Sorry, I could not find anything.'))
+            return m.channel.send(
+                err.setDescription(':disappointed: Sorry, I could not find anything.')
+            )
 
 
         const [{ rarity, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit],
@@ -73,69 +77,78 @@ export = class extends FgoCommand {
         } = results[0].noblePhantasm.pop();
 
 
+        let base = () => new MessageEmbed()
+                .setColor(SUCCESS_COLOR)
+                .setAuthor(`${rarity}☆ ${className}`)
+                .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`),
+            ccount = (_ : Card) => 
+                cardIds.reduce((b, a) => a === _ ? b + 1 : b, 0)
 
-        const resultEmbed = new MessageEmbed()
-            .setColor(SUCCESS_COLOR)
-            .setAuthor(`${rarity}☆ ${className}`)
-            .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`)
-            .addField(
-                'HP/ATK',
-                `- Base : ${hp[0]}/${atk[0]}`
-                + `\n- Maximum : ${hp[maxLevel[+rarity - 1]]}/${atk[maxLevel[+rarity - 1]]}`
-                + `\n- Maximum (grailed) : ${hp.pop()}/${atk.pop()}`,
-                true
-            )
-            .addField(
-                'Cards / Damage distribution by %',
-                // -1 due to array from 0
-                `- Buster : ${cardIds.reduce((b, a) => a === Card.BUSTER ? b + 1 : b, 0)} / ${dmg[Card.BUSTER - 1].join('-')}`
-                + `\n- Arts : ${cardIds.reduce((b, a) => a === Card.ARTS ? b + 1 : b, 0)} / ${dmg[Card.ARTS - 1].join('-')}`
-                + `\n- Quick : ${cardIds.reduce((b, a) => a === Card.QUICK ? b + 1 : b, 0)} / ${dmg[Card.QUICK - 1].join('-')}`
-                + `\n- Extra : 1 / ${dmg[Card.EXTRA - 1].join('-')}`,
-                true
-            )
-            .addField('\u200b', '\u200b')
-            .addField('NP generation', `- Per hit : ${npPerATK}\n- When attacked : ${npPerHit}`, true)
-            .addField('Critical stars', `- Star weighting : ${starAbsorption}\n- Star generation : ${(starGen / 10).toFixed(1)}%`, true)
-            .addField('\u200b', '\u200b')
-            .addField('Traits', traits.join(', '), true)
-            .addField(
-                'Gender / Attribute / Alignment', 
-                `${Gender[genderType].join(' + ')} / ${Attribute[attri]} / ${
-                    alignment.split(' ').map(a=>sentence(a)).join(' ')
-                }`,
-                true
-            ).addField(
-                'Related quests (ID)',
-                relateQuestIds.map(a => `\`${a}\``).join(', ') || 'None',
-                true
-            )
-            .addField('\u200b', '\u200b')
-            .addField(
-                'Active skill',
-                activeSkill.map(a => {
-                    const upgrades = a.length, { name, rank, detail, condition } = a.pop();
-                    return (
-                        `**${name}** __[${rank}]__` + (upgrades > 1 ? ` (${upgrades} upgrades)` : '')
-                        + `\n${detail}`
-                        + `\n_${condition}_`
+        new PagedEmbeds()
+            .setChannel(m.channel)
+            .setEmbeds(
+                [
+                    base()
+                    .addField(
+                        'HP/ATK',
+                        `- Base : ${hp[0]}/${atk[0]}`
+                        + `\n- Maximum : ${hp[maxLevel[+rarity - 1]]}/${atk[maxLevel[+rarity - 1]]}`
+                        + `\n- Maximum (grailed) : ${hp.pop()}/${atk.pop()}`,
+                        true
                     )
-                }).join('\n\n')
+                    .addField(
+                        'Cards / Damage distribution by %',
+                        // -1 due to array from 0
+                        `- Buster : ${ccount(Card.BUSTER)} / ${dmg[Card.BUSTER - 1].join('-')}`
+                        + `\n- Arts : ${ccount(Card.ARTS)} / ${dmg[Card.ARTS - 1].join('-')}`
+                        + `\n- Quick : ${ccount(Card.QUICK)} / ${dmg[Card.QUICK - 1].join('-')}`
+                        + `\n- Extra : 1 / ${dmg[Card.EXTRA - 1].join('-')}`,
+                        true
+                    )
+                    .addField('NP generation', `- Per hit : ${npPerATK}\n- When attacked : ${npPerHit}`, true)
+                    .addField('Critical stars', `- Star weighting : ${starAbsorption}\n- Star generation : ${(starGen / 10).toFixed(1)}%`, true)
+                    .addField('Traits', traits.join(', '), true)
+                    .addField(
+                        'Gender / Attribute / Alignment', 
+                        `${Gender[genderType].join(' + ')} / ${Attribute[attri]} / ${
+                            alignment.split(' ').map(sentence).join(' ')
+                        }`,
+                        true
+                    ).addField(
+                        'Related quests (ID)',
+                        relateQuestIds.map(a => `\`${a}\``).join(', ') || 'None',
+                        true
+                    ),
+                    base()
+                    .addField(
+                        'Active skill',
+                        activeSkill.map(a => {
+                            const upgrades = a.length, { name, rank, detail, condition } = a.pop();
+                            return (
+                                `**${name}** __[${rank}]__` + (upgrades > 1 ? ` (${upgrades} upgrades)` : '')
+                                + `\n${detail}`
+                                + `\n_${condition}_`
+                            )
+                        }).join('\n\n')
+                    )
+                    .addField(
+                        'Passive skill',
+                        passiveSkill.map(({ name, detail, rank }) => `**${name}** [__${rank}__]\n${detail}`).join('\n\n')
+                    ),
+                    base()
+                    .addField(
+                        'Noble Phantasm ' + (npUpgradesCount > 1 ? `(${npUpgradesCount} upgrade${plural(npUpgradesCount)})` : ''),
+                        `**${npName}** __${npRank}__ (${npClass})`
+                        + (npExtName ? `\n_${npExtName}_` : '')
+                        + `\n\n- ${npDetail.split('\n').filter(a=>!!a).join('\n- ')}`
+                        + `\n- ${npOverDetail.split('\n').filter(a=>!!a).map(a=>`__${a}__`).join('\n- ')}`
+                        + (npCondition ? `\n_${npCondition}_` : '')
+                    )
+                ]
+                .map((a, i, _) => a.setFooter(`Page ${++i}/${_.length}`))
             )
-            .addField(
-                'Passive skill',
-                passiveSkill.map(({ name, detail, rank }) => `**${name}** [__${rank}__]\n${detail}`).join('\n\n')
-            )
-            .addField('\u200b', '\u200b')
-            .addField(
-                'Noble Phantasm ' + (npUpgradesCount > 1 ? `(${npUpgradesCount} upgrade${plural(npUpgradesCount)})` : ''),
-                `**${npName}** __${npRank}__ (${npClass})`
-                + (npExtName ? `\n_${npExtName}_` : '')
-                + `\n\n- ${npDetail.split('\n').filter(a=>!!a).join('\n- ')}`
-                + `\n- ${npOverDetail.split('\n').filter(a=>!!a).map(a=>`__${a}__`).join('\n- ')}`
-                + (npCondition ? `\n_${npCondition}_` : '')
-            )
-
-        await out.edit('', resultEmbed)
+            .addHandler('⬅️', (m, i, u, e) => ({ index: (i - 1 + e.length) % e.length }))
+            .addHandler('➡️', (m, i, u, e) => ({ index: (i + 1 + e.length) % e.length }))
+            .run({ idle: 20000, dispose: true })
     }
 }
