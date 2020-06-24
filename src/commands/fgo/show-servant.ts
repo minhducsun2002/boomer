@@ -32,7 +32,8 @@ export = class extends FgoCommand {
                 flag: ['-c', '-c=', '/c:', '--class=', '/class:']
             }],
             typing: true,
-            description: 'Show a servant\'s details.'
+            description: 'Show a servant\'s details.',
+            cooldown: 1500
         })
     }
 
@@ -69,7 +70,9 @@ export = class extends FgoCommand {
         let { name: npName, extendedName: npExtName, 
             rank: npRank, detail: npDetail, overchargeDetail: npOverDetail,
             condition: npCondition, class: npClass
-        } = results[0].noblePhantasm.pop()
+        } = results[0].noblePhantasm.pop();
+
+
 
         const resultEmbed = new MessageEmbed()
             .setColor(SUCCESS_COLOR)
