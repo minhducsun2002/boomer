@@ -4,9 +4,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
-import { chunk } from '../../lib/chunk';
-import { log } from '../../lib/logger';
-import { pad } from '../../lib/pad';
+import { pad, chunk } from '@pepper/utils';
 import { modes, mode_friendly } from '../../constants/osu';
 
 const commandName = 'beatmap';
@@ -199,7 +197,6 @@ export default class extends OsuCommand {
                 )
             }
         } catch (e) {
-            log.error(`${e}`);
             m.channel.send(err.setDescription(`Sorry, an error occurred.`));
         }
     }

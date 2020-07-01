@@ -1,0 +1,1 @@
+export const plural = (a : number) => a <= 1 ? '' : 's'

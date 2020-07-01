@@ -2,7 +2,6 @@ import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
 import { constructQuery as c } from '../../lib/fgo/';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import { log } from '../../lib/logger';
 
 const commandName = 'show-spot';
 const aliases = [commandName, 'spot', 'sp']
@@ -40,9 +39,7 @@ export = class extends FgoCommand {
                 )
             m.channel.send(out)
         }
-        catch (e) {
-            let _ : Error = e;
-            log.error(`${_.name}: ${_.message}\n${_.stack}`)
+        catch {
             m.channel.send(err.setDescription('Sorry, an error occurred.'))
         }
     }

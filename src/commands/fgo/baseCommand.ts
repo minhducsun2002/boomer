@@ -1,12 +1,15 @@
-import { deriveBaseCommand } from '../../lib/classes/baseCommand';
-import cfg from '../../config';
+import type { PepperCommand } from '@pepper/struct';
+import { extendCommand } from '@pepper/struct';
 
-let base = deriveBaseCommand({ category: 'F/GO', prefix: cfg.get("prefix:fgo")[0], typing: true });
-type _ = ConstructorParameters<typeof base>;
-
-export const FgoCommand = 
-    class extends base {
-        constructor(id : _[0], o : _[1]) {
-            super(`fgo-${id}`, o)
-        }
+export const FgoCommand = class extends extendCommand({
+    category: 'F/GO', typing: true    
+}) {
+    constructor(...args: ConstructorParameters<typeof PepperCommand>) {
+        super(`fgo-${args[0]}`, args[1]);
     }
+
+    initialize = () => {
+        this.prefix = this.client.config.prefix['fgo'];
+        return super.initialize()
+    }
+}

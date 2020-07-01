@@ -1,9 +1,10 @@
-import { Message } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import { OwnerCommand } from './baseCommand';
-import Bot from '../../';
-import { relative } from 'path';
+import { relative as rel } from 'path';
+import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
+import { chunk, plural as p } from '@pepper/utils';
 
-const commandName = 'list-cmds'
+const commandName = 'list-cmds';
 const aliases = [commandName, 'cmds', 'cmd', 'list-cmd']
 
 export = class extends OwnerCommand {
@@ -15,12 +16,29 @@ export = class extends OwnerCommand {
     }
 
     async exec(m: Message) {
-        const handler = (this.client as Bot).cmdHandler;
-        const cmds = handler.modules.array();
-        m.channel.send(
-            `Loaded ${cmds.length} commands.\n${
-                cmds.map(({ id, filepath }) => `\`${id}\` -> \`${relative(handler.directory, filepath)}\``).join('\n')
-            }`
-        )
+        const page = 5;
+        const h = this.client.commandHandler;
+        const c = h.modules.array();
+        let out = chunk(c, page)
+            .map(
+                (a, i, _) => new MessageEmbed()
+                    .setTitle(`Loaded command modules`)
+                    .setDescription(
+                        `Currently loaded ${c.length} command${p(c.length)} from \`${h.directory}\``
+                    )
+                    .addFields(
+                        a.map(p => ({
+                            name: p.id,
+                            value: 
+                                `Path: \`${rel(h.directory, p.filepath)}\``
+                                + `\nCategory: ${p.categoryID || 'N/A'}`
+                        }))
+                    )
+                    .setFooter(`Page ${i + 1}/${_.length}`)
+            )
+        new PagedEmbeds()
+            .setChannel(m.channel)
+            .setEmbeds(out)
+            .run({ idle: 20000, dispose: true })
     }
 }

@@ -1,6 +1,8 @@
 import { createConnection, Connection, Model } from 'mongoose';
-import { log } from '../../lib/logger';
+import { componentLog } from '@pepper/utils';
 import cfg from '../../config';
+
+const log = new componentLog('Database');
 
 function a (s: string) { return `[F/GO] ${s}` }
 
@@ -39,19 +41,22 @@ import { mstQuestConsumeItemSchema,  mstQuestConsumeItemDocument } from './maste
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
 
-const _ = (s : keyof typeof master) => ({
-    mstSvt: master[s].model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
-    mstClass: master[s].model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
-    mstAttriRelation: master[s].model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
-    mstQuest: master[s].model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
-    mstSpot: master[s].model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
-    mstWar: master[s].model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
-    mstSvtCard: master[s].model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>,
-    mstSvtComment: master[s].model('mstSvtComment', mstSvtCommentSchema, 'mstSvtComment') as Model<mstSvtCommentDocument>,
-    mstSvtSkill: master[s].model('mstSvtSkill', mstSvtSkillSchema, 'mstSvtSkill') as Model<mstSvtSkillDocument>,
-    mstSkillDetail: master[s].model('mstSkillDetail', mstSkillDetailSchema, 'mstSkillDetail') as Model<mstSkillDetailDocument>,
-    mstItem: master[s].model('mstItem', mstItemSchema, 'mstItem') as Model<mstItemDocument>,
-    mstQuestConsumeItem: master[s].model('mstQuestConsumeItem', mstQuestConsumeItemSchema, 'mstQuestConsumeItem') as Model<mstQuestConsumeItemDocument>
-})
+const _ = (s : keyof typeof master) => {
+    let __ = master[s];
+    return {
+        mstSvt: __.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
+        mstClass: __.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
+        mstAttriRelation: __.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
+        mstQuest: __.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
+        mstSpot: __.model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
+        mstWar: __.model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
+        mstSvtCard: __.model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>,
+        mstSvtComment: __.model('mstSvtComment', mstSvtCommentSchema, 'mstSvtComment') as Model<mstSvtCommentDocument>,
+        mstSvtSkill: __.model('mstSvtSkill', mstSvtSkillSchema, 'mstSvtSkill') as Model<mstSvtSkillDocument>,
+        mstSkillDetail: __.model('mstSkillDetail', mstSkillDetailSchema, 'mstSkillDetail') as Model<mstSkillDetailDocument>,
+        mstItem: __.model('mstItem', mstItemSchema, 'mstItem') as Model<mstItemDocument>,
+        mstQuestConsumeItem: __.model('mstQuestConsumeItem', mstQuestConsumeItemSchema, 'mstQuestConsumeItem') as Model<mstQuestConsumeItemDocument>
+    }
+}
 
 export const NA = _('NA'), JP = _('JP')

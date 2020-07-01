@@ -4,8 +4,7 @@ import axios from 'axios';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { modes, mode_friendly, status } from '../../constants/osu';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../..//constants/colors';
-import { chunk } from '../../lib/chunk';
-// import { pad } from '../../lib/pad';
+import { chunk } from '@pepper/utils';
 
 const commandName = 'search';
 const aliases = [commandName];

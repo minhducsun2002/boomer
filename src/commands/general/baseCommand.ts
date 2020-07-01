@@ -1,3 +1,3 @@
-import { deriveBaseCommand } from '../../lib/classes/baseCommand';
+import { extendCommand } from '@pepper/struct';
 
-export const GeneralCommand = deriveBaseCommand({ category: 'General' })
+export const GeneralCommand = extendCommand({ category: 'General' })

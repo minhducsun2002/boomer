@@ -4,7 +4,7 @@ import { CardType as Card } from '../../constants/fgo'
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { constructQuery as c } from '../../lib/fgo/';
 import sentence from '../../lib/sentence';
-import plural from '../../lib/plural';
+import { plural as p } from '@pepper/utils';
 import { FgoCommand } from './baseCommand';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 
@@ -137,7 +137,7 @@ export = class extends FgoCommand {
                     ),
                     base()
                     .addField(
-                        'Noble Phantasm ' + (npUpgradesCount > 1 ? `(${npUpgradesCount} upgrade${plural(npUpgradesCount)})` : ''),
+                        'Noble Phantasm ' + (npUpgradesCount > 1 ? `(${npUpgradesCount} upgrade${p(npUpgradesCount)})` : ''),
                         `**${npName}** __${npRank}__ (${npClass})`
                         + (npExtName ? `\n_${npExtName}_` : '')
                         + `\n\n- ${npDetail.split('\n').filter(a=>!!a).join('\n- ')}`

@@ -6,7 +6,6 @@ import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import { Replay } from '@minhducsun2002/node-osr-parser';
 import { mode_friendly } from '../../constants/osu';
 import { modToString, accuracy } from '../../lib/osu/utils';
-import Bot from '../../';
 
 const commandName = 'parse';
 const aliases = [commandName, 'replay', 'sr'];
@@ -66,7 +65,7 @@ export = class extends OsuCommand {
             try {
                 let __ = await axios.get(`https://osu.ppy.sh/api/get_beatmaps?k=${key}&h=${md5map}`, { responseType: 'json' })
                 if (__.data.length) {
-                    let _ = (this.client as Bot).cmdHandler;
+                    let _ = this.client.commandHandler;
                     _.runCommand(m, _.findCommand(`beatmap`), { beatmap: __.data[0].beatmap_id });
                     if (pp) {
                         _.runCommand(

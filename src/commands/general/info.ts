@@ -1,6 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js'
 import { GeneralCommand } from './baseCommand';
-import Bot from '../..'
 
 const commandName = 'info';
 const aliases = [commandName, 'i'];
@@ -16,7 +15,7 @@ export = class extends GeneralCommand {
     async exec({ guild, channel } : Message) {
         const [r, u] = process.env.npm_package_repository_url.split('/').filter(a=>a).reverse()
 
-        const { instanceId, user, ownerID, users } = this.client as Bot;
+        const { user, ownerID, users } = this.client;
         const owner = (await users.fetch(ownerID[0]))
         const out = new MessageEmbed()
             .setTitle(`Hello, I am ${user.username}!`)
@@ -29,7 +28,6 @@ export = class extends GeneralCommand {
                 ].join('\n')
             )
             .setTimestamp()
-            .setFooter(`Instance ID : ${instanceId}`)
         channel.send('', out)
     }
 }

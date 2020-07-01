@@ -12,7 +12,17 @@
         "target": "ES6",
         "esModuleInterop": true,
         "emitDecoratorMetadata": false,
-        "downlevelIteration": true
+        "downlevelIteration": true,
+        "paths": {
+            "@pepper/utils": ["src/utils/index"],
+            "@pepper/struct": ["src/struct/index"]
+        },
+        "plugins": [
+            {
+                "transform": "@zerollup/ts-transform-paths"
+            }
+        ],
+        "baseUrl": "."
     },
     "include": ["src/**/*"]
 }

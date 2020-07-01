@@ -2,7 +2,7 @@ import { MessageEmbed, Message } from 'discord.js';
 
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import plural from '../../lib/plural';
+import { plural as p } from '@pepper/utils' ;
 import sentence from '../../lib/sentence';
 import { FgoCommand } from './baseCommand';
 
@@ -54,7 +54,7 @@ export = class extends FgoCommand {
         const embed = new MessageEmbed()
             .setColor(SUCCESS_COLOR)
             .setAuthor(`${id}. ${name}`)
-            .setTitle(`Noble Phantasm${plural(np.length)}`)
+            .setTitle(`Noble Phantasm${p(np.length)}`)
 
         np.forEach(
             ({ name, extendedName, rank, detail, class: _class, hitcount, records,
