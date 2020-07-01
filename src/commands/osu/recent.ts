@@ -5,8 +5,7 @@ import cheerio from 'cheerio';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
 import type { osuUser, osuUserExtra } from './user';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
-import { chunk } from '../../lib/chunk';
-import { log } from '../../lib/logger';
+import { chunk } from '@pepper/utils';
 
 const commandName = 'recent';
 const aliases = [commandName, 'recentplay', 'rp'];
@@ -110,7 +109,6 @@ export = class extends OsuCommand {
                 )
         }
         catch (e) {
-            log.error(String(e));
             m.channel.send(err.setDescription(`Sorry, an error occurred.`));
         }
     }

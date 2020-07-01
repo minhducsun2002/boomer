@@ -2,7 +2,7 @@ import { MessageEmbed, Message } from 'discord.js';
 
 import { constructQuery } from '../../lib/fgo/search';
 import { ERROR_COLOR, INDETERMINATE_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import plural from '../../lib/plural';
+import { plural as p } from '@pepper/utils' ;
 import sentence from '../../lib/sentence';
 import { FgoCommand } from './baseCommand';
 
@@ -86,7 +86,7 @@ export = class extends FgoCommand {
         await out.edit('',
             wait.setColor(INDETERMINATE_COLOR)
                 .setDescription(`:hourglass: Be patient, I found something : ${results.length} servant${
-                        plural(results.length)
+                        p(results.length)
                     } match${results.length > 1 ? '' : 'es'} your query.`
                 )
         )

@@ -1,11 +1,10 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
 import { constructQuery as c } from '../../lib/fgo/';
-import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import { log } from '../../lib/logger';
+import { ERROR_COLOR } from '../../constants/colors';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
-import p from '../../lib/plural';
-import { chunk } from '../../lib/chunk';
+import { plural as p } from '@pepper/utils' ;
+import { chunk } from '../../utils/chunk';
 
 const commandName = 'search-spot';
 const aliases = [commandName, 'ssp']
@@ -65,9 +64,7 @@ export = class extends FgoCommand {
                         .setDescription(_.map(({ name, id }) => `\`${id}\` **${name}**`).join('\n'))
                 )
         }
-        catch (e) {
-            let _ : Error = e;
-            log.error(`${_.name}: ${_.message}\n${_.stack}`)
+        catch {
             m.channel.send(err.setDescription('Sorry, an error occurred.'))
         }
     }

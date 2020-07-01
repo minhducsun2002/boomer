@@ -2,8 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
 import { constructQuery as c } from '../../lib/fgo/';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import { log } from '../../lib/logger';
-import p from '../../lib/plural';
+import { plural as p } from '@pepper/utils' ;
 
 const commandName = 'search-item';
 const aliases = [commandName, 'ssit']
@@ -37,9 +36,7 @@ export = class extends FgoCommand {
                 .setDescription(_.map(({ name, id }) => `\`${id}\` **${name}**`).join('\n'))
             m.channel.send(out)
         }
-        catch (e) {
-            let _ : Error = e;
-            log.error(`${_.name}: ${_.message}\n${_.stack}`)
+        catch {
             m.channel.send(err.setDescription('Sorry, an error occurred.'))
         }
     }

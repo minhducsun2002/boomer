@@ -2,11 +2,9 @@ import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
 import { constructQuery as c } from '../../lib/fgo/';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import { log } from '../../lib/logger';
 
 const commandName = 'show-item';
 const aliases = [commandName, 'item', 'it']
-const MAX_QUEST = 15;
 interface a { q?: string }
 
 export = class extends FgoCommand {
@@ -42,9 +40,7 @@ export = class extends FgoCommand {
                     )
             )
         }
-        catch (e) {
-            let _ : Error = e;
-            log.error(`${_.name}: ${_.message}\n${_.stack}`)
+        catch {
             m.channel.send(err.setDescription('Sorry, an error occurred.'))
         }
     }

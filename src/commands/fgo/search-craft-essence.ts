@@ -1,7 +1,7 @@
 import { FgoCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
 import { constructQuery as c } from '../../lib/fgo/';
-import p from '../../lib/plural';
+import { plural as p } from '@pepper/utils'
 import __ from '../../lib/querifySubstring';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 import { SvtType } from '../../constants/fgo'

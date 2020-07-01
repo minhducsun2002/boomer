@@ -2,7 +2,6 @@ import { MessageEmbed, Message } from 'discord.js';
 import { OwnerCommand } from './baseCommand';
 import { performance, PerformanceObserver } from 'perf_hooks';
 import { Command } from 'discord-akairo';
-import Bot from '../../';
 
 const commandName = 'reload-cmd'
 const aliases = [commandName, 'reload', 'reloadcmd', 'rld-cmd']
@@ -22,7 +21,7 @@ export = class extends OwnerCommand {
     }
 
     async exec(m: Message, { cmd } : arg) {
-        const handler = (this.client as Bot).cmdHandler;
+        const handler = this.client.commandHandler;
         if (cmd) {
             let out = await m.channel.send(`Reloading \`${cmd.id}\`...`);
             new PerformanceObserver((l, o) => {

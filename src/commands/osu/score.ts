@@ -3,9 +3,8 @@ import { Message, MessageEmbed, User } from 'discord.js';
 import axios from 'axios';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
-import { chunk } from '../../lib/chunk';
 import { accuracy as acc, modToString as mm } from '../../lib/osu/utils';
-import { pad } from '../../lib/pad';
+import { pad, chunk } from '@pepper/utils';
 import map from './beatmap';
 import { modes } from '../../constants/osu';
 

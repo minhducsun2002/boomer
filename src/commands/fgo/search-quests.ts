@@ -1,7 +1,7 @@
 import { FgoCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
 import { constructQuery as c } from '../../lib/fgo/';
-import p from '../../lib/plural'
+import { plural as p } from '@pepper/utils' 
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 
 const commandName = 'search-quests';

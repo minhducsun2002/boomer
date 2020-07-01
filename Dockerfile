@@ -1,13 +1,17 @@
-FROM node:13.8.0-alpine3.11
+FROM node:13.8.0-alpine3.11 as build
 
 WORKDIR /app
-RUN apk add --no-cache git
 
 COPY package.json .
-RUN npm install
+RUN yarn install
 
 COPY tsconfig.json .
 COPY src/ src/
-RUN npm run build
+RUN yarn build
 
-CMD npm start
+FROM node:13.8.0-alpine3.11 as run
+WORKDIR /app
+COPY --from=build /app/package.json .
+COPY --from=build /app/dist/ dist/
+RUN yarn install --prod
+CMD yarn start
