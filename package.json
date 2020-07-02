@@ -10,6 +10,7 @@
   "scripts": {
     "transpile": "tsc && tscpaths -p tsconfig.json -s src/ -o dist",
     "start": "node dist/index.js",
+    "start:dev": "ts-node --compiler ttypescript src/index.ts",
     "build": "rimraf dist/ && npm run transpile",
     "build:test": "tsc --noEmit",
     "dev": "ts-node-dev --compiler ttypescript --respawn --no-notify --prefer-ts --transpile-only src/index.ts"

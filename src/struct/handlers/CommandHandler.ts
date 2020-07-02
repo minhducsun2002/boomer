@@ -2,7 +2,6 @@ import type { Collection } from 'discord.js';
 import { CommandHandler as c } from 'discord-akairo';
 import type { PepperClient } from '../Client';
 import type { PepperCommand } from '../Command';
-import { NOT_INITIALIZED } from '../Command';
 // util
 import { componentLog } from '@pepper/utils'
 import ch from 'chalk';
@@ -25,11 +24,6 @@ export class CommandHandler extends c {
                     + ch.blueBright(`./${relative(directory, filepath)}`)
                     + ` -> ${ch.yellowBright(`${id}`)}`
                 );
-                Promise.resolve((m as PepperCommand).initialize())
-                    .then(
-                        m => (m === NOT_INITIALIZED)
-                        ? 0 : this.clientLog.success(`Initialized command ${id}.`)
-                    )
             }
         )
     }

@@ -31,3 +31,4 @@ client.commandHandler.loadAll()
         )
     })
 client.login(process.env.DISCORD_TOKEN);
+export { client };
