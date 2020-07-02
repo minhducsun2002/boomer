@@ -15,7 +15,8 @@
         "downlevelIteration": true,
         "paths": {
             "@pepper/utils": ["src/utils/index"],
-            "@pepper/struct": ["src/struct/index"]
+            "@pepper/struct": ["src/struct/index"],
+            "@pepper/client": ["src/index.ts"]
         },
         "plugins": [
             {
