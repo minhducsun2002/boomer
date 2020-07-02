@@ -33,6 +33,39 @@ export = class extends OsuCommand {
         })
     }
 
+    __parse(recents : osuUserExtra['scoresBest'], username: string, mode: string, userId: number) {
+        return chunk(recents, MAX_VIEW)
+            .map((s, i, c) => {
+                let out = new MessageEmbed()
+                    .setTitle(`Recent plays of **${username}**`)
+                    .setURL(`https://osu.ppy.sh/users/${userId}`)
+                    .setColor(SUCCESS_COLOR)
+                    .setFooter(`Page ${i + 1}/${c.length} | All times are UTC`)
+                s.forEach(({
+                    accuracy, mods, perfect, rank, max_combo,
+                    beatmap: b, beatmapset: s, pp, created_at, id
+                }) => out.addField(
+                    `${s.artist} - ${s.title} [${b.version}]`
+                    + (mods.length ? `+${mods.join('')}` : ''),
+                    `[**${rank}**] ${
+                        // multiple formatting
+                        pp
+                        ? `**${pp}**pp (**${(accuracy * 100).toFixed(3)}**% | **${max_combo}**x)`
+                        : `**${(accuracy * 100).toFixed(3)}**% - **${max_combo}**x`
+                    }`
+                    + (perfect ? ` (FC)` : '')
+                    + `\n@ **${
+                        new Date(created_at)
+                            .toLocaleString('vi-VN', { timeZone: 'UTC' })
+                    }**`
+                    + `\n${b.difficulty_rating} :star: - \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}**`
+                    + `\n[[**Beatmap**]](https://osu.ppy.sh/b/${b.id}) `
+                    + ` [[**Score**]](https://osu.ppy.sh/scores/${mode}/${id})`
+                ))
+                return out;
+            })
+    }
+
     async exec(m : Message, { user, mode } = { user: '', mode: '' }) {
         user = user.trim();
         if (!modes.includes(mode)) mode = modes[0];
@@ -75,30 +108,7 @@ export = class extends OsuCommand {
             if (recents.length) 
                 new PagedEmbeds()
                     .setChannel(m.channel)
-                    .setEmbeds(
-                        chunk(recents, MAX_VIEW)
-                            .map((s, i, c) => {
-                                let out = new MessageEmbed()
-                                    .setTitle(`Recent plays of **${username}**`)
-                                    .setURL(`https://osu.ppy.sh/users/${id}`)
-                                    .setColor(SUCCESS_COLOR)
-                                    .setFooter(`Page ${i + 1}/${c.length}`)
-                                s.forEach(({ accuracy, mods, perfect, rank, max_combo, beatmap: b, beatmapset: s, pp }) => out.addField(
-                                    `${s.artist} - ${s.title} [${b.version}]`
-                                    + (mods.length ? `+${mods.join('')}` : ''),
-                                    `[**${rank}**] ${
-                                        // multiple formatting
-                                        pp
-                                        ? `**${pp}**pp (**${(accuracy * 100).toFixed(3)}**% | **${max_combo}**x)`
-                                        : `**${(accuracy * 100).toFixed(3)}**% - **${max_combo}**x`
-                                    }`
-                                        + (perfect ? ` (FC)` : '')
-                                    + `\n[Link](https://osu.ppy.sh/beatmaps/${b.id}) ([download](https://osu.ppy.sh/beatmaps/${b.id}/download))`
-                                    + `\n${b.difficulty_rating} :star: - \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}**`
-                                ))
-                                return out;
-                            })
-                    )
+                    .setEmbeds(this.__parse(recents, username, mode, id))
                     .addHandler('⬅️', (m, i, u, e) => ({ index: (i - 1 + e.length) % e.length }))
                     .addHandler('➡️', (m, i, u, e) => ({ index: (i + 1 + e.length) % e.length }))
                     .run({ idle: 20000, dispose: true })

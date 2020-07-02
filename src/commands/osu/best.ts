@@ -4,8 +4,8 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
 import type { osuUser, osuUserExtra } from './user';
+import recent from './recent';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
-import { chunk } from '@pepper/utils';
 
 const commandName = 'best';
 const aliases = [commandName];
@@ -32,6 +32,8 @@ export = class extends OsuCommand {
             // 3s
         })
     }
+
+    private __parse = new recent().__parse;
 
     async exec(m : Message, { user, mode } = { user: '', mode: '' }) {
         user = user.trim();
@@ -76,23 +78,8 @@ export = class extends OsuCommand {
                 new PagedEmbeds()
                     .setChannel(m.channel)
                     .setEmbeds(
-                        chunk(recents, MAX_VIEW)
-                            .map((s, i, c) => {
-                                let out = new MessageEmbed()
-                                    .setTitle(`Top plays of **${username}**`)
-                                    .setURL(`https://osu.ppy.sh/users/${id}`)
-                                    .setColor(SUCCESS_COLOR)
-                                    .setFooter(`Page ${i + 1}/${c.length}`)
-                                s.forEach(({ accuracy, mods, perfect, rank, max_combo, beatmap: b, beatmapset: s, pp }) => out.addField(
-                                    `${s.artist} - ${s.title} [${b.version}]`
-                                    + (mods.length ? `+${mods.join('')}` : ''),
-                                    `[**${rank}**] **${pp}**pp (**${(accuracy * 100).toFixed(3)}**% | **${max_combo}**x)`
-                                    + (perfect ? ` (FC)` : '')
-                                    + `\n[Link](https://osu.ppy.sh/beatmaps/${b.id}) ([download](https://osu.ppy.sh/beatmaps/${b.id}/download))`
-                                    + `\n${b.difficulty_rating} :star: - \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}**`
-                                ))
-                                return out;
-                            })
+                        this.__parse(recents, username, mode, id)
+                            .map(a => a.setTitle(`Top plays of **${username}**`))
                     )
                     .addHandler('⬅️', (m, i, u, e) => ({ index: (i - 1 + e.length) % e.length }))
                     .addHandler('➡️', (m, i, u, e) => ({ index: (i + 1 + e.length) % e.length }))
