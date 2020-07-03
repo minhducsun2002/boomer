@@ -36,7 +36,7 @@ export = class extends FgoCommand {
         let out =  new MessageEmbed()
             .setColor(SUCCESS_COLOR)
             .setTitle(`${name} (\`${id}\`)`)
-            .setDescription(`${actConsume} AP | Recommended level : ${recommendLv}`)
+            .setDescription(`**${actConsume}** AP | Recommended level : **${recommendLv}**`)
             .addField(
                 'Place',
                 spot 
