@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
 import { constructQuery as c } from '../../lib/fgo/';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import { mstQuest } from '../../db/fgo/master/mstQuest';
+import type { mstQuest } from '../../db/fgo/master/mstQuest';
 
 const commandName = 'show-quests';
 const aliases = [commandName, 'quests', 'quest', 'sq', 'q']
@@ -33,6 +33,20 @@ export = class extends FgoCommand {
                 return ((_ as any).cache() as typeof _).select('name id').limit(1).exec()
             }))).map(([a]) => a)
             : [];
+
+        let phases = (await c.mstQuestPhase({ questId: id }).NA.exec())
+            .sort((a, b) => a.phase - b.phase);
+        let [{ friendshipExp, qp, playerExp }] = phases;
+
+        // dedupe & fetch
+        
+        let _cl = (await Promise.all(
+            [...new Set(phases.map(a => a.classIds).flat())]
+                .map(id => c.mstClass({ id }).NA.exec())
+        )).flat();
+        let cls = new Map<typeof _cl[0]['id'], typeof _cl[0]>();
+        _cl.forEach(a => cls.set(a.id, a));
+            
         let out =  new MessageEmbed()
             .setColor(SUCCESS_COLOR)
             .setTitle(`${name} (\`${id}\`)`)
@@ -50,6 +64,19 @@ export = class extends FgoCommand {
                     `\`Opened\`|\`${new Date(openedAt * 1000).toLocaleString()}\``,
                     `\`Closed\`|\`${new Date(closedAt * 1000).toLocaleString()}\``,
                 ].join('\n')
+            )
+            .addField(
+                `Rewards`,
+                `QP : **${qp}** | Bond : **${friendshipExp}** | EXP : **${playerExp}**`
+            )
+            .addFields(
+                phases.map(a => ({
+                    name: `Phase ${a.phase}`,
+                    value: [
+                        `Enemy classes : ${a.classIds.map(_ => cls.get(_).name).join(', ')}`,
+                        ``
+                    ].join('\n')
+                }))
             )
 
         if (items.length) out.addField(

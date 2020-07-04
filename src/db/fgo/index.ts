@@ -38,6 +38,7 @@ import { mstSvtSkillSchema,  mstSvtSkillDocument } from './master/mstSvtSkill';
 import { mstSkillDetailSchema,  mstSkillDetailDocument } from './master/mstSkillDetail';
 import { mstItemSchema,  mstItemDocument } from './master/mstItem';
 import { mstQuestConsumeItemSchema,  mstQuestConsumeItemDocument } from './master/mstQuestConsumeItem';
+import { mstQuestPhaseSchema, mstQuestPhaseDocument } from './master/mstQuestPhase';
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
 
@@ -55,7 +56,8 @@ const _ = (s : keyof typeof master) => {
         mstSvtSkill: __.model('mstSvtSkill', mstSvtSkillSchema, 'mstSvtSkill') as Model<mstSvtSkillDocument>,
         mstSkillDetail: __.model('mstSkillDetail', mstSkillDetailSchema, 'mstSkillDetail') as Model<mstSkillDetailDocument>,
         mstItem: __.model('mstItem', mstItemSchema, 'mstItem') as Model<mstItemDocument>,
-        mstQuestConsumeItem: __.model('mstQuestConsumeItem', mstQuestConsumeItemSchema, 'mstQuestConsumeItem') as Model<mstQuestConsumeItemDocument>
+        mstQuestConsumeItem: __.model('mstQuestConsumeItem', mstQuestConsumeItemSchema, 'mstQuestConsumeItem') as Model<mstQuestConsumeItemDocument>,
+        mstQuestPhase: __.model('mstQuestPhase', mstQuestPhaseSchema, 'mstQuestPhase') as Model<mstQuestPhaseDocument>        
     }
 }
 
