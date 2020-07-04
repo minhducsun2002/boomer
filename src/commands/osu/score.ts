@@ -5,14 +5,12 @@ import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { accuracy as acc, modToString as mm } from '../../lib/osu/utils';
 import { pad, chunk } from '@pepper/utils';
-import map from './beatmap';
 import { modes } from '@pepper/constants/osu';
-import { fetchMapset } from '@pepper/lib/osu'
+import { fetchMapset, checkURL as check } from '@pepper/lib/osu'
 
 const commandName = 'score', aliases : string[] = [commandName, 'scores', 'sc'];
 
 export = class extends OsuCommand {
-    private check = new map().checkURL;
     constructor() {
         super(commandName, {
             aliases,
@@ -39,7 +37,7 @@ export = class extends OsuCommand {
         let _ = +beatmap;
         if (isNaN(_)) 
         // try parsing as URL
-            try { _ = this.check(beatmap).id; } catch { _ = null }
+            try { _ = check(beatmap).id; } catch { _ = null }
             
         if (!_)
             return m.channel.send(err.setDescription('You passed neither a beatmap ID, nor a beatmap URL!'));

@@ -1,16 +1,13 @@
 import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
-import map from './beatmap';
 import axios from 'axios';
 import oj from 'ojsama';
-import { mode_friendly } from '../../constants/osu';
+import { mode_friendly } from '@pepper/constants/osu';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 
 const commandName = 'pp', aliases : string[] = [commandName];
 
 export = class extends OsuCommand {
-    private check = new map().checkURL;
-
     constructor() {
         super(commandName, {
             aliases,
@@ -55,14 +52,6 @@ export = class extends OsuCommand {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, an error occurred.`)
         let _ = +mapId;
-        // if (isNaN(_)) {
-        //     // try parsing as URL
-        //     try {
-        //         _ = this.check(mapId).id;
-        //     } catch { _ = null }
-        // };
-        // if (!_)
-        //     return m.channel.send(err.setDescription('You passed neither a beatmap ID, nor a beatmap URL!'));
 
         if (isNaN(_))
             return m.channel.send(err.setDescription('You passed an invalid beatmap ID!'));

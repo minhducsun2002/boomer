@@ -1,10 +1,8 @@
 import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
-import axios from 'axios';
-import cheerio from 'cheerio';
 import { ERROR_COLOR } from '../../constants/colors';
 import { paginatedEmbed } from '@pepper/utils';
-import { embedBeatmap, Beatmapset, embedBeatmapset } from '@pepper/lib/osu';
+import { embedBeatmap, embedBeatmapset, checkURL } from '@pepper/lib/osu';
 import { fetchMapset } from '@pepper/lib/osu';
 
 const commandName = 'beatmap';
@@ -31,20 +29,6 @@ export default class extends OsuCommand {
         })
     }
 
-    
-    public checkURL (url : string) : { set?: number; id?: number; mode?: string } {
-        let valid = !!url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/(b|beatmapsets|beatmaps)\/(\d+)/);
-        if (!valid) throw new TypeError(`Not a beatmap(set) URL`);
-        let set = +(url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)/) || []).slice(1)[0];
-        let id = +(
-            url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/beatmaps\/(\d+)/)
-            || url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/b\/(\d+)/)
-            || (url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)#(osu|taiko|fruits|mania)\/(\d+)/) || []).slice(3)
-        ).slice(1)[0];
-        let [mode] = (url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)#(osu|taiko|fruits|mania)\/(\d+)/) || []).slice(2)
-        return { set, id, mode };
-    }
-
     async exec(m : Message, { beatmap, set } = { beatmap: '', set: false }) {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, an error occurred.`)
@@ -54,7 +38,7 @@ export default class extends OsuCommand {
             let _e = () : any =>
                 m.channel.send(err.setDescription(`Sorry, couldn't find such beatmap(set).`));
             try {
-                let _ = this.checkURL(beatmap);
+                let _ = checkURL(beatmap);
                 mode = _.mode;
                 // base logic :
                 // URL overrides everything.
