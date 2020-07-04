@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { OwnerCommand } from './baseCommand';
 import { relative as rel } from 'path';
-import { chunk, plural as p, embed } from '@pepper/utils';
+import { chunk, plural as p, paginatedEmbed } from '@pepper/utils';
 
 const commandName = 'list-cmds';
 const aliases = [commandName, 'cmds', 'cmd', 'list-cmd']
@@ -36,7 +36,7 @@ export = class extends OwnerCommand {
                     )
                     .setFooter(`Page ${i + 1}/${_.length}`)
             )
-        embed()
+        paginatedEmbed()
             .setChannel(m.channel)
             .setEmbeds(out)
             .run({ idle: 20000, dispose: true })
