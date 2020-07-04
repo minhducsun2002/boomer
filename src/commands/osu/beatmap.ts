@@ -2,11 +2,10 @@ import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
 import axios from 'axios';
 import cheerio from 'cheerio';
-import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
+import { ERROR_COLOR } from '../../constants/colors';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
-import { pad, chunk } from '@pepper/utils';
-import { modes, mode_friendly } from '../../constants/osu';
-import { embedBeatmap, Beatmap, Beatmapset, embedBeatmapset } from '@pepper/lib/osu';
+import { paginatedEmbed } from '@pepper/utils';
+import { embedBeatmap, Beatmapset, embedBeatmapset } from '@pepper/lib/osu';
 
 const commandName = 'beatmap';
 const aliases = [commandName, 'map'];
@@ -80,17 +79,14 @@ export default class extends OsuCommand {
             let __ = await this.getURL(_id, set);
 
             if (set) {
-                
-                let out = embedBeatmapset(
-                    __, MAX_DIFF_PER_PAGE,
-                    a => mode ? a.filter(a => a.mode === mode) : a
-                )
-
-                new PagedEmbeds()
-                    .addHandler('⬅️', (m, i, u, e) => ({ index: (i - 1 + e.length) % e.length }))
-                    .addHandler('➡️', (m, i, u, e) => ({ index: (i + 1 + e.length) % e.length }))
+                paginatedEmbed()
                     .setChannel(m.channel)
-                    .setEmbeds(out.flat())
+                    .setEmbeds(
+                        embedBeatmapset(
+                        __, MAX_DIFF_PER_PAGE,
+                        a => mode ? a.filter(a => a.mode === mode) : a
+                        ).flat()
+                    )
                     .run({ idle: 20000, dispose: true })
 
             } else {
