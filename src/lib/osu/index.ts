@@ -1,5 +1,7 @@
 export { accuracy, modToString, ModNames } from './utils';
-export { Beatmap, embedBeatmap } from './beatmap';
-export { Beatmapset, embedBeatmapset } from './beatmapset';
-export { fetchMapset } from './fetchBeatmap';
+export { embedBeatmapset, embedBeatmap, embedScoreset } from './embeds';
+export type { Beatmap } from './beatmap';
+export type { Beatmapset } from './beatmapset';
+export { fetchMapset, fetchUser, fetchBest, fetchRecent } from './fetch';
 export { checkURL } from './checkURL';
+export type { osuUser, osuUserExtra } from './user';

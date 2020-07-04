@@ -81,7 +81,7 @@ export = class extends OsuCommand {
             let {
                 difficulty_rating, mode_int,
                 max_combo, ar, accuracy, cs, drain, total_length, id
-            } = set.beatmaps.find(a => a.id == _);
+            } = set.beatmaps.find(a => a.id === _);
 
             let __ = chunk(scores, MAX_SCORES);
 

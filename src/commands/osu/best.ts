@@ -1,17 +1,14 @@
 import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
-import axios from 'axios';
-import cheerio from 'cheerio';
-import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
-import type { osuUser, osuUserExtra } from './user';
-import recent from './recent';
-import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
+import { ERROR_COLOR } from '../../constants/colors';
+import { modes } from '@pepper/constants/osu'
+import { fetchUser, fetchBest, embedScoreset } from '@pepper/lib/osu';
+import { paginatedEmbed } from '@pepper/utils';
 
 const commandName = 'best';
 const aliases = [commandName];
 
-const modes = ['osu', 'taiko', 'fruits', 'mania'];
-const MAX_RESULTS = 100, MAX_SINGLE = 50, MAX_VIEW = 5;
+const MAX_RESULTS = 100, MAX_SINGLE = 50;
 
 export = class extends OsuCommand {
     constructor() {
@@ -33,8 +30,6 @@ export = class extends OsuCommand {
         })
     }
 
-    private __parse = new recent().__parse;
-
     async exec(m : Message, { user, mode } = { user: '', mode: '' }) {
         user = user.trim();
         if (!modes.includes(mode)) mode = modes[0];
@@ -42,47 +37,18 @@ export = class extends OsuCommand {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
         try {
-            const _ = await axios.get(`https://osu.ppy.sh/u/${encodeURIComponent(user)}/${mode}`, {
-                validateStatus: () => true
-            });
-            if (_.status === 404) return m.channel.send(err);
-            if (_.status !== 200) throw new Error(
-                `Error getting user ID : Expected status 200, got status ${_.status}`
-            );
-
-            const dom = cheerio.load(_.data);
-            let { id, username } : osuUser = JSON.parse(dom('#json-user').contents().first().text());
+            let { user: { id, username } } = await fetchUser(user, mode);
             // we got the ID, now we start fetching things
 
-            let initial = 0, recents : osuUserExtra['scoresBest'] = []
-            while (initial < MAX_RESULTS) {
-                let _ = await axios.get(`https://osu.ppy.sh/users/${
-                    encodeURIComponent(id)
-                }/scores/best?mode=${mode}&offset=${encodeURIComponent(initial)}&limit=${encodeURIComponent(MAX_SINGLE)}`);
-                if (_.status === 404) return m.channel.send(err);
-                if (_.status !== 200) throw new Error(
-                    `Error fetching data : Expected status 200, got status ${_.status}`
-                );
-                initial += MAX_SINGLE;
-                // default axios behavior is parsing applications/json?
-                
-                // let ___ = JSON.parse(_.data);
-                let ___ : typeof recents = _.data;
-                recents = recents.concat(___);
-                if (!___.length)
-                    // if no data, we cannot fetch further
-                    break;
-            }
+            let recents = await fetchBest(id, mode, MAX_RESULTS, MAX_SINGLE);
             
             if (recents.length) 
-                new PagedEmbeds()
+                paginatedEmbed()
                     .setChannel(m.channel)
                     .setEmbeds(
-                        this.__parse(recents, username, mode, id)
+                        embedScoreset(recents, username, id, mode)
                             .map(a => a.setTitle(`Top plays of **${username}**`))
                     )
-                    .addHandler('⬅️', (m, i, u, e) => ({ index: (i - 1 + e.length) % e.length }))
-                    .addHandler('➡️', (m, i, u, e) => ({ index: (i + 1 + e.length) % e.length }))
                     .run({ idle: 20000, dispose: true })
             else
                 m.channel.send(
