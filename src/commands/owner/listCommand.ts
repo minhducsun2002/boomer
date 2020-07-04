@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import { OwnerCommand } from './baseCommand';
 import { relative as rel } from 'path';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
-import { chunk, plural as p } from '@pepper/utils';
+import { chunk, plural as p, embed } from '@pepper/utils';
 
 const commandName = 'list-cmds';
 const aliases = [commandName, 'cmds', 'cmd', 'list-cmd']
@@ -24,7 +24,7 @@ export = class extends OwnerCommand {
                 (a, i, _) => new MessageEmbed()
                     .setTitle(`Loaded command modules`)
                     .setDescription(
-                        `Currently loaded ${c.length} command${p(c.length)} from \`${h.directory}\``
+                        `Currently loaded ${c.length} command${p(c.length)} from \`${h.directory}\`.`
                     )
                     .addFields(
                         a.map(p => ({
@@ -32,11 +32,12 @@ export = class extends OwnerCommand {
                             value: 
                                 `Path: \`${rel(h.directory, p.filepath)}\``
                                 + `\nCategory: ${p.categoryID || 'N/A'}`
+                                + `\nAliases : ${p.aliases.map(a => `\`${a}\``).join(', ')}`
                         }))
                     )
                     .setFooter(`Page ${i + 1}/${_.length}`)
             )
-        new PagedEmbeds()
+        embed()
             .setChannel(m.channel)
             .setEmbeds(out)
             .run({ idle: 20000, dispose: true })
