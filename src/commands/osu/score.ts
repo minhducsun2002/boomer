@@ -6,12 +6,12 @@ import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { accuracy as acc, modToString as mm } from '../../lib/osu/utils';
 import { pad, chunk } from '@pepper/utils';
 import map from './beatmap';
-import { modes } from '../../constants/osu';
+import { modes } from '@pepper/constants/osu';
+import { fetchMapset } from '@pepper/lib/osu'
 
 const commandName = 'score', aliases : string[] = [commandName, 'scores', 'sc'];
 
 export = class extends OsuCommand {
-    private getURL = new map().getURL;
     private check = new map().checkURL;
     constructor() {
         super(commandName, {
@@ -79,7 +79,7 @@ export = class extends OsuCommand {
             if (scores.length === 0)
                 return m.channel.send(err.setDescription(`Sorry, no scores found on that beatmap.`))
 
-            let set = await this.getURL(_, false);
+            let set = await fetchMapset(_, false)
             let {
                 difficulty_rating, mode_int,
                 max_combo, ar, accuracy, cs, drain, total_length, id

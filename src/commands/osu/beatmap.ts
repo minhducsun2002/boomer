@@ -3,9 +3,9 @@ import { Message, MessageEmbed } from 'discord.js';
 import axios from 'axios';
 import cheerio from 'cheerio';
 import { ERROR_COLOR } from '../../constants/colors';
-import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { paginatedEmbed } from '@pepper/utils';
 import { embedBeatmap, Beatmapset, embedBeatmapset } from '@pepper/lib/osu';
+import { fetchMapset } from '@pepper/lib/osu';
 
 const commandName = 'beatmap';
 const aliases = [commandName, 'map'];
@@ -45,38 +45,29 @@ export default class extends OsuCommand {
         return { set, id, mode };
     }
 
-    public async getURL(id : number, set : boolean = false) {
-        const _ = await axios.get(
-            set ? `https://osu.ppy.sh/beatmapsets/${id}` : `https://osu.ppy.sh/beatmaps/${id}`,
-            { validateStatus: () => true }
-        );
-        if (_.status === 404) throw new Error(`Beatmap not found`);
-        if (_.status !== 200) throw new Error(
-            `Error getting beatmap : Expected status 200, got status ${_.status}`
-        );
-
-        const dom = cheerio.load(_.data);
-        return JSON.parse(dom('#json-beatmapset').contents().first().text()) as Beatmapset;
-    }
-
     async exec(m : Message, { beatmap, set } = { beatmap: '', set: false }) {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, an error occurred.`)
         // check if ID or URL
         let _id = +beatmap, mode = '';
         if (isNaN(_id)) {
-            let _ = this.checkURL(beatmap);
-            mode = _.mode;
-            // base logic :
-            // URL overrides everything.
-            // if id is available, fetch map, else fetch mapset
-            _id = (_.id ? _.id : _.set)
-            // /set is enabled if no ID is present, and setId is present
-            set = !!_.set && !_.id
-            if (!_id) return m.channel.send(err.setDescription(`Sorry, couldn't find such beatmap(set).`))
+            let _e = () : any =>
+                m.channel.send(err.setDescription(`Sorry, couldn't find such beatmap(set).`));
+            try {
+                let _ = this.checkURL(beatmap);
+                mode = _.mode;
+                // base logic :
+                // URL overrides everything.
+                // if id is available, fetch map, else fetch mapset
+                _id = (_.id ? _.id : _.set)
+                // /set is enabled if no ID is present, and setId is present
+                set = !!_.set && !_.id
+            }
+            catch { return _e(); }
+            if (!_id) return _e();
         }
         try {
-            let __ = await this.getURL(_id, set);
+            let __ = await fetchMapset(_id, set);
 
             if (set) {
                 paginatedEmbed()
