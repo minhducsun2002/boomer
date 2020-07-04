@@ -1,7 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { OwnerCommand } from './baseCommand';
 import { relative as rel } from 'path';
-import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { chunk, plural as p, embed } from '@pepper/utils';
 
 const commandName = 'list-cmds';
