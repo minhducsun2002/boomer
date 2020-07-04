@@ -16,7 +16,9 @@
         "paths": {
             "@pepper/utils": ["src/utils/index"],
             "@pepper/struct": ["src/struct/index"],
-            "@pepper/client": ["src/index"]
+            "@pepper/client": ["src/index"],
+            "@pepper/lib/*": ["src/lib/*"],
+            "@pepper/constants/*": ["src/constants/*"]
         },
         "plugins": [
             {

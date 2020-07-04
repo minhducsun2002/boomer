@@ -6,39 +6,10 @@ import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { pad, chunk } from '@pepper/utils';
 import { modes, mode_friendly } from '../../constants/osu';
+import { embedBeatmap, Beatmap, Beatmapset, embedBeatmapset } from '@pepper/lib/osu';
 
 const commandName = 'beatmap';
 const aliases = [commandName, 'map'];
-
-export interface Beatmap {
-    id: number; beatmapset_id: number;
-    mode: 'osu' | 'taiko' | 'fruits' | 'mania'; mode_int: number; convert: true | null;
-    difficulty_rating: number; version: string;
-    total_length: number; hit_length: number;
-    bpm: number; cs: number, drain: number, accuracy: number, ar: number;
-    playcount: number, passcount: number;
-    max_combo: number;
-}
-
-export interface Beatmapset {
-    id: number;
-    title: string; artist: string;
-    play_count: number; favourite_count: number;
-    submitted_date: string; last_updated: string; ranked_date: string;
-    source: string; tags: string; preview_url: string;
-    video: boolean; storyboard: boolean;
-    ranked: number; status: string;
-
-    beatmaps: Beatmap[]; converts: Beatmap[];
-
-    creator: string; user_id: number;
-    covers: {
-        cover: string; 'cover@2x': string;
-        card: string; 'card@2x': string;
-        list: string; 'list@2x': string;
-        slimcover: string; 'slimcover@2x': string;
-    };
-}
 
 const MAX_DIFF_PER_PAGE = 7;
 
@@ -108,57 +79,12 @@ export default class extends OsuCommand {
         try {
             let __ = await this.getURL(_id, set);
 
-            let {
-                beatmaps, converts,
-                title, artist, id: set_id, status, creator, user_id,
-                ranked, ranked_date, last_updated, covers
-            } = __;
-            beatmaps = beatmaps.concat(...converts);
-            if (mode) beatmaps = beatmaps.filter(a => a.mode === mode);
             if (set) {
-                let availableModes = [] as string[];
-                beatmaps.forEach(a => (availableModes.includes(a.mode) ? 0 : availableModes.push(a.mode)));
-
-                // start building embed for modes
-                let out = availableModes.map((m, ii, ___) => {
-                    let maps = beatmaps.filter(a => a.mode === m).sort((m1, m2) => m1.difficulty_rating - m2.difficulty_rating);
-
-                    return chunk(maps, MAX_DIFF_PER_PAGE).map((chunked, i, _) => (
-                        new MessageEmbed()
-                        .setTitle(`${artist} - ${title}`)
-                        .setURL(`https://osu.ppy.sh/beatmapsets/${set_id}`)
-                        .setDescription(
-                            `Mapped by **[${creator}](https://osu.ppy.sh/users/${user_id})**. `
-                            + (!(ranked > 0) ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
-                            + ((ranked > 0)
-                                ? `Ranked **${new Date(ranked_date).toLocaleString('en-US')}**.`
-                                : `Last updated **${new Date(last_updated).toLocaleString('en-US')}**.`)
-                            + `\nDownload : [main site](https://osu.ppy.sh/beatmapsets/${set_id}/download) | `
-                            + `[Ripple mirror](https://storage.ripple.moe/d/${set_id})`
-                        )
-                        .setImage(covers["cover@2x"])
-                        .setColor(SUCCESS_COLOR)
-                        .addFields(chunked.map(
-                            ({
-                                version, difficulty_rating,
-                                max_combo, ar, accuracy, cs, drain,
-                                total_length, id
-                            }) => ({
-                                name: version,
-                                value:
-                                    `${difficulty_rating} :star:${max_combo ? ` | **${max_combo}**x` : ''} | `
-                                    + `${pad(2)(Math.floor(total_length / 60))}:${pad(2)(total_length % 60)} | `
-                                    + `\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${accuracy}** \`HP\`**${drain}**\n`
-                                    + `[Link](https://osu.ppy.sh/beatmaps/${id})`
-                            })
-                        ))
-                        .setFooter(
-                            `Mode : ${mode_friendly[modes.findIndex(_ => _ === m)]} | `
-                            + `Page ${i + 1}/${_.length} - ${ii + 1}/${___.length}`
-                        )
-                        .setTimestamp()
-                    ));
-                })
+                
+                let out = embedBeatmapset(
+                    __, MAX_DIFF_PER_PAGE,
+                    a => mode ? a.filter(a => a.mode === mode) : a
+                )
 
                 new PagedEmbeds()
                     .addHandler('⬅️', (m, i, u, e) => ({ index: (i - 1 + e.length) % e.length }))
@@ -168,34 +94,15 @@ export default class extends OsuCommand {
                     .run({ idle: 20000, dispose: true })
 
             } else {
-                let [{ version, difficulty_rating, max_combo, ar, accuracy, cs, drain, total_length, mode_int, bpm, id: map_id }] =
-                    beatmaps.filter(a => a.id === _id);
                 m.channel.send(
-                    new MessageEmbed()
-                        .setTitle(`${artist} - ${title} [${version}]`)
-                        .setURL(`https://osu.ppy.sh/beatmapsets/${set_id}#${modes[mode_int]}/${map_id}`)
-                        .setDescription(
-                            `Mapped by **[${creator}](https://osu.ppy.sh/users/${user_id})**. `
-                            + (!(ranked > 0) ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
-                            + ((ranked > 0)
-                                ? `Ranked **${new Date(ranked_date).toUTCString()}**.`
-                                : `Last updated **${new Date(last_updated)}**`)
-                        )
-                        .setImage(covers["cover@2x"])
-                        .setColor(SUCCESS_COLOR)
-                        .addField(
-                            `Difficulty`,
-                            `${difficulty_rating} :star: - \`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${accuracy}** \`HP\`**${drain}**`
-                            + ` - ${bpm} BPM`
-                        )
-                        .addField(
-                            `Length`,
-                            `**${max_combo}**x | ${pad(2)(Math.floor(total_length / 60))}:${pad(2)(total_length % 60)}`,
-                            true
-                        )
-                        .addField(`Game mode`, mode_friendly[mode_int], true)
+                    embedBeatmap(
+                        __.beatmaps.concat(__.converts)
+                            .filter(a => a.id === _id)[0],
+                        __
+                    )
                 )
             }
+            
         } catch (e) {
             m.channel.send(err.setDescription(`Sorry, an error occurred.`));
         }
