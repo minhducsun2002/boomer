@@ -1,0 +1,17 @@
+name: Linting check
+on: [push]
+jobs:
+  build:
+    name: Build image
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-node@v1
+      name: Setup Node.js
+      with:
+        node-version: '14.x'
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Install packages
+      run: yarn
+    - name: Running the lint
+      run: yarn lint
