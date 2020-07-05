@@ -8,7 +8,7 @@ import { paginatedEmbed } from '@pepper/utils';
 const commandName = 'recent';
 const aliases = [commandName, 'recentplay', 'rp'];
 
-const MAX_RESULTS = 100, MAX_SINGLE = 50, MAX_VIEW = 5;
+const MAX_RESULTS = 100, MAX_SINGLE = 50;
 
 export = class extends OsuCommand {
     constructor() {

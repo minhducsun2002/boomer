@@ -1,5 +1,5 @@
 import { OsuCommand } from './baseCommand';
-import { Message, MessageEmbed, User } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import axios from 'axios';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';

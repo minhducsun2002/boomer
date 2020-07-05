@@ -43,13 +43,13 @@ export = class extends FgoCommand {
                                 .setFooter(`Page ${i + 1}/${c.length}`)
                             )
                     )
-                    .addHandler(this.client.emojis.resolveIdentifier('⬅️'), (m, i, u, e, c) => {
+                    .addHandler(this.client.emojis.resolveIdentifier('⬅️'), (m, i, u, e) => {
                         return {
                             index: (i - 1 + e.length) % e.length,
                             embed: e
                         }
                     })
-                    .addHandler(this.client.emojis.resolveIdentifier('➡️'), (m, i, u, e, c) => {
+                    .addHandler(this.client.emojis.resolveIdentifier('➡️'), (m, i, u, e) => {
                         return {
                             index: (i + 1 + e.length) % e.length,
                             embed: e

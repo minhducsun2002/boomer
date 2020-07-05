@@ -1,5 +1,5 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { Duration, TimeUnit } from 'timezonecomplete';
+import { Duration } from 'timezonecomplete';
 import { GeneralCommand } from './baseCommand'
 
 const commandName = 'uptime';
