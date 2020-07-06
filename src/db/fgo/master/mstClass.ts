@@ -1,8 +1,8 @@
 import { Schema, Document } from 'mongoose';
-import { ClassType, Attribute, AttackRate } from '../../../constants/fgo';
+import { ClassType, Attribute, AttackRate, Trait } from '../../../constants/fgo';
 export interface mstClass {
     id: ClassType;
-    attri: Attribute | number;
+    attri: typeof Attribute[keyof typeof Attribute] | Trait;
     name: string;
     attackRate: AttackRate;
 }

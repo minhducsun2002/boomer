@@ -1,8 +1,8 @@
-import { Attribute, AttackRate } from '../../../constants/fgo/'
+import type { Attribute, AttackRate } from '../../../constants/fgo/'
 import { Schema, Document } from 'mongoose'
 export interface mstAttriRelation {
-    atkAttri: Attribute;
-    defAttri: Attribute;
+    atkAttri: typeof Attribute[keyof typeof Attribute];
+    defAttri: typeof Attribute[keyof typeof Attribute];
     /** Damage multiplier used.
      * @see https://grandorder.wiki/Attributes
      */

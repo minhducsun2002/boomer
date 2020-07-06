@@ -37,7 +37,7 @@ export interface mstSvt {
     /** Class */
     classId: ClassType;
     /** Attribute */
-    attri: Attribute;
+    attri: typeof Attribute[keyof typeof Attribute];
 }
 
 export interface mstSvtDocument extends mstSvt, Document { id: number; }

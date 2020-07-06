@@ -1,5 +1,5 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { Attribute, Gender } from '../../constants/fgo/strings';
+import { Gender, Trait } from '@pepper/constants/fgo/strings';
 import { CardType as Card } from '../../constants/fgo'
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { constructQuery as c } from '../../lib/fgo/';
@@ -110,7 +110,7 @@ export = class extends FgoCommand {
                     .addField('Traits', traits.join(', '), true)
                     .addField(
                         'Gender / Attribute / Alignment', 
-                        `${Gender[genderType].join(' + ')} / ${Attribute[attri]} / ${
+                        `${Gender[genderType].join(' + ')} / ${Trait[attri as keyof typeof Trait]} / ${
                             alignment.split(' ').map(sentence).join(' ')
                         }`,
                         true

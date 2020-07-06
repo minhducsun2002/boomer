@@ -36,15 +36,6 @@ export enum ClassType {
     Foreigner = 25,
 }
 
-/** Servant attribute */
-export enum Attribute {
-    STAR = 4,
-    BEAST = 5,
-    HUMAN = 1,
-    EARTH = 3,
-    HEAVEN = 2,
-}
-
 /** Base attack multiplier for servant (class-agnostic) */
 export type AttackRate = number;
 /** Action Points */
@@ -741,4 +732,13 @@ export enum Trait {
     criticalHit = 4100,
     canBeInBattle = 5000,
     notBasedOnServant = 5010,
+}
+
+/** Servant attribute */
+export const Attribute = {
+    STAR: Trait.attributeStar,
+    BEAST: Trait.attributeBeast,
+    HUMAN: Trait.attributeHuman,
+    EARTH: Trait.attributeEarth,
+    HEAVEN: Trait.attributeSky,
 }
