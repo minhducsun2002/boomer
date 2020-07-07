@@ -10,8 +10,11 @@ import { constructQuery as mstSvtSkill } from './mstSvtSkill';
 import { constructQuery as mstSkillDetail } from './mstSkillDetail';
 import { constructQuery as mstItem } from './mstItem';
 import { constructQuery as mstQuestConsumeItem } from './mstQuestConsumeItem';
-import { constructQuery as mstQuestPhase } from './mstQuestPhase'
+import { constructQuery as mstQuestPhase } from './mstQuestPhase';
+import { constructQuery as mstSvtLimit } from './mstSvtLimit';
 export const constructQuery = {
     mstClass, mstSvt, mstAttriRelation, mstQuest, mstSpot, mstWar, mstSvtCard, mstSvtComment, mstSvtSkill,
-    mstSkillDetail, mstItem, mstQuestConsumeItem, mstQuestPhase
+    mstSkillDetail, mstItem, mstQuestConsumeItem, mstQuestPhase, mstSvtLimit
 }
+
+export { embedServantBase } from './embeds';

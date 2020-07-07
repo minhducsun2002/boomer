@@ -7,12 +7,11 @@ import {
     ClassModifier as claMod
 } from '@pepper/constants/fgo';
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
-import { constructQuery as c } from '../../lib/fgo/';
+import { constructQuery as c, embedServantBase } from '@pepper/lib/fgo';
 import { plural as p } from '@pepper/utils';
 import { FgoCommand } from './baseCommand';
 import { paginatedEmbed } from '@pepper/utils'
-
-import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors'
+import { ERROR_COLOR } from '@pepper/constants/colors';
 
 const commandName = 'servant-info';
 const aliases = ['servant', 'servant-info', 's'];
@@ -66,16 +65,16 @@ export = class extends FgoCommand {
             )
 
 
-        const [{ rarity, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit],
-            criticalStat: [starAbsorption],
+        const [{ id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit],
             noblePhantasm: { length: npUpgradesCount }, activeSkill, passiveSkill
         }] = results;
 
-        const [{
-            name, baseSvtId, classId, attri, genderType, cardIds,
-            starRate: starGen, collectionNo, relateQuestIds, individuality: _in
-        }] = await c.mstSvt({ collectionNo: id as number }).NA.exec()
-        const [{ name: className }] = await c.mstClass({ id: classId }).NA.exec()
+        const [svt] = await c.mstSvt({ collectionNo: id as number }).NA.exec();
+        let {
+            baseSvtId, classId, attri, genderType, cardIds,
+            starRate: starGen, relateQuestIds, individuality: _in
+        } = svt;
+        const mstSvtLimits = await c.mstSvtLimit({ svtId: baseSvtId }).NA.limit(5).exec();
         const dmg = (await c.mstSvtCard({ svtId: baseSvtId }).NA.limit(4).exec())
             .sort((a, b) => a.cardId - b.cardId)
             .map(a => a.normalDamage)
@@ -86,10 +85,9 @@ export = class extends FgoCommand {
         } = results[0].noblePhantasm.pop();
 
 
-        let base = () => new MessageEmbed()
-                .setColor(SUCCESS_COLOR)
-                .setAuthor(`${rarity}☆ ${className}`)
-                .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`),
+        let rarity = Math.max(...mstSvtLimits.map(a => a.rarity));
+        let __class = (await c.mstClass({ id: classId }).NA.exec())[0];
+        let base = () => embedServantBase(svt, __class, mstSvtLimits),
             ccount = (_ : Card) => 
                 cardIds.reduce((b, a) => a === _ ? b + 1 : b, 0)
 
@@ -121,7 +119,9 @@ export = class extends FgoCommand {
                         true
                     )
                     .addField('NP generation', `- Per hit : ${npPerATK}\n- When attacked : ${npPerHit}`, true)
-                    .addField('Critical stars', `- Star weighting : ${starAbsorption}\n- Star generation : ${(starGen / 10).toFixed(1)}%`, true)
+                    .addField('Critical stars', `- Star weighting : ${
+                        mstSvtLimits[0].criticalWeight
+                    }\n- Star generation : ${(starGen / 10).toFixed(1)}%`, true)
                     .addField(
                         'Traits',
                         [...ind]
