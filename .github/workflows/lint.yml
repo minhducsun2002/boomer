@@ -2,7 +2,7 @@ name: Linting check
 on: [push]
 jobs:
   build:
-    name: Build image
+    name: Linting
     runs-on: ubuntu-latest
     steps:
     - uses: actions/setup-node@v1
