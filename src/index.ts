@@ -17,7 +17,7 @@ const client = new PepperClient({
     )
 });
 client.commandHandler.loadAll()
-    .on('commandBlocked', async (m, c, r) => {
+    .on('commandBlocked', async (m, {}, r) => {
         let h = client.commandHandler, rr = client.extras.CommandBlockReason;
         let _ = await h.parseCommand(m) || await h.parseCommandOverwrittenPrefixes(m);
         m.channel.send(

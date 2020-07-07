@@ -2,9 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
 import { constructQuery as c } from '../../lib/fgo/';
 import { ERROR_COLOR } from '../../constants/colors';
-import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
-import { plural as p } from '@pepper/utils' ;
-import { chunk } from '../../utils/chunk';
+import { plural as p, paginatedEmbed, chunk } from '@pepper/utils' ;
 
 const commandName = 'search-spot';
 const aliases = [commandName, 'ssp']
@@ -33,7 +31,7 @@ export = class extends FgoCommand {
                 .NA.select('name id').exec();
             
             if (_.length > MAX_PAGE)
-                new PagedEmbeds()
+                paginatedEmbed()
                     .setChannel(m.channel)
                     .setEmbeds(
                         chunk(_, MAX_PAGE)
@@ -43,18 +41,6 @@ export = class extends FgoCommand {
                                 .setFooter(`Page ${i + 1}/${c.length}`)
                             )
                     )
-                    .addHandler(this.client.emojis.resolveIdentifier('⬅️'), (m, i, u, e) => {
-                        return {
-                            index: (i - 1 + e.length) % e.length,
-                            embed: e
-                        }
-                    })
-                    .addHandler(this.client.emojis.resolveIdentifier('➡️'), (m, i, u, e) => {
-                        return {
-                            index: (i + 1 + e.length) % e.length,
-                            embed: e
-                        }
-                    })
                     .run({ idle: 20000, dispose: true })
             else
                 m.channel.send(

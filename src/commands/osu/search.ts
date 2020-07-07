@@ -1,10 +1,9 @@
 import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
 import axios from 'axios';
-import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { modes, mode_friendly, status } from '../../constants/osu';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../..//constants/colors';
-import { chunk } from '@pepper/utils';
+import { chunk, paginatedEmbed } from '@pepper/utils';
 
 const commandName = 'search';
 const aliases = [commandName];
@@ -94,10 +93,8 @@ export = class extends OsuCommand {
             if (out.length === 1)
                 return m.channel.send(out[0]);
             if (out.length >= 2)
-                new PagedEmbeds()
+                paginatedEmbed()
                 .setEmbeds(out)
-                .addHandler('⬅️', (m, i, u, e) => ({ index: (i - 1 + e.length) % e.length }))
-                .addHandler('➡️', (m, i, u, e) => ({ index: (i + 1 + e.length) % e.length }))
                 .setChannel(m.channel)
                 .run({ idle: 20000, dispose: true })
         } catch (e) {

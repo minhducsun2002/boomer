@@ -1,9 +1,8 @@
 {
-    "plugins": ["@typescript-eslint", "unused-imports"],
+    "plugins": ["@typescript-eslint"],
     "rules": {
         "no-unused-vars": "off",
-        "unused-imports/no-unused-imports-ts": "error",
-        "unused-imports/no-unused-vars-ts": "warn"
+        "@typescript-eslint/no-unused-vars-experimental": ["error"]
     },
     "parserOptions": {
         "sourceType": "module",

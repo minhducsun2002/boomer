@@ -21,7 +21,7 @@ export = class extends OsuCommand {
             }, {
                 id: 'accuracy',
                 match: 'phrase',
-                type: (m : Message, p : string) : number => {
+                type: ({}, p : string) : number => {
                     let _ = +(p.endsWith('%') ? p.slice(0, -1) : p).trim();
                     return (isNaN(_) || (_ < 0) || (_ > 100)) ? null : _;
                 },
@@ -29,7 +29,7 @@ export = class extends OsuCommand {
             }, {
                 id: 'combo',
                 match: 'phrase',
-                type: (m : Message, p : string) : number => {
+                type: ({}, p : string) : number => {
                     let _ = +(p.endsWith('x') ? p.slice(0, -1) : p).trim();
                     return (isNaN(_) || (_ < 0)) ? null : _;
                 },

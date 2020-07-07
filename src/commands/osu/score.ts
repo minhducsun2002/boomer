@@ -2,9 +2,8 @@ import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
 import axios from 'axios';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
-import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
 import { accuracy as acc, modToString as mm } from '../../lib/osu/utils';
-import { pad, chunk } from '@pepper/utils';
+import { pad, chunk, paginatedEmbed } from '@pepper/utils';
 import { modes } from '@pepper/constants/osu';
 import { fetchMapset, checkURL as check } from '@pepper/lib/osu'
 
@@ -118,9 +117,7 @@ export = class extends OsuCommand {
 
             if (__.length < 2) return m.channel.send(createEmbed(__[0]));
             else
-                new PagedEmbeds()
-                    .addHandler('⬅️', (m, i, u, e) => ({ index: (i - 1 + e.length) % e.length }))
-                    .addHandler('➡️', (m, i, u, e) => ({ index: (i + 1 + e.length) % e.length }))
+                paginatedEmbed()
                     .setChannel(m.channel)
                     .setEmbeds(
                         __.map(

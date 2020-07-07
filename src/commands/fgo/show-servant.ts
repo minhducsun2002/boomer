@@ -10,7 +10,7 @@ import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { constructQuery as c } from '../../lib/fgo/';
 import { plural as p } from '@pepper/utils';
 import { FgoCommand } from './baseCommand';
-import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
+import { paginatedEmbed } from '@pepper/utils'
 
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors'
 
@@ -99,7 +99,7 @@ export = class extends FgoCommand {
             ind.delete(genderType + genMod);
             ind.delete(claMod + classId);
 
-        new PagedEmbeds()
+        paginatedEmbed()
             .setChannel(m.channel)
             .setEmbeds(
                 [
@@ -173,8 +173,6 @@ export = class extends FgoCommand {
                 ]
                 .map((a, i, _) => a.setFooter(`Page ${++i}/${_.length}`))
             )
-            .addHandler('⬅️', (m, i, u, e) => ({ index: (i - 1 + e.length) % e.length }))
-            .addHandler('➡️', (m, i, u, e) => ({ index: (i + 1 + e.length) % e.length }))
             .run({ idle: 20000, dispose: true })
     }
 }
