@@ -9,6 +9,9 @@ export interface mstSvtLimit {
     // stats
     power: number; defense: number; agility: number;
     magic: number; luck: number; treasureDevice: number;
+    
+    hpBase: number; hpMax: number;
+    atkBase: number; atkMax: number;
 }
 
 export interface mstSvtLimitDocument extends Document, mstSvtLimit { id: number }
@@ -18,5 +21,7 @@ export const mstSvtLimitSchema : Schema<mstSvtLimit> = new Schema({
     rarity: Number, lvMax: Number, criticalWeight: Number,
 
     power: Number, defense: Number, agility: Number,
-    magic: Number, luck: Number, treasureDevice: Number
+    magic: Number, luck: Number, treasureDevice: Number,
+
+    hpBase: Number, hpMax: Number, atkBase: Number, atkMax: Number
 })

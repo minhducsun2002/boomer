@@ -12,9 +12,12 @@ import { constructQuery as mstItem } from './mstItem';
 import { constructQuery as mstQuestConsumeItem } from './mstQuestConsumeItem';
 import { constructQuery as mstQuestPhase } from './mstQuestPhase';
 import { constructQuery as mstSvtLimit } from './mstSvtLimit';
+import { constructQuery as mstSvtTreasureDevice } from './mstSvtTreasureDevice'
+import { constructQuery as mstTreasureDeviceLv } from './mstTreasureDeviceLv'
 export const constructQuery = {
     mstClass, mstSvt, mstAttriRelation, mstQuest, mstSpot, mstWar, mstSvtCard, mstSvtComment, mstSvtSkill,
-    mstSkillDetail, mstItem, mstQuestConsumeItem, mstQuestPhase, mstSvtLimit
+    mstSkillDetail, mstItem, mstQuestConsumeItem, mstQuestPhase, mstSvtLimit,
+    mstSvtTreasureDevice, mstTreasureDeviceLv
 }
 
-export { embedServantBase } from './embeds';
+export { embedServantBase, embedServantDashboard } from './embeds';
