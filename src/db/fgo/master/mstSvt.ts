@@ -1,5 +1,5 @@
 import { Schema, Document } from 'mongoose';
-import { SvtType, GenderType, CardType, ClassType, Attribute, Level } from '../../../constants/fgo';
+import { SvtType, GenderType, CardType, ClassType, Attribute, Level, Trait } from '../../../constants/fgo';
 
 export interface mstSvt {
     name: string;
@@ -38,6 +38,8 @@ export interface mstSvt {
     classId: ClassType;
     /** Attribute */
     attri: typeof Attribute[keyof typeof Attribute];
+    /** Traits */
+    individuality: Trait[];
 }
 
 export interface mstSvtDocument extends mstSvt, Document { id: number; }
@@ -59,5 +61,6 @@ export const mstSvtSchema : Schema<mstSvt> = new Schema({
     starRate: Number,
     rewardLv: Number,
     classId: Number,
-    attri: Number
+    attri: Number,
+    individuality: [Number]
 })

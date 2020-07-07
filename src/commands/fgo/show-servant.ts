@@ -1,9 +1,13 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { Gender, Trait } from '@pepper/constants/fgo/strings';
-import { CardType as Card } from '../../constants/fgo'
+import { Trait } from '@pepper/constants/fgo/strings';
+import {
+    CardType as Card,
+    AttributeModifier as attrMod,
+    GenderModifier as genMod,
+    ClassModifier as claMod
+} from '@pepper/constants/fgo';
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { constructQuery as c } from '../../lib/fgo/';
-import sentence from '../../lib/sentence';
 import { plural as p } from '@pepper/utils';
 import { FgoCommand } from './baseCommand';
 import { PagedEmbeds } from '@minhducsun2002/paged-embeds';
@@ -14,8 +18,6 @@ const commandName = 'servant-info';
 const aliases = ['servant', 'servant-info', 's'];
 
 const maxLevel = [59, 64, 69, 79, 89];
-
-interface commandArguments { query?: string; _class: string }
 
 export = class extends FgoCommand {
     constructor() {
@@ -31,6 +33,11 @@ export = class extends FgoCommand {
                 match: 'option',
                 description: 'Filtering by class',
                 flag: ['-c', '-c=', '/c:', '--class=', '/class:']
+            }, {
+                id: 'allTrait',
+                match: 'flag',
+                description: 'Show non-rendered traits',
+                flag: ['/a']
             }],
             typing: true,
             description: 'Show a servant\'s details.',
@@ -38,7 +45,9 @@ export = class extends FgoCommand {
         })
     }
 
-    async exec(m: Message, { query, _class }: commandArguments) {
+    async exec(m: Message,
+        { query, _class, allTrait }: { query?: string; _class: string, allTrait: boolean }
+    ) {
         const err = new MessageEmbed().setColor(ERROR_COLOR);
 
         if (!query && !_class)
@@ -58,13 +67,13 @@ export = class extends FgoCommand {
 
 
         const [{ rarity, id, stats: { hp, atk }, npGainStat: [npPerATK, npPerHit],
-            criticalStat: [starAbsorption], traits, alignment, 
+            criticalStat: [starAbsorption],
             noblePhantasm: { length: npUpgradesCount }, activeSkill, passiveSkill
         }] = results;
 
         const [{
             name, baseSvtId, classId, attri, genderType, cardIds,
-            starRate: starGen, collectionNo, relateQuestIds
+            starRate: starGen, collectionNo, relateQuestIds, individuality: _in
         }] = await c.mstSvt({ collectionNo: id as number }).NA.exec()
         const [{ name: className }] = await c.mstClass({ id: classId }).NA.exec()
         const dmg = (await c.mstSvtCard({ svtId: baseSvtId }).NA.limit(4).exec())
@@ -83,6 +92,12 @@ export = class extends FgoCommand {
                 .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`),
             ccount = (_ : Card) => 
                 cardIds.reduce((b, a) => a === _ ? b + 1 : b, 0)
+
+        let ind = new Set(_in);
+            ind.delete(baseSvtId);
+            ind.delete(attri + attrMod);
+            ind.delete(genderType + genMod);
+            ind.delete(claMod + classId);
 
         new PagedEmbeds()
             .setChannel(m.channel)
@@ -107,12 +122,23 @@ export = class extends FgoCommand {
                     )
                     .addField('NP generation', `- Per hit : ${npPerATK}\n- When attacked : ${npPerHit}`, true)
                     .addField('Critical stars', `- Star weighting : ${starAbsorption}\n- Star generation : ${(starGen / 10).toFixed(1)}%`, true)
-                    .addField('Traits', traits.join(', '), true)
                     .addField(
-                        'Gender / Attribute / Alignment', 
-                        `${Gender[genderType].join(' + ')} / ${Trait[attri as keyof typeof Trait]} / ${
-                            alignment.split(' ').map(sentence).join(' ')
-                        }`,
+                        'Traits',
+                        [...ind]
+                            .map(a => Trait[a as keyof typeof Trait] || a)
+                            // filter out not defined mappings
+                            .filter(a => allTrait ? 1 : isNaN(+a))
+                            .map(a => `* **${a}**`)
+                            .join('\n'),
+                        true
+                    )
+                    .addField(
+                        'Gender / Attribute', 
+                        `${Trait[
+                            (genderType + genMod) as keyof typeof Trait
+                        ]} / ${Trait[
+                            (attri + attrMod) as keyof typeof Trait
+                        ]}`,
                         true
                     ).addField(
                         'Related quests (ID)',
