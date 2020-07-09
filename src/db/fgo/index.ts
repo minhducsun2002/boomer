@@ -42,6 +42,9 @@ import { mstQuestPhaseSchema, mstQuestPhaseDocument } from './master/mstQuestPha
 import { mstSvtLimitSchema, mstSvtLimitDocument } from './master/mstSvtLimit';
 import { mstSvtTreasureDeviceSchema, mstSvtTreasureDeviceDocument } from './master/mstSvtTreasureDevice';
 import { mstTreasureDeviceLvSchema, mstTreasureDeviceLvDocument } from './master/mstTreasureDeviceLv';
+import { mstTreasureDeviceSchema, mstTreasureDeviceDocument } from './master/mstTreasureDevice';
+import { mstFuncSchema, mstFuncDocument } from './master/mstFunc';
+import { mstBuffSchema, mstBuffDocument } from './master/mstBuff';
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
 
@@ -64,6 +67,9 @@ const _ = (s : keyof typeof master) => {
         mstSvtLimit: __.model('mstSvtLimit', mstSvtLimitSchema, 'mstSvtLimit') as Model<mstSvtLimitDocument>,
         mstSvtTreasureDevice: __.model('mstSvtTreasureDevice', mstSvtTreasureDeviceSchema, 'mstSvtTreasureDevice') as Model<mstSvtTreasureDeviceDocument>,
         mstTreasureDeviceLv: __.model('mstTreasureDeviceLv', mstTreasureDeviceLvSchema, 'mstTreasureDeviceLv') as Model<mstTreasureDeviceLvDocument>,
+        mstTreasureDevice: __.model('mstTreasureDevice', mstTreasureDeviceSchema, 'mstTreasureDevice') as Model<mstTreasureDeviceDocument>,
+        mstFunc: __.model('mstFunc', mstFuncSchema, 'mstFunc') as Model<mstFuncDocument>,
+        mstBuff: __.model('mstBuff', mstBuffSchema, 'mstBuff') as Model<mstBuffDocument>,
     }
 }
 
