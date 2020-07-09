@@ -53,6 +53,11 @@ export type DamageDistribution = number[];
 /** Item ID */
 export type Item = number;
 
+export enum ApplyTarget {
+    PLAYER = 1,
+    ENEMY, PLAYER_AND_ENEMY
+}
+
 export enum FuncType {
     NONE = 0,
     ADD_STATE = 1,
