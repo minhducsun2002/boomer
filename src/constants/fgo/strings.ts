@@ -1,4 +1,10 @@
-import { GenderType, Trait as t } from './';
+import {
+    GenderType,
+    Trait as t,
+    FuncType as fType,
+    TargetType as tType,
+    ApplyTarget as aType
+} from './';
 
 export const Gender = {
     [GenderType.Male]: ['Male'],
@@ -148,4 +154,20 @@ export const Trait = {
     [t.skyOrEarthExceptPseudoAndDemi]: 'Heaven or Earth (except Pseudo-Servants & Demi-Servants)',
     [t.threatToHumanity]: 'Threat to Humanity',
     [t.weakToEnumaElish]: 'Weak to Enuma Elish',
+}
+
+export const FuncTypes = {
+    [fType.ABSORB_NPTURN]: '',
+    [fType.ADD_STATE]: 'Add state',
+    [fType.ADD_STATE_SHORT]: 'Add state in 1 turn'
+}
+
+export const TargetType = {
+    [tType.SELF]: 'self'
+}
+
+export const ApplyTarget = {
+    [aType.ENEMY]: 'Enemy',
+    [aType.PLAYER]: 'Player',
+    [aType.PLAYER_AND_ENEMY]: 'Player & enemy'
 }
