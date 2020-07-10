@@ -10,5 +10,6 @@ export interface mstTreasureDeviceDocument extends Document, mstTreasureDevice {
 
 export const mstTreasureDeviceSchema : Schema<mstTreasureDevice> = new Schema({
     individuality: [Number], id: Number, seqId: Number,
-    rank: String, maxLv: Number, typeText: String, attackAttri: Number
+    rank: String, maxLv: Number, typeText: String, attackAttri: Number,
+    name: String, 
 })

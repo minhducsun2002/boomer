@@ -14,7 +14,7 @@ export interface mstTreasureDeviceLv {
 export interface mstTreasureDeviceLvDocument extends Document, mstTreasureDeviceLv { id: number }
 
 export const mstTreasureDeviceLvSchema : Schema<mstTreasureDeviceLv> = new Schema({
-    treasureDeviceId: Number, lv: Number, detailId: Number,
+    treaureDeviceId: Number, lv: Number, detailId: Number,
     tdPoint: Number, tdPointDef: Number,
     tdPointQ: Number, tdPointA: Number, tdPointB: Number, tdPointEx: Number,
     qp: Number,
