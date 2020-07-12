@@ -163,11 +163,29 @@ export const FuncTypes = {
 }
 
 export const TargetType = {
-    [tType.SELF]: 'self'
+    [tType.ENEMY]: 'a single enemy on field',
+    [tType.ENEMY_ALL]: 'all enemies on field',
+    [tType.ENEMY_ANOTHER]: '',
+    [tType.ENEMY_FULL]: 'all enemies',
+    [tType.ENEMY_OTHER]: '',
+    [tType.ENEMY_OTHER_FULL]: '',
+    [tType.ENEMY_RANDOM]: 'a random single enemy on field',
+    [tType.PTSELECT_ONE_SUB]: 'a (chosen) backrow ally',
+    [tType.PTSELECT_SUB]: '',
+    [tType.PT_ALL]: 'all allies on field',
+    [tType.PT_ANOTHER]: '',
+    [tType.PT_FULL]: 'all allies',
+    [tType.PT_ONE]: 'a (chosen) ally',
+    [tType.PT_ONE_ANOTHER_RANDOM]: '',
+    [tType.PT_ONE_OTHER]: 'allies on field except the chosen one',
+    [tType.PT_OTHER]: 'other allies on field',
+    [tType.PT_OTHER_FULL]: 'other allies',
+    [tType.PT_RANDOM]: 'a random ally on field',
+    [tType.SELF]: 'self',
 }
 
 export const ApplyTarget = {
-    [aType.ENEMY]: 'Enemy',
-    [aType.PLAYER]: 'Player',
-    [aType.PLAYER_AND_ENEMY]: 'Player & enemy'
+    [aType.ENEMY]: 'enemy',
+    [aType.PLAYER]: 'player',
+    [aType.PLAYER_AND_ENEMY]: 'player & enemy'
 }
