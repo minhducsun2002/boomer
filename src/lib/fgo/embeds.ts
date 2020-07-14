@@ -5,12 +5,15 @@ import {
     ClassModifier as claMod
 } from '@pepper/constants/fgo';
 import { Trait } from '@pepper/constants/fgo/strings';
-import type { mstSvt } from '../../db/fgo/master/mstSvt';
-import type { mstClass } from '../../db/fgo/master/mstClass';
-import type { mstSvtLimit } from '../../db/fgo/master/mstSvtLimit';
-import type { mstSvtCard } from '../../db/fgo/master/mstSvtCard';
-import type { mstTreasureDeviceLv } from '../../db/fgo/master/mstTreasureDeviceLv'
+import type { mstSvt } from '@pepper/db/fgo/master/mstSvt';
+import type { mstClass } from '@pepper/db/fgo/master/mstClass';
+import type { mstSvtLimit } from '@pepper/db/fgo/master/mstSvtLimit';
+import type { mstSvtCard } from '@pepper/db/fgo/master/mstSvtCard';
+import type { mstTreasureDeviceLv } from '@pepper/db/fgo/master/mstTreasureDeviceLv';
+import type { mstTreasureDevice } from '@pepper/db/fgo/master/mstTreasureDevice';
 import { MessageEmbed } from 'discord.js';
+import { renderInvocation } from './func';
+import { NA } from '@pepper/db/fgo';
 
 export function embedServantBase(
     { name, baseSvtId, collectionNo } : mstSvt,
@@ -93,4 +96,22 @@ export function embedServantDashboard(
             relateQuestIds.map(a => `\`${a}\``).join(', ') || 'None',
             true
         )
+}
+
+export async function embedTreasureDeviceBase(td : mstTreasureDevice) {
+    let { id } = td;
+    let levels = await NA.mstTreasureDeviceLv.find({ treaureDeviceId: id }).exec();
+
+    let base = levels[0];
+    let funcBase = await Promise.all(
+        base.funcId.map(
+            id => NA.mstFunc.findOne({ id }).exec()
+                .then(f => renderInvocation(f))
+        )
+    );
+    return funcBase.map(_ => ({
+        name: `${_.action} ${_.targets.map(a => `[${a}]`).join(', ')}`,
+        value: `Apply when on ${_.affectWhenOnTeam} team`
+            + `\nAffects ${_.affectTarget}`
+    }))
 }

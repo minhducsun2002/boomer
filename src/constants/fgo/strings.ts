@@ -3,7 +3,8 @@ import {
     Trait as t,
     FuncType as fType,
     TargetType as tType,
-    ApplyTarget as aType
+    ApplyTarget as aType,
+    Buff as bType,
 } from './';
 
 export const Gender = {
@@ -158,8 +159,8 @@ export const Trait = {
 
 export const FuncTypes = {
     [fType.ABSORB_NPTURN]: '',
-    [fType.ADD_STATE]: 'Add state',
-    [fType.ADD_STATE_SHORT]: 'Add state in 1 turn',
+    [fType.ADD_STATE]: 'Apply',
+    [fType.ADD_STATE_SHORT]: 'Apply',
     [fType.BREAK_GAUGE_DOWN]: '',
     [fType.BREAK_GAUGE_UP]: '',
     [fType.CALL_SERVANT]: 'Summon another servant',
@@ -233,7 +234,8 @@ export const FuncTypes = {
     [fType.REPLACE_MEMBER]: 'Replace active party member',
     [fType.REVIVAL]: 'Revive',
     [fType.SEND_SUPPORT_FRIEND_POINT]: '',
-    [fType.SERVANT_FRIENDSHIP_UP]: 'Increase Bond points gained'
+    [fType.SERVANT_FRIENDSHIP_UP]: 'Increase Bond points gained',
+    [fType.SUB_STATE]: 'Remove state'
 }
 
 export const TargetType = {
@@ -262,4 +264,32 @@ export const ApplyTarget = {
     [aType.ENEMY]: 'enemy',
     [aType.PLAYER]: 'player',
     [aType.PLAYER_AND_ENEMY]: 'player & enemy'
+}
+
+export const BuffTypes = {
+    [bType.ADD_DAMAGE]: 'Add damage',
+    [bType.ADD_INDIVIDUALITY]: 'Add trait',
+    [bType.ADD_MAXHP]: 'Increase maximum HP',
+    [bType.AVOID_INSTANTDEATH]: 'Immune to Death',
+    [bType.AVOID_STATE]: 'Immunity',
+    [bType.AVOIDANCE]: 'Evade',
+    [bType.BREAK_AVOIDANCE]: 'Sure Hit',
+    [bType.DELAY_FUNCTION]: 'Trigger skill after duration',
+    [bType.DONOT_NOBLE]: 'NP Seal',
+    [bType.DONOT_NOBLE_COND_MISMATCH]: 'NP block if condition fails',
+    [bType.DONOT_RECOVERY]: 'Recovery Disabled',
+    [bType.DONOT_SELECT_COMMANDCARD]: 'Do not shuffle in cards',
+    [bType.DONOT_SKILL]: 'Skill Seal',
+    [bType.FIELD_INDIVIDUALITY]: 'Change Field type',
+    [bType.GUTS]: 'Guts',
+    [bType.INVINCIBLE]: 'Invincible',
+    [bType.MULTIATTACK]: 'Multiple hits',
+    [bType.PIERCE_INVINCIBLE]: 'Ignore Invincible',
+    [bType.REGAIN_HP]: 'HP per turn',
+    [bType.REGAIN_NP]: 'NP per turn',
+    [bType.REGAIN_STAR]: 'Stars per turn',
+    [bType.SELFTURNEND_FUNCTION]: 'Trigger skill after duration',
+    [bType.SUB_SELFDAMAGE]: 'Damage Cut',
+    [bType.TD_TYPE_CHANGE]: 'Change Noble Phantasm',
+    [bType.UP_HATE]: 'Taunt',
 }

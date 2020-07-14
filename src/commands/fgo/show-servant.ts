@@ -1,7 +1,10 @@
 import { MessageEmbed, Message } from 'discord.js';
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
-import { constructQuery as c, embedServantBase, embedServantDashboard } from '@pepper/lib/fgo';
-import { plural as p } from '@pepper/utils';
+import { constructQuery as c,
+    embedServantBase, embedServantDashboard,
+    embedTreasureDeviceBase
+} from '@pepper/lib/fgo';
+import { NA } from '@pepper/db/fgo';
 import { FgoCommand } from './baseCommand';
 import { paginatedEmbed } from '@pepper/utils'
 import { ERROR_COLOR } from '@pepper/constants/colors';
@@ -56,9 +59,7 @@ export = class extends FgoCommand {
             )
 
 
-        const [{ id,
-            noblePhantasm: { length: npUpgradesCount }, activeSkill, passiveSkill
-        }] = results;
+        const [{ id, activeSkill, passiveSkill }] = results;
 
         const [svt] = await c.mstSvt({ collectionNo: id as number }).NA.exec();
         let { baseSvtId, classId } = svt;
@@ -67,15 +68,23 @@ export = class extends FgoCommand {
             await c.mstSvtCard({ svtId: baseSvtId }).NA.limit(4).exec(),
             await c.mstClass({ id: classId }).NA.exec()
         ]);
-        const [{ treasureDeviceId: tdId }] = await c.mstSvtTreasureDevice({ svtId: baseSvtId, num: 1 }).NA.exec();
-        const [td] = await c.mstTreasureDeviceLv({ treaureDeviceId: tdId }).NA.exec()
-
-        let { name: npName, extendedName: npExtName, 
-            rank: npRank, detail: npDetail, overchargeDetail: npOverDetail,
-            condition: npCondition, class: npClass
-        } = results[0].noblePhantasm.pop();
+        // render NP gain
+        const svtTdMapping = await NA.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
+        let [{ treasureDeviceId: tdId }] = svtTdMapping;
+        const [td] = await c.mstTreasureDeviceLv({ treaureDeviceId: tdId }).NA.exec();
+        const tDevices = await Promise.all(
+            svtTdMapping.map(
+                a => NA.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
+            )
+        );
 
         let base = () => embedServantBase(svt, __class, mstSvtLimits)
+
+        let tdEmbed = (await Promise.all(
+            tDevices.map(td => embedTreasureDeviceBase(td))
+        )).map((a, i) => base().addFields(a).setDescription(
+            `Noble Phantasm : **${tDevices[i].name}** [**__${tDevices[i].typeText}__**]`
+        ))
 
         paginatedEmbed()
             .setChannel(m.channel)
@@ -98,15 +107,7 @@ export = class extends FgoCommand {
                         'Passive skill',
                         passiveSkill.map(({ name, detail, rank }) => `**${name}** [__${rank}__]\n${detail}`).join('\n\n')
                     ),
-                    base()
-                    .addField(
-                        'Noble Phantasm ' + (npUpgradesCount > 1 ? `(${npUpgradesCount} upgrade${p(npUpgradesCount)})` : ''),
-                        `**${npName}** __${npRank}__ (${npClass})`
-                        + (npExtName ? `\n_${npExtName}_` : '')
-                        + `\n\n- ${npDetail.split('\n').filter(a=>!!a).join('\n- ')}`
-                        + `\n- ${npOverDetail.split('\n').filter(a=>!!a).map(a=>`__${a}__`).join('\n- ')}`
-                        + (npCondition ? `\n_${npCondition}_` : '')
-                    )
+                    ...tdEmbed
                 ]
                 .map((a, i, _) => a.setFooter(`Page ${++i}/${_.length}`))
             )
