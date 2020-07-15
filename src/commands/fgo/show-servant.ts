@@ -72,25 +72,35 @@ export = class extends FgoCommand {
         const svtTdMapping = await NA.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
         let [{ treasureDeviceId: tdId }] = svtTdMapping;
         const [td] = await c.mstTreasureDeviceLv({ treaureDeviceId: tdId }).NA.exec();
-        const tDevices = await Promise.all(
+        const tDevices = (await Promise.all(
             svtTdMapping.map(
                 a => NA.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
             )
-        );
+        )).sort((a, b) => a.id - b.id);
 
         let base = () => embedServantBase(svt, __class, mstSvtLimits)
+            .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${id}`)
 
         let tdEmbed = (await Promise.all(
             tDevices.map(td => embedTreasureDeviceBase(td))
-        )).map((a, i) => base().addFields(a).setDescription(
-            `Noble Phantasm : **${tDevices[i].name}** [**__${tDevices[i].typeText}__**]`
-        ))
+        )).map((a, i) => 
+            base()
+                .addFields(a)
+                .setDescription(
+                    `[**${tDevices[i].name}** [**__${tDevices[i].typeText}__**]](${
+                        `https://apps.atlasacademy.io/db/#/NA/noble-phantasm/${tDevices[i].id}`
+                    })`
+                )
+                .setFooter(`Noble Phantasm`)
+        )
 
         paginatedEmbed()
             .setChannel(m.channel)
             .setEmbeds(
                 [
-                    embedServantDashboard(svt, __class, mstSvtLimits, cards, td, allTrait),
+                    embedServantDashboard(svt, __class, mstSvtLimits, cards, td, allTrait)
+                        .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${id}`)
+                        .setFooter(`Basic details`),
                     base()
                     .addField(
                         'Active skill',
@@ -106,10 +116,13 @@ export = class extends FgoCommand {
                     .addField(
                         'Passive skill',
                         passiveSkill.map(({ name, detail, rank }) => `**${name}** [__${rank}__]\n${detail}`).join('\n\n')
-                    ),
+                    )
+                    .setFooter(`Skills`),
                     ...tdEmbed
                 ]
-                .map((a, i, _) => a.setFooter(`Page ${++i}/${_.length}`))
+                .map((a, i, _) => a.setFooter(`${
+                    a.footer?.text ? `${a.footer.text} • ` : ''
+                }Page ${++i}/${_.length}`))
             )
             .run({ idle: 20000, dispose: true })
     }

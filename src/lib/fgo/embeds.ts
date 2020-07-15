@@ -110,7 +110,7 @@ export async function embedTreasureDeviceBase(td : mstTreasureDevice) {
         )
     );
     return funcBase.map(_ => ({
-        name: `${_.action} ${_.targets.map(a => `[${a}]`).join(', ')}`,
+        name: `${_.action} ${_.targets.map(a => `[${a.trim()}]`).join(', ')}`,
         value: `Apply when on ${_.affectWhenOnTeam} team`
             + `\nAffects ${_.affectTarget}`
     }))
