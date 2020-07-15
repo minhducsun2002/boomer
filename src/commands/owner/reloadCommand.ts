@@ -30,7 +30,7 @@ export = class extends OwnerCommand {
         } else {
             let out = await m.channel.send(`Reloading all commands...`);
             new PerformanceObserver((l, o) => {
-                out.edit(`Reloaded ${handler.modules.size} commands in ${l.getEntries()[0].duration}s.`)
+                out.edit(`Reloaded ${handler.modules.size} commands in ${l.getEntries()[0].duration / 1000}s.`)
                 o.disconnect();
             }).observe({ entryTypes: ['function'] });
             performance.timerify(() => handler.reloadAll())()
