@@ -24,9 +24,14 @@ export async function renderInvocation({
     let action = fTp[funcType as keyof typeof fTp];
     let buff_desc = buff.map(a => a.name);
     return {
+        /** Action that this function executes. Should map to `FuncType`. */
         action,
+        /** Buffs that this action grants. Should be buff names, if any. */
         targets: buff_desc,
-        id, popupText,
+        /** Function ID. */
+        id,
+        /** Popup text in game when this function is invoked. */
+        popupText,
         affectWhenOnTeam: teamApply,
         affectTarget: target
     }
