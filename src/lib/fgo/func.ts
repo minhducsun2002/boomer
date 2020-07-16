@@ -1,13 +1,11 @@
 import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import { getBuffById } from './buff';
 
-type ReturnTypePromise<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
-type Buff = ReturnTypePromise<typeof getBuffById>;
-
 import {
     ApplyTarget as aTgt,
     FuncTypes as fTp,
-    TargetType as tTp
+    TargetType as tTp,
+    Trait as tr
 } from '@pepper/constants/fgo/strings';
 
 export async function renderInvocation({
@@ -17,7 +15,9 @@ export async function renderInvocation({
     let teamApply = aTgt[applyTarget],
         target = tTp[targetType];
     let buff = await Promise.all(
-        vals.map(buffId => getBuffById(buffId).catch(() => null as Buff))
+        vals.map(buffId => getBuffById(buffId)
+            .catch(() => ({ name: tr[buffId as keyof typeof tr] }))
+        )
     );
     // ignore the traits?
     buff = buff.filter(a => a)
