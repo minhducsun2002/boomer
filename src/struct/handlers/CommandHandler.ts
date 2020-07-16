@@ -1,3 +1,4 @@
+import { performance, PerformanceObserver } from 'perf_hooks';
 import type { Collection } from 'discord.js';
 import { CommandHandler as c } from 'discord-akairo';
 import type { PepperClient } from '../Client';
@@ -32,9 +33,14 @@ export class CommandHandler extends c {
         this.clientLog.info(
             `Loading commands from ${ch.blueBright(this.directory)}...`
         )
-        let _ = super.loadAll(...args);
-        this.clientLog.success(`Loaded ${this.modules.size} commands.`)
-        return _;
+        new PerformanceObserver((l, o) => {
+            this.clientLog.success(`Loaded ${this.modules.size} commands in ${
+                l.getEntries()[0].duration / 1000
+            }s.`);
+            o.disconnect();
+        }).observe({ entryTypes: ['function'] });
+        performance.timerify(() => super.loadAll(...args))();
+        return this;
     }
 
     modules: Collection<string, PepperCommand>;
