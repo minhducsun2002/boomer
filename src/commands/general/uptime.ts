@@ -15,9 +15,18 @@ export = class extends GeneralCommand {
     }
 
     async exec(m : Message) {
-        const o = new Duration(this.client.uptime).toFullString()
-        m.channel.send('', {
-            embed: new MessageEmbed().setDescription(`:alarm_clock: ${this.client.user} been running for ${o}.`)
-        })
+        let inline = true;
+        m.channel.send(
+            new MessageEmbed()
+                .addFields([{
+                    name: 'Process uptime',
+                    value: `${new Duration(process.uptime() * 1000).toFullString()}`,
+                    inline
+                }, {
+                    name: 'Connection uptime',
+                    value: `${new Duration(this.client.uptime).toFullString()}`,
+                    inline
+                }])
+        )
     }
 }
