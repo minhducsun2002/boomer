@@ -86,6 +86,8 @@ export class PepperClient extends AkairoClient {
                     a => ` * ${c.bgCyanBright.black(a.id)} `
                         + c.green(`=>`)
                         + ` ${c.bgYellowBright.black(a.name)}`
+                        + `\n    ${c.magenta('@')} ${c.bgRedBright.black(a.owner.user.tag)}`
+                        + ` (${a.owner.id})`
                 ).join('\n')
             )
         })
