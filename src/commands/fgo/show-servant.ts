@@ -22,7 +22,7 @@ export = class extends FgoCommand {
                 description: 'Search query. Can be a servant ID.',
                 type: 'string'
             }, {
-                id: '_class',
+                id: 'class',
                 match: 'option',
                 description: 'Filtering by class',
                 flag: ['-c', '-c=', '/c:', '--class=', '/class:']
@@ -39,7 +39,7 @@ export = class extends FgoCommand {
     }
 
     async exec(m: Message,
-        { query, _class, allTrait }: { query?: string; _class: string, allTrait: boolean }
+        { query, class : _class, allTrait }: { query?: string; class: string, allTrait: boolean }
     ) {
         const err = new MessageEmbed().setColor(ERROR_COLOR);
 
