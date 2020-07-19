@@ -1,11 +1,8 @@
 import type { ArgumentOptions } from 'discord-akairo';
 import { Message, MessageEmbed } from 'discord.js';
 import { GeneralCommand } from './baseCommand';
-import { SUCCESS_COLOR } from '../../constants/colors';
 
 const commandName = 'help', aliases = [commandName];
-
-interface Arg { q: string };
 
 export = class extends GeneralCommand {
     constructor() {
@@ -21,7 +18,7 @@ export = class extends GeneralCommand {
         })
     }
 
-    async exec(m: Message, { q } : Arg) {
+    async exec(m: Message, { q } : { q: string }) {
         const handler = this.client.commandHandler;
         // I am not supposed to do this, but yikes
         let out : MessageEmbed | string = new MessageEmbed()
@@ -29,7 +26,6 @@ export = class extends GeneralCommand {
                 `${this.client.user.username}#${this.client.user.discriminator}`,
                 this.client.user.avatarURL()
             )
-            .setColor(SUCCESS_COLOR)
 
         let prefix = (handler.prefixes.size ? [...handler.prefixes.entries()][0][0] : handler.prefix) as string;
         if (Array.isArray(prefix)) [prefix] = prefix;
@@ -75,9 +71,11 @@ export = class extends GeneralCommand {
                     const f = args.filter(a => a.match === 'flag' || a.match === 'option');
                     out = out.addField(
                         `Flags`,
-                        f.map(({ flag, id }) => {
+                        f.map(({ flag, id, match }) => {
                             if (!Array.isArray(flag)) flag = [flag];
-                            return `\`${id}\` **:** ${flag.map(a => `\`${a}\``).join(' ')} (+ content)`
+                            return `\`${id}\` **:** ${flag.map(a => `\`${a}\``).join('|')} ${
+                                match === 'option' ? `(+ content)` : ''
+                            }`
                         }).join('\n')
                     )
                 }
