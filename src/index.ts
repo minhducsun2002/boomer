@@ -8,6 +8,9 @@ const client = new PepperClient({
         allowMention: true,
         directory: join(__dirname, 'commands')
     },
+    inhibitorHandlerOptions: {
+        directory: join(__dirname, 'inhibitors')
+    },
     config: require(
         join(
             process.cwd(),
@@ -16,7 +19,7 @@ const client = new PepperClient({
         )
     )
 });
-client.commandHandler.loadAll()
+client.commandHandler
     .on('commandBlocked', async (m, {}, r) => {
         let h = client.commandHandler, rr = client.extras.CommandBlockReason;
         let _ = await h.parseCommand(m) || await h.parseCommandOverwrittenPrefixes(m);
@@ -30,5 +33,8 @@ client.commandHandler.loadAll()
                 .addField('Reason', rr[r as keyof typeof rr]())
         )
     })
+    .loadAll();
+client.inhibitorHandler.loadAll();
+
 client.login(process.env.DISCORD_TOKEN);
 export { client };

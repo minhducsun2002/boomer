@@ -31,6 +31,7 @@ export class PepperClient extends AkairoClient {
     private clientLog = new componentLog(`Client`, '#00fff7', '#000');
     config: PepperConfiguration['config']
     commandHandler : CommandHandler;
+    inhibitorHandler : InhibitorHandler;
     extras = utils;
 
     constructor(cfg : PepperConfiguration = {
@@ -101,6 +102,8 @@ export class PepperClient extends AkairoClient {
                 cfg.commandHandlerOptions   
             )
         );
+        this.inhibitorHandler = new InhibitorHandler(this, cfg.inhibitorHandlerOptions);
+        this.commandHandler.useInhibitorHandler(this.inhibitorHandler);
         this.config = cfg.config;
     }
 }

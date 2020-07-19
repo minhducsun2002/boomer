@@ -34,8 +34,10 @@ export class CommandHandler extends c {
             `Loading commands from ${ch.blueBright(this.directory)}...`
         )
         new PerformanceObserver((l, o) => {
-            this.clientLog.success(`Loaded ${this.modules.size} commands in ${
-                l.getEntries()[0].duration / 1000
+            this.clientLog.success(`Loaded ${
+                ch.yellowBright(this.modules.size)
+            } commands in ${
+                ch.green(l.getEntries()[0].duration / 1000)
             }s.`);
             o.disconnect();
         }).observe({ entryTypes: ['function'] });
