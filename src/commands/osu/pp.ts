@@ -71,12 +71,12 @@ export = class extends OsuCommand {
             let map = beatmap.map;
             let diff = new oj.diff().calc({ map, mods: oj.modbits.from_string(mods) });
             let pp = oj.ppv2({ stars: diff, combo, nmiss: misses, acc_percent: accuracy }).total.toFixed(4);
-            let { title_unicode, version, artist_unicode, ar, cs, od, hp, mode, creator } = map;
+            let { title_unicode, title, version, artist_unicode, artist, ar, cs, od, hp, mode, creator } = map;
             m.channel.send(
                 new MessageEmbed()
                     .setColor(SUCCESS_COLOR)
                     .setAuthor(mode_friendly[mode])
-                    .setTitle(`${artist_unicode} - ${title_unicode} [${version}]`)
+                    .setTitle(`${artist_unicode || artist} - ${title_unicode || title} [${version}]`)
                     .setDescription(`_by [${creator}](https://osu.ppy.sh/u/${encodeURI(creator)})_`)
                     .setURL(`https://osu.ppy.sh/beatmaps/${mapId}`)
                     .addField(
