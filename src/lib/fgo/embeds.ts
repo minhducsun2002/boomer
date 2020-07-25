@@ -27,7 +27,7 @@ export function embedServantBase(
         .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`)
 }
 
-export function embedServantDashboard(
+export async function embedServantDashboard(
     svt: mstSvt, cl : mstClass, limits: mstSvtLimit[], cards: mstSvtCard[], 
     { tdPoint, tdPointDef }: mstTreasureDeviceLv, allTrait = false
 ) {
@@ -92,8 +92,13 @@ export function embedServantDashboard(
             ]}`,
             true
         ).addField(
-            'Related quests (ID)',
-            relateQuestIds.map(a => `\`${a}\``).join(', ') || 'None',
+            'Related quests',
+            (await Promise.all(
+                relateQuestIds
+                    .map(id => NA.mstQuest.findOne({ id }).select('id name').exec())
+            ))
+                .map(q => `\`${q.id}\` ${q.name}`)
+                .join('\n') || 'None',
             true
         )
 }

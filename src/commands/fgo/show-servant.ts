@@ -61,7 +61,7 @@ export = class extends FgoCommand {
 
         const [{ id, activeSkill, passiveSkill }] = results;
 
-        const [svt] = await c.mstSvt({ collectionNo: id as number }).NA.exec();
+        const [svt] = await c.mstSvt({ collectionNo: +id }).NA.exec();
         let { baseSvtId, classId } = svt;
         const [mstSvtLimits, cards, { [0]: __class }] = await Promise.all([
             await c.mstSvtLimit({ svtId: baseSvtId }).NA.limit(5).exec(),
@@ -98,7 +98,7 @@ export = class extends FgoCommand {
             .setChannel(m.channel)
             .setEmbeds(
                 [
-                    embedServantDashboard(svt, __class, mstSvtLimits, cards, td, allTrait)
+                    (await embedServantDashboard(svt, __class, mstSvtLimits, cards, td, allTrait))
                         .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${id}`)
                         .setFooter(`Basic details`),
                     base()
