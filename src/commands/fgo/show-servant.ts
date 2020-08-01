@@ -1,5 +1,5 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { constructQuery, SearchParameters } from '../../lib/fgo/search';
+import { constructQuery } from '../../lib/fgo/search';
 import { constructQuery as c,
     embedServantBase, embedServantDashboard,
     embedTreasureDeviceBase, renderPassiveSkill
@@ -8,6 +8,7 @@ import { NA } from '@pepper/db/fgo';
 import { FgoCommand } from './baseCommand';
 import { paginatedEmbed } from '@pepper/utils'
 import { ERROR_COLOR } from '@pepper/constants/colors';
+import search from '@pepper/modules/fgo/servant-name-search';
 
 const commandName = 'servant-info';
 const aliases = ['servant', 'servant-info', 's'];
@@ -39,26 +40,31 @@ export = class extends FgoCommand {
     }
 
     async exec(m: Message,
-        { query, class : _class, allTrait }: { query?: string; class: string, allTrait: boolean }
+        { query, allTrait }: { query?: string, allTrait: boolean }
     ) {
         const err = new MessageEmbed().setColor(ERROR_COLOR);
 
-        if (!query && !_class)
+        if (!query)
             return m.channel.send(
                 err.setDescription(':frowning: Where is your query?')
             )
 
-        const q = Number.isInteger(+query)
-            ? { id: +query }
-            : { name: query, class: [_class].filter(Boolean) } as SearchParameters
+        let search_instance = this.client.moduleHandler.findInstance(search);
 
-        const results = await constructQuery(q).exec();
-        if (!results.length) 
-            return m.channel.send(
-                err.setDescription(':disappointed: Sorry, I could not find anything.')
-            )
+        let bail = () => m.channel.send(
+            err.setDescription(':disappointed: Sorry, I could not find anything.')
+        )
 
+        let _id : number;
+        if (Number.isInteger(+query)) _id = +query;
+        else {
+            let res = await search_instance.search(query);
+            if (!res.length) return bail();
+            _id = res[0].item.id;
+        }
 
+        const results = await constructQuery({ id: _id }).limit(1).exec();
+        if (!results.length) return bail();
         const [{ id, activeSkill }] = results;
 
         const [svt] = await c.mstSvt({ collectionNo: +id }).NA.exec();

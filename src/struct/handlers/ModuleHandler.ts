@@ -16,13 +16,14 @@ export class ModuleHandler extends a {
         super(...args);
         this.on(
             'load', 
-            m => {
+            (m : PepperModule) => {
                 let { id, categoryID,  filepath, handler: { directory } } = m;
                 this.clientLog.success(
                     `${ch.bgYellowBright.black(`[${categoryID}]`)} `
                     + ch.blueBright(`./${relative(directory, filepath)}`)
                     + ` -> ${ch.yellowBright(`${id}`)}`
                 );
+                m.initialize();
             }
         )
     }
