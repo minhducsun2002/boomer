@@ -794,3 +794,8 @@ export const AttributeModifier = 199;
 export const GenderModifier = 0;
 /** Plus mstSvt.classId to get trait */
 export const ClassModifier = 99;
+
+export enum SkillType {
+    ACTIVE = 1,
+    PASSIVE = 2
+}

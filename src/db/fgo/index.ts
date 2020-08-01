@@ -45,6 +45,8 @@ import { mstTreasureDeviceLvSchema, mstTreasureDeviceLvDocument } from './master
 import { mstTreasureDeviceSchema, mstTreasureDeviceDocument } from './master/mstTreasureDevice';
 import { mstFuncSchema, mstFuncDocument } from './master/mstFunc';
 import { mstBuffSchema, mstBuffDocument } from './master/mstBuff';
+import { mstSkillSchema, mstSkillDocument } from './master/mstSkill';
+import { mstSkillLvSchema, mstSkillLvDocument } from './master/mstSkillLv';
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
 
@@ -70,6 +72,8 @@ const _ = (s : keyof typeof master) => {
         mstTreasureDevice: __.model('mstTreasureDevice', mstTreasureDeviceSchema, 'mstTreasureDevice') as Model<mstTreasureDeviceDocument>,
         mstFunc: __.model('mstFunc', mstFuncSchema, 'mstFunc') as Model<mstFuncDocument>,
         mstBuff: __.model('mstBuff', mstBuffSchema, 'mstBuff') as Model<mstBuffDocument>,
+        mstSkill: __.model('mstSkill', mstSkillSchema, 'mstSkill') as Model<mstSkillDocument>,
+        mstSkillLv: __.model('mstSkillLv', mstSkillLvSchema, 'mstSkillLv') as Model<mstSkillLvDocument>,
     }
 }
 
