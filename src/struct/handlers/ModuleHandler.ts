@@ -1,18 +1,18 @@
 import { performance, PerformanceObserver } from 'perf_hooks';
-import { InhibitorHandler as i } from 'discord-akairo';
 import type { Collection } from 'discord.js';
+import { AkairoHandler as a } from 'discord-akairo';
 import type { PepperClient } from '../Client';
 // util
 import { componentLog } from '@pepper/utils'
 import ch from 'chalk';
 import { relative } from 'path';
-import type { PepperInhibitor } from '../Inhibitor';
+import { PepperModule } from '../Module';
 
-export class InhibitorHandler extends i {
+export class ModuleHandler extends a {
     client: PepperClient;
-    clientLog = new componentLog('Inhibitors', '972f2f', 'ffffff')
+    clientLog = new componentLog('Modules', '3b55ff', 'ffffff')
 
-    constructor(...args : ConstructorParameters<typeof i>) {
+    constructor(...args : ConstructorParameters<typeof a>) {
         super(...args);
         this.on(
             'load', 
@@ -27,14 +27,14 @@ export class InhibitorHandler extends i {
         )
     }
 
-    loadAll(...args : Parameters<i['loadAll']>) {
+    loadAll(...args : Parameters<a['loadAll']>) {
         this.clientLog.info(
-            `Loading inhibitors from ${ch.blueBright(this.directory)}...`
+            `Loading modules from ${ch.blueBright(this.directory)}...`
         )
         new PerformanceObserver((l, o) => {
             this.clientLog.success(`Loaded ${
                 ch.yellowBright(this.modules.size)
-            } inhibitors in ${
+            } modules in ${
                 ch.green(l.getEntries()[0].duration / 1000)
             }s.`);
             o.disconnect();
@@ -43,5 +43,8 @@ export class InhibitorHandler extends i {
         return this;
     }
 
-    modules: Collection<string, PepperInhibitor>;
+    modules: Collection<string, PepperModule>;
+    findInstance<Module extends typeof PepperModule>(ctor : Module) {
+        return this.modules.find(m => m instanceof ctor) as InstanceType<typeof ctor>;
+    }
 }

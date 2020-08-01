@@ -11,6 +11,9 @@ const client = new PepperClient({
     inhibitorHandlerOptions: {
         directory: join(__dirname, 'inhibitors')
     },
+    moduleHandlerOptions: {
+        directory: join(__dirname, 'modules')
+    },
     config: require(
         join(
             process.cwd(),
@@ -35,6 +38,7 @@ client.commandHandler
     })
     .loadAll();
 client.inhibitorHandler.loadAll();
+client.moduleHandler.loadAll();
 
 client.login(process.env.DISCORD_TOKEN);
 export { client };

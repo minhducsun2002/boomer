@@ -1,6 +1,6 @@
 import { environmentMode } from '@pepper/constants/configurations';
-import { Inhibitor } from 'discord-akairo';
-export = class extends Inhibitor {
+import { PepperInhibitor } from '@pepper/struct';
+export = class extends PepperInhibitor {
     constructor() {
         super('development-filter-owner', {
             reason: 'I am in development mode! Only my owners can invoke commands.',
@@ -9,7 +9,7 @@ export = class extends Inhibitor {
         })
     }
 
-    exec(m : Parameters<Inhibitor['exec']>[0]) {
+    exec(m : Parameters<PepperInhibitor['exec']>[0]) {
         if (process.env.NODE_ENV !== environmentMode.production)
             if (!this.client.isOwner(m.author))
                 return true;

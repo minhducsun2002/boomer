@@ -4,6 +4,7 @@ import type { User } from 'discord.js';
 // handlers
 import { InhibitorHandler } from './handlers/InhibitorHandler';
 import { CommandHandler } from './handlers/CommandHandler';
+import { ModuleHandler } from './handlers/ModuleHandler';
 // logger
 import { componentLog } from '@pepper/utils';
 // utils
@@ -18,6 +19,8 @@ type databaseMapping = { [key: string]: string };
 interface PepperConfiguration extends cfg {
     commandHandlerOptions?: ConstructorParameters<typeof CommandHandler>[1],
     inhibitorHandlerOptions?: ConstructorParameters<typeof InhibitorHandler>[1],
+    moduleHandlerOptions?: ConstructorParameters<typeof ModuleHandler>[1],
+
     config?: {
         /** Whether mentioning the bot directly counts as a prefix */
         pingAsPrefix?: boolean;
@@ -32,12 +35,14 @@ export class PepperClient extends AkairoClient {
     config: PepperConfiguration['config']
     commandHandler : CommandHandler;
     inhibitorHandler : InhibitorHandler;
+    moduleHandler : ModuleHandler;
     extras = utils;
 
     constructor(cfg : PepperConfiguration = {
         ownerID: [],
         commandHandlerOptions: {},
         inhibitorHandlerOptions: {},
+        moduleHandlerOptions: {},
         config: {}
     }) {
         super(cfg);
@@ -104,6 +109,7 @@ export class PepperClient extends AkairoClient {
         );
         this.inhibitorHandler = new InhibitorHandler(this, cfg.inhibitorHandlerOptions);
         this.commandHandler.useInhibitorHandler(this.inhibitorHandler);
+        this.moduleHandler = new ModuleHandler(this, cfg.moduleHandlerOptions);
         this.config = cfg.config;
     }
 }
