@@ -34,6 +34,7 @@ export const Trait = {
     [t.automata]: 'Automata',
     [t.basedOnServant]: 'Servant',
     [t.beastServant]: 'Beast',
+    [t.blessedByKur]: 'Blessed by Kur',
     [t.brynhildsBeloved]: `Brynhildr's Beloved`,
     [t.buffAtkDown]: 'ATK Down',
     [t.buffAtkUp]: 'ATK Up',
@@ -94,11 +95,11 @@ export const Trait = {
     // Abigail Williams?
     [t.buffTerrorStunChanceAfterTurn]: 'Terror',
     [t.canBeInBattle]: '',
-    [t.cardArts]: '',
-    [t.cardBuster]: '',
-    [t.cardExtra]: '',
-    [t.cardNP]: '',
-    [t.cardQuick]: '',
+    [t.cardArts]: 'Arts Cards',
+    [t.cardBuster]: 'Buster Cards',
+    [t.cardExtra]: 'Extra Cards',
+    [t.cardNP]: 'NP Cards',
+    [t.cardQuick]: 'Quick Cards',
     [t.centaur]: 'Centaur',
     [t.chimera]: 'Chimera',
     [t.classAlterEgo]: 'Alter Ego',
@@ -160,7 +161,7 @@ export const Trait = {
 export const FuncTypes = {
     [fType.ABSORB_NPTURN]: '',
     [fType.ADD_STATE]: 'Apply',
-    [fType.ADD_STATE_SHORT]: 'Apply',
+    [fType.ADD_STATE_SHORT]: 'Apply (short)',
     [fType.BREAK_GAUGE_DOWN]: '',
     [fType.BREAK_GAUGE_UP]: '',
     [fType.CALL_SERVANT]: 'Summon another servant',
@@ -235,7 +236,8 @@ export const FuncTypes = {
     [fType.REVIVAL]: 'Revive',
     [fType.SEND_SUPPORT_FRIEND_POINT]: '',
     [fType.SERVANT_FRIENDSHIP_UP]: 'Increase Bond points gained',
-    [fType.SUB_STATE]: 'Remove state'
+    [fType.SUB_STATE]: 'Remove effect with',
+    [fType.TRANSFORM_SERVANT]: 'Swap servant'
 }
 
 export const TargetType = {
@@ -263,33 +265,64 @@ export const TargetType = {
 export const ApplyTarget = {
     [aType.ENEMY]: 'enemy',
     [aType.PLAYER]: 'player',
-    [aType.PLAYER_AND_ENEMY]: 'player & enemy'
+    [aType.PLAYER_AND_ENEMY]: 'either'
 }
 
 export const BuffTypes = {
     [bType.ADD_DAMAGE]: 'Add damage',
     [bType.ADD_INDIVIDUALITY]: 'Add trait',
-    [bType.ADD_MAXHP]: 'Increase maximum HP',
-    [bType.AVOID_INSTANTDEATH]: 'Immune to Death',
+    [bType.ADD_MAXHP]: 'Increase max HP',
+    [bType.ADD_SELFDAMAGE]: '',
+    [bType.ATTACK_FUNCTION]: '',
+    [bType.AVOID_INSTANTDEATH]: 'Death Immunity',
     [bType.AVOID_STATE]: 'Immunity',
     [bType.AVOIDANCE]: 'Evade',
+    [bType.BATTLESTART_FUNCTION]: '',
     [bType.BREAK_AVOIDANCE]: 'Sure Hit',
+    [bType.COMMANDATTACK_FUNCTION]: `Bonus effect on attacks`,
     [bType.DELAY_FUNCTION]: 'Trigger skill after duration',
+    [bType.DONOT_ACT]: 'Stun',
     [bType.DONOT_NOBLE]: 'NP Seal',
     [bType.DONOT_NOBLE_COND_MISMATCH]: 'NP block if condition fails',
     [bType.DONOT_RECOVERY]: 'Recovery Disabled',
     [bType.DONOT_SELECT_COMMANDCARD]: 'Do not shuffle in cards',
     [bType.DONOT_SKILL]: 'Skill Seal',
-    [bType.FIELD_INDIVIDUALITY]: 'Change Field type',
+    [bType.DOWN_CRITICALPOINT]: 'Decrease Critical Point',
+    [bType.DOWN_CRITICALRATE]: 'Decrease Critical Rate',
+    [bType.DOWN_DEFENCE]: 'DEF Down',
+    [bType.DOWN_DEFENCECOMMANDALL]: 'Resistance Down',
+    [bType.DOWN_GRANTSTATE]: `Buff Chance Down`,
+    [bType.DOWN_TOLERANCE]: 'Debuff Resist Down',
+    [bType.DOWN_TOLERANCE_SUBSTATE]: 'Cleanse Resist Down',
+    [bType.DOWN_NPDAMAGE]: `NP Damage Down`,
+    [bType.FIELD_INDIVIDUALITY]: 'Change Field Type',
     [bType.GUTS]: 'Guts',
     [bType.INVINCIBLE]: 'Invincible',
     [bType.MULTIATTACK]: 'Multiple hits',
+    [bType.NONE]: 'None',
+    [bType.UP_NONRESIST_INSTANTDEATH]: 'Death Resist Down',    
     [bType.PIERCE_INVINCIBLE]: 'Ignore Invincible',
-    [bType.REGAIN_HP]: 'HP per turn',
-    [bType.REGAIN_NP]: 'NP per turn',
-    [bType.REGAIN_STAR]: 'Stars per turn',
-    [bType.SELFTURNEND_FUNCTION]: 'Trigger skill after duration',
+    [bType.REGAIN_HP]: 'HP gain per turn',
+    [bType.REGAIN_NP]: 'NP gain per turn',
+    [bType.REGAIN_STAR]: 'Stars gain per turn',
+    [bType.SELFTURNEND_FUNCTION]: 'Trigger Skill every Turn',
     [bType.SUB_SELFDAMAGE]: 'Damage Cut',
     [bType.TD_TYPE_CHANGE]: 'Change Noble Phantasm',
+    [bType.UP_ATK]: 'ATK Up',
+    [bType.UP_COMMANDALL]: 'Card Effectiveness Up',
+    [bType.UP_CRITICALDAMAGE]: 'Critical Damage Up',
+    [bType.UP_CRITICALPOINT]: 'C. Star Drop Rate Up',
+    [bType.UP_CRITICALRATE]: 'Critical Rate Up',
+    [bType.UP_DEFENCE]: `DEF Up`,
+    [bType.UP_GRANTSTATE]: `Buff Chance Up`,
+    [bType.UP_NPDAMAGE]: 'NP Damage Up',
     [bType.UP_HATE]: 'Taunt',
+    [bType.UP_MAXHP]: 'Increase Max HP by percentage',
+    [bType.UP_TOLERANCE]: 'Debuff Resist Up',
+    [bType.UP_TOLERANCE_SUBSTATE]: 'Cleanse Resist Up'
+}
+
+export enum ValueFields {
+    RATE = `Probability`,
+    VALUE = `Value`
 }
