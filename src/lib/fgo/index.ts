@@ -20,4 +20,4 @@ export const constructQuery = {
     mstSvtTreasureDevice, mstTreasureDeviceLv
 }
 
-export { embedServantBase, embedServantDashboard, embedTreasureDeviceBase } from './embeds';
+export { embedServantBase, embedServantDashboard, embedTreasureDeviceBase, renderPassiveSkill } from './embeds';

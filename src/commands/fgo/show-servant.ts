@@ -2,7 +2,7 @@ import { MessageEmbed, Message } from 'discord.js';
 import { constructQuery, SearchParameters } from '../../lib/fgo/search';
 import { constructQuery as c,
     embedServantBase, embedServantDashboard,
-    embedTreasureDeviceBase
+    embedTreasureDeviceBase, renderPassiveSkill
 } from '@pepper/lib/fgo';
 import { NA } from '@pepper/db/fgo';
 import { FgoCommand } from './baseCommand';
@@ -59,10 +59,10 @@ export = class extends FgoCommand {
             )
 
 
-        const [{ id, activeSkill, passiveSkill }] = results;
+        const [{ id, activeSkill }] = results;
 
         const [svt] = await c.mstSvt({ collectionNo: +id }).NA.exec();
-        let { baseSvtId, classId } = svt;
+        let { baseSvtId, classId, classPassive } = svt;
         const [mstSvtLimits, cards, { [0]: __class }] = await Promise.all([
             await c.mstSvtLimit({ svtId: baseSvtId }).NA.limit(5).exec(),
             await c.mstSvtCard({ svtId: baseSvtId }).NA.limit(4).exec(),
@@ -71,8 +71,8 @@ export = class extends FgoCommand {
         // render NP gain
         const svtTdMapping = await NA.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
         let [{ treasureDeviceId: tdId }] = svtTdMapping;
-        const [td] = await c.mstTreasureDeviceLv({ treaureDeviceId: tdId }).NA.exec();
-        const tDevices = (await Promise.all(
+        const [td_npGain] = await c.mstTreasureDeviceLv({ treaureDeviceId: tdId }).NA.exec();
+        const td = (await Promise.all(
             svtTdMapping.map(
                 a => NA.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
             )
@@ -82,23 +82,26 @@ export = class extends FgoCommand {
             .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${id}`)
 
         let tdEmbed = (await Promise.all(
-            tDevices.map(td => embedTreasureDeviceBase(td))
+            td.map(td => embedTreasureDeviceBase(td))
         )).map((a, i) => 
             base()
                 .addFields(a)
                 .setDescription(
-                    `[**${tDevices[i].name}** [**__${tDevices[i].typeText}__**]](${
-                        `https://apps.atlasacademy.io/db/#/NA/noble-phantasm/${tDevices[i].id}`
+                    `[__${td[i].rank}__] `
+                    + `[**${td[i].name}** [**__${td[i].typeText}__**]](${
+                        `https://apps.atlasacademy.io/db/#/NA/noble-phantasm/${td[i].id}`
                     })`
                 )
                 .setFooter(`Noble Phantasm`)
         )
 
+        let passives = await Promise.all(classPassive.map(_ => renderPassiveSkill(_)));
+
         paginatedEmbed()
             .setChannel(m.channel)
             .setEmbeds(
                 [
-                    (await embedServantDashboard(svt, __class, mstSvtLimits, cards, td, allTrait))
+                    (await embedServantDashboard(svt, __class, mstSvtLimits, cards, td_npGain, allTrait))
                         .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${id}`)
                         .setFooter(`Basic details`),
                     base()
@@ -113,11 +116,8 @@ export = class extends FgoCommand {
                             )
                         }).join('\n\n')
                     )
-                    .addField(
-                        'Passive skill',
-                        passiveSkill.map(({ name, detail, rank }) => `**${name}** [__${rank}__]\n${detail}`).join('\n\n')
-                    )
-                    .setFooter(`Skills`),
+                    .setFooter(`Active skills`),
+                    base().addFields(passives).setFooter(`Passive skills`),
                     ...tdEmbed
                 ]
                 .map((a, i, _) => a.setFooter(`${

@@ -11,9 +11,14 @@ import type { mstSvtLimit } from '@pepper/db/fgo/master/mstSvtLimit';
 import type { mstSvtCard } from '@pepper/db/fgo/master/mstSvtCard';
 import type { mstTreasureDeviceLv } from '@pepper/db/fgo/master/mstTreasureDeviceLv';
 import type { mstTreasureDevice } from '@pepper/db/fgo/master/mstTreasureDevice';
+import type { mstSkill } from '@pepper/db/fgo/master/mstSkill';
+import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import { MessageEmbed } from 'discord.js';
 import { renderInvocation } from './func';
 import { NA } from '@pepper/db/fgo';
+import { zip } from '@pepper/utils';
+import { parseVals } from './datavals';
+import { renderBuffStatistics, zippedNormalVals } from './buffView';
 
 export function embedServantBase(
     { name, baseSvtId, collectionNo } : mstSvt,
@@ -116,9 +121,86 @@ export async function embedTreasureDeviceBase(td : mstTreasureDevice) {
     );
     return funcBase.map(_ => ({
         name: `${_.action} ${_.targets.map(a => `[${a.trim()}]`).join(', ')}`,
-        value: 
+        value:
             `[Link](https://apps.atlasacademy.io/db/#/NA/func/${_.id})`
-            + `\nApply when on ${_.affectWhenOnTeam} team`
-            + `\nAffects ${_.affectTarget}`
+            + `\nAffects **${
+                _.affectTarget
+                + (_.traitVals.length
+                    ? ` with ${_.traitVals.map(_ => `[${_}]`).join(', ')}`
+                    : ``)
+            }** when on **${_.affectWhenOnTeam}** team`
     }))
+}
+
+async function renderSkill(s: mstSkill) {
+    let levels = await NA.mstSkillLv.find({ skillId: s.id }).exec();
+    // precompiling stuff
+    let cache = new Map<number, mstFunc>(),
+        func = [...new Set(levels.map(l => l.funcId).flat())];
+    await Promise.all(
+        func.map(async f => cache.set(
+            f,
+            await NA.mstFunc.findOne({ id: f }).exec()
+        ))
+    )
+    let _inv = func.map(async fid => {
+        let vals = levels.map(
+            level => level.svals[level.funcId.findIndex(_ => _ === fid)]
+        );
+        let resolvedVals = await Promise.all(
+            vals.map(v => parseVals(v, cache.get(fid).funcType))
+        );
+        // zip them up
+        return {
+            funcId: fid,
+            vals: zip(resolvedVals)
+        }
+    })
+
+    let invocations = await Promise.all(_inv);
+    let _ = await Promise.all(invocations.map(
+        async inv => ({
+            func: await renderInvocation(cache.get(inv.funcId)),
+            vals: inv.vals
+        })
+    ))
+    return _;
+}
+
+export async function renderPassiveSkill(skillId: number) {
+    let skill = await NA.mstSkill.findOne({ id: skillId }).exec();
+    let acts = await renderSkill(skill);
+
+    let funcs = new Map<number, typeof acts[0]['func']>();
+    acts.forEach(_ => funcs.set(_.func.id, _.func));
+
+    let values = acts.map(async _ => {
+        let { func: f, vals } = _;
+        // zip this up
+        Object.keys(vals).forEach(
+            (k : keyof typeof vals) => {
+                let _ = vals[k] as any[];
+                (vals[k] as any) = [...new Set(_)];
+            }
+        );
+
+        let details = await renderBuffStatistics(f.rawBuffs[0], vals as zippedNormalVals);
+        return (
+            `**[${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}]`
+            + `(https://apps.atlasacademy.io/db/#/NA/func/${f.id})**`
+            + ` on **${f.affectTarget}**\nMember of : **${f.affectWhenOnTeam}** team`
+            + `${
+                (`\n` + details.map(_ => `${_.name} : ${
+                    // _.value.join(' / ')
+                    _.value[0]
+                    // a passive skill only has one degree of power?
+                }`).join('\n')).trimRight()
+            }`
+        )
+    })
+
+    return {
+        name: skill.name,
+        value: (await Promise.all(values)).join('\n\n') 
+    };
 }
