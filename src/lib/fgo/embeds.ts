@@ -20,6 +20,8 @@ import { zip } from '@pepper/utils';
 import { parseVals } from './datavals';
 import { renderBuffStatistics, zippedNormalVals } from './buffView';
 
+type tr = keyof typeof Trait;
+
 export function embedServantBase(
     { name, baseSvtId, collectionNo } : mstSvt,
     { name: className } : mstClass,
@@ -30,10 +32,11 @@ export function embedServantBase(
             [...new Set(limits.map(a => a.rarity))].sort((a, b) => a - b).join('-')
         }☆ ${className}`)
         .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`)
+        .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${collectionNo}`)
 }
 
 export async function embedServantDashboard(
-    svt: mstSvt, cl : mstClass, limits: mstSvtLimit[], cards: mstSvtCard[], 
+    svt: mstSvt, limits: mstSvtLimit[], cards: mstSvtCard[], 
     { tdPoint, tdPointDef }: mstTreasureDeviceLv, allTrait = false
 ) {
     let { hpBase, hpMax, atkBase, atkMax } = limits[0],
@@ -47,65 +50,55 @@ export async function embedServantDashboard(
         ind.delete(attri + attrMod);
         ind.delete(genderType + genMod);
         ind.delete(claMod + classId);
-    return embedServantBase(svt, cl, limits)
-        .addField(
-            'HP/ATK',
-            `- Base : ${hpBase}/${atkBase}\n- Maximum : ${hpMax}/${atkMax}`,
-            true
-        )
-        .addField(
-            'Cards / Damage distribution by %',
-            // -1 due to array from 0
-            `- Buster : ${ccount(Card.BUSTER)} / ${dmg[Card.BUSTER - 1].join('-')}`
+    let inline = true;
+    let out = [{
+        name: 'HP/ATK',
+        value: `- Base : ${hpBase}/${atkBase}\n- Maximum : ${hpMax}/${atkMax}`,
+        inline
+    }, {
+        name: 'Cards / Damage distribution by %',
+        value: `- Buster : ${ccount(Card.BUSTER)} / ${dmg[Card.BUSTER - 1].join('-')}`
             + `\n- Arts : ${ccount(Card.ARTS)} / ${dmg[Card.ARTS - 1].join('-')}`
             + `\n- Quick : ${ccount(Card.QUICK)} / ${dmg[Card.QUICK - 1].join('-')}`
             + `\n- Extra : 1 / ${dmg[Card.EXTRA - 1].join('-')}`,
-            true
-        )
-        .addField(
-            'NP generation',
-            `Per hit : **${
-                (tdPoint / 100).toFixed(2)
-            }**%\nWhen attacked : **${
-                (tdPointDef / 100).toFixed(2)
-            }**%`,
-            true
-        )
-        .addField(
-            `Critical stars`,
-            `Weight : **${limits[0].criticalWeight}**\nGeneration : **${
-                (starRate / 10).toFixed(1)
-            }**%`,
-            true
-        )
-        .addField(
-            'Traits',
-            [...ind]
-                .map(a => Trait[a as keyof typeof Trait] || a)
-                // filter out not defined mappings
-                .filter(a => allTrait ? 1 : isNaN(+a))
-                .map(a => `* **${a}**`)
-                .join('\n'),
-            true
-        )
-        .addField(
-            'Gender / Attribute', 
-            `${Trait[
-                (genderType + genMod) as keyof typeof Trait
-            ]} / ${Trait[
-                (attri + attrMod) as keyof typeof Trait
-            ]}`,
-            true
-        ).addField(
-            'Related quests',
-            (await Promise.all(
+        inline
+    }, {
+        name: 'NP generation',
+        value: `Per hit : **${(tdPoint / 100).toFixed(2)}**%`
+            + `\nWhen attacked : **${(tdPointDef / 100).toFixed(2)}**%`,
+        inline
+    }, {
+        name: `Critical stars`,
+        value: `Weight : **${limits[0].criticalWeight}**`
+            + `\nGeneration : **${(starRate / 10).toFixed(1)}**%`,
+        inline
+    }, {
+        name: 'Traits',
+        value: [...ind]
+            .map(a => Trait[a as tr] || a)
+            // filter out not defined mappings
+            .filter(a => allTrait ? 1 : isNaN(+a))
+            .map(a => `* **${a}**`)
+            .join('\n'),
+        inline
+    }, {
+        name: 'Gender / Attribute', 
+        value: `${Trait[(genderType + genMod) as tr]} / ${Trait[(attri + attrMod) as tr]}`,
+        inline
+    }];
+    if (relateQuestIds.length) 
+        out.push({
+            name: `Related quests`,
+            value: (await Promise.all(
                 relateQuestIds
                     .map(id => NA.mstQuest.findOne({ id }).select('id name').exec())
             ))
                 .map(q => `\`${q.id}\` ${q.name}`)
-                .join('\n') || 'None',
-            true
-        )
+                .join('\n'),
+            inline
+        })
+    
+    return out;
 }
 
 export async function embedTreasureDeviceBase(td : mstTreasureDevice) {

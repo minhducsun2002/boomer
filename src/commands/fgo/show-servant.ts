@@ -87,8 +87,7 @@ export = class extends FgoCommand {
             )
         )).sort((a, b) => a.id - b.id);
 
-        let base = () => embedServantBase(svt, __class, mstSvtLimits)
-            .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${id}`)
+        let base = () => embedServantBase(svt, __class, mstSvtLimits);
 
         let tdEmbed = (await Promise.all(
             td.map(td => embedTreasureDeviceBase(td))
@@ -110,8 +109,10 @@ export = class extends FgoCommand {
             .setChannel(m.channel)
             .setEmbeds(
                 [
-                    (await embedServantDashboard(svt, __class, mstSvtLimits, cards, td_npGain, allTrait))
-                        .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${id}`)
+                    base()
+                        .addFields(
+                            await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, allTrait)
+                        )
                         .setFooter(`Basic details`),
                     base()
                     .addField(
