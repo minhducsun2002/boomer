@@ -33,6 +33,7 @@ export function embedServantBase(
         }☆ ${className}`)
         .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`)
         .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${collectionNo}`)
+        .setThumbnail(`https://assets.atlasacademy.io/GameData/NA/Faces/f_${baseSvtId}0.png`)
 }
 
 export async function embedServantDashboard(
