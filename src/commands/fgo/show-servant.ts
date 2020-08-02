@@ -141,21 +141,17 @@ export = class extends FgoCommand {
             cache_details.push(_id, e.map(e => e.toJSON()));
         };
 
+        let notice = det ? '' : (
+            `Search may not bring up the expected result.`
+            + `\nPlease use \`${
+                this.handler.findCommand(`ss`)
+                    .aliases.sort((a, b) => a.length - b.length)[0]
+            }\` command first to search, then call this command again with servant ID.`
+        );
+
         paginatedEmbed()
             .setChannel(m.channel)
             .setEmbeds(e)
-            .run({ idle: 20000, dispose: true })
-            .then(c => {
-                if (!det) {
-                    let m = c.message;
-                    m.edit(
-                        `Search may not bring up the expected result.`
-                        + `\nPlease use \`${
-                            this.handler.findCommand(`ss`)
-                                .aliases.sort((a, b) => a.length - b.length)[0]
-                        }\` command first to search, then call this command again with servant ID.`
-                    )
-                }
-            })
+            .run({ idle: 20000, dispose: true }, notice)
     }
 }
