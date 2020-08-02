@@ -55,8 +55,11 @@ export = class extends FgoCommand {
             err.setDescription(':disappointed: Sorry, I could not find anything.')
         )
 
-        let _id : number;
-        if (Number.isInteger(+query)) _id = +query;
+        let _id : number, det = false;
+        if (Number.isInteger(+query)) {
+            _id = +query;
+            det = true;
+        }
         else {
             let res = await search_instance.search(query);
             if (!res.length) return bail();
@@ -103,7 +106,7 @@ export = class extends FgoCommand {
 
         let passives = await Promise.all(classPassive.map(_ => renderPassiveSkill(_)));
 
-        paginatedEmbed()
+        let _ = paginatedEmbed()
             .setChannel(m.channel)
             .setEmbeds(
                 [
@@ -131,5 +134,17 @@ export = class extends FgoCommand {
                 }Page ${++i}/${_.length}`))
             )
             .run({ idle: 20000, dispose: true })
+            .then(c => {
+                if (!det) {
+                    let m = c.message;
+                    m.edit(
+                        `Search may not bring up the expected result.`
+                        + `\nPlease use \`${
+                            this.handler.findCommand(`ss`)
+                                .aliases.sort((a, b) => a.length - b.length)[0]
+                        }\` command first to search, then call this command again with servant ID.`
+                    )
+                }
+            })
     }
 }
