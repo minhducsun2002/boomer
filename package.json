@@ -8,7 +8,7 @@
     "url": "https://github.com/minhducsun2002/boomer"
   },
   "scripts": {
-    "transpile": "ttsc",
+    "transpile": "ttsc --project tsconfig.build.json",
     "start": "node dist/index.js",
     "start:dev": "ts-node --compiler ttypescript src/index.ts",
     "build": "rimraf dist/ && npm run transpile",

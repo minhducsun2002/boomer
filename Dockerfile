@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package.json .
 RUN yarn install
 
-COPY tsconfig.json .
+COPY tsconfig.build.json .
 COPY src/ src/
 RUN yarn build
 
