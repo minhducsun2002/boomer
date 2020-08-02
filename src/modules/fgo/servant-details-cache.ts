@@ -10,7 +10,7 @@ export = class extends FgoModule {
     }
 
     private log = new componentLog(`F/GO servant details cache`);
-    private cache = new Collection<number, Buffer>();
+    readonly cache = new Collection<number, Buffer>();
 
     push(s: number, d: any) {
         let b = encode(d);
@@ -28,7 +28,8 @@ export = class extends FgoModule {
     clean() {
         let _ = this.cache.size;
         this.cache.clear();
-        this.log.info(`Cleared ${_} entries from cache.`)
+        this.log.info(`Cleared ${_} entries from cache.`);
+        return _;
     }
 
     initialized = false;
