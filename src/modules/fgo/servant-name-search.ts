@@ -28,6 +28,16 @@ export = class extends FgoModule {
         return this.fuse.search(s);
     }
 
+    private async verifyDupes(s : Servant[]) {
+        let _ = s.map(s => [s.name, ...s.alias]).flat();
+        let _1 = new Set(_).size;
+        if (_1 !== _.length)
+            this.log.warning(
+                `There are ${_.length} names/aliases listed, but only ${_1} unique aliases.`
+                + `\nPlease remove duplicates for search determinism.`
+            )
+    }
+
     initialized = false;
     async initialize() {
         let { main } = this.client.config.database.fgo as { [k: string]: string };
@@ -38,18 +48,24 @@ export = class extends FgoModule {
             .on('open', () => this.log.success(`Connection to alias database succeeded.`))
             .model('Servant', Schema)
         let records = await mod.find({}).select('name alias id').exec();
-        this.log.info(`Found aliases for ${records.length} servants.`)
+        this.log.info(`Found aliases for ${records.length} servants.`);
+
+        // warning for dupes sh*t
+        this.verifyDupes(records);
 
         // building index
         let index = f.createIndex(['name', 'alias'], records);
         this.fuse = new f(
             records,
             {
-                keys: ['name', 'alias'],
+                keys: ['name', {
+                    name: 'alias',
+                    weight: 1.5
+                }],
                 includeScore: true,
                 minMatchCharLength: 3,
-                tokenize: true
-            } as any,
+                ignoreLocation: true
+            },
             index
         );
         this.log.success(`Servant aliases indexing complete.`)
