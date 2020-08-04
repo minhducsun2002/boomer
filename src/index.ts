@@ -40,5 +40,9 @@ client.commandHandler
 client.inhibitorHandler.loadAll();
 client.moduleHandler.loadAll();
 
-client.login(process.env.DISCORD_TOKEN);
+// initialize all modules
+Promise.all(
+    client.moduleHandler.modules.array()
+        .map(m => m.initialize())
+).then(() => client.login(process.env.DISCORD_TOKEN))
 export { client };
