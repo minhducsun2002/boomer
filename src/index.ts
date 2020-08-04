@@ -1,5 +1,5 @@
+import './globals';
 import { PepperClient } from './struct';
-import { config } from 'dotenv'; config();
 import { join } from 'path';
 
 const client = new PepperClient({

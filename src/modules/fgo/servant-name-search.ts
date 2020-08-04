@@ -16,7 +16,7 @@ export = class extends FgoModule {
         super(`servant-name-search`, {});
     }
 
-    private log = new componentLog('F/GO name search');
+    private log = new componentLog('F/GO servant name search');
     private fuse : f<Servant>;
 
     /**
@@ -41,9 +41,6 @@ export = class extends FgoModule {
     initialized = false;
     async initialize() {
         let { main } = this.client.config.database.fgo as { [k: string]: string };
-        m.set('useNewUrlParser', true);
-        m.set('useFindAndModify', false);
-        m.set('useUnifiedTopology', true);
         let mod : m.Model<Servant> = m.createConnection(main)
             .on('open', () => this.log.success(`Connection to alias database succeeded.`))
             .model('Servant', Schema)
