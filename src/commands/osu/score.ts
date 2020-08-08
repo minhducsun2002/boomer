@@ -78,7 +78,7 @@ export = class extends OsuCommand {
 
             let set = await fetchMapset(_, false)
             let {
-                difficulty_rating, mode_int,
+                difficulty_rating, mode_int, version,
                 max_combo, ar, accuracy, cs, drain, total_length, id
             } = set.beatmaps.find(a => a.id === _);
 
@@ -87,7 +87,7 @@ export = class extends OsuCommand {
             const createEmbed = (__ : typeof scores) => new MessageEmbed()
                 .setColor(SUCCESS_COLOR).setTimestamp()
                 .setURL(`https://osu.ppy.sh/beatmaps/${_}`)
-                .setTitle(`Scores by \`${scores[0].username}\`\non **${set.artist}** - **${set.title}**`)
+                .setTitle(`Scores by \`${scores[0].username}\`\non **${set.artist}** - **${set.title}** [**${version}**]`)
                 .setDescription(
                     `\n${difficulty_rating} :star:${max_combo ? ` | **${max_combo}**x` : ''} | `
                     + `${pad(2)(Math.floor(total_length / 60))}:${pad(2)(total_length % 60)} | `
