@@ -1,15 +1,12 @@
 import { MessageEmbed, Message } from 'discord.js';
-
-import { constructQuery, SearchParameters } from '../../lib/fgo/search';
-import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
+import { constructQuery } from '@pepper/lib/fgo/search';
 import { plural as p } from '@pepper/utils' ;
-import sentence from '../../lib/sentence';
+import sentence from '@pepper/lib/sentence';
 import { FgoCommand } from './baseCommand';
+import search from '@pepper/modules/fgo/servant-name-search';
 
 const commandName = 'servant-np';
 const aliases = ['servant-np', 'np', 'snp'];
-
-interface commandArgument { query?: String; _class?: String[]; }
 
 export = class extends FgoCommand {
     constructor() {
@@ -19,40 +16,34 @@ export = class extends FgoCommand {
                 id: 'query',
                 match: 'rest',
                 description: 'Search query'
-            },{
-                id: '_class',
-                match: 'option',
-                description: 'Filtering by class',
-                flag: ['-c', '-c=', '/c:', '--class=', '/class:'],
-                multipleFlags: true
             }],
             typing: true,
-            description: "Show servant's Noble Phantasm."
+            description: "Show a servant's Noble Phantasm."
         })
     }
 
-    async exec(msg: Message, { query, _class } : commandArgument) {
-        const wait = new MessageEmbed().setDescription(':hourglass: Querying database...')
-        const errEmbed = new MessageEmbed().setColor(ERROR_COLOR);
-        const out = await msg.channel.send(wait) as Message;
+    async exec(m: Message, { query } : { query: string }) {
+        const bail = () => m.channel.send(
+            new MessageEmbed().setDescription(':frowning: Sorry, but I could not find anything matching.')
+        );
 
-        if (!query) return out.edit('', errEmbed.setDescription(':frowning: Where is your query?'));
+        if (!query) return bail();
 
-        const q = Number.isInteger(+query) 
-            ? { id: +query } as SearchParameters
-            : { np: query, name: query, class: _class } as SearchParameters
-        const results = await constructQuery(q, 1)
+        let _id = +query;
+        if (isNaN(_id)) {
+            let res = await this.client.moduleHandler.findInstance(search)
+                .search(query);
+            if (!res.length) return bail();
+            _id = res[0].item.id;
+        }
+        const results = await constructQuery({ id: _id }, 1)
             .select('name noblePhantasm id dmgDistribution.np').exec();
 
-        if (!results.length) return out.edit(
-            '', 
-            errEmbed.setDescription(':frowning: Sorry, but I could not find anything matching.')
-        )
+        if (!results.length) return bail();
 
         const [{ name, id, noblePhantasm: np }] = results;
 
         const embed = new MessageEmbed()
-            .setColor(SUCCESS_COLOR)
             .setAuthor(`${id}. ${name}`)
             .setTitle(`Noble Phantasm${p(np.length)}`)
 
@@ -84,6 +75,6 @@ export = class extends FgoCommand {
             }
         )
 
-        out.edit('', embed)
+        m.channel.send(embed);
     }
 }

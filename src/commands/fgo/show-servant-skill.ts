@@ -1,15 +1,11 @@
 import { MessageEmbed, Message } from 'discord.js';
-
-import sentence from '../../lib/sentence';
-import { constructQuery } from '../../lib/fgo/search';
+import search from '@pepper/modules/fgo/servant-name-search';
+import sentence from '@pepper/lib/sentence';
+import { constructQuery } from '@pepper/lib/fgo/search';
 import { FgoCommand } from './baseCommand';
-
-import { ERROR_COLOR, SUCCESS_COLOR, INDETERMINATE_COLOR } from '../../constants/colors'
 
 const commandName = 'servant-skills';
 const aliases = ['servant-skills', 'sk', 'sks', 'ssks', 'skills', 'skill'];
-
-interface commandArguments { query?: String; }
 
 export = class extends FgoCommand {
     constructor() {
@@ -26,31 +22,28 @@ export = class extends FgoCommand {
         })
     }
 
-    async exec (msg: Message, { query } : commandArguments) {
-        const wait = new MessageEmbed().setDescription(':hourglass: Querying database...')
-        const out = await msg.channel.send(wait) as Message;
-        const err = new MessageEmbed().setColor(ERROR_COLOR);
+    async exec (m: Message, { query } : { query: string; }) {
+        const bail = () => m.channel.send(
+            new MessageEmbed().setDescription(':frowning: Sorry, but I could not find anything matching.')
+        );
 
-        if (!query) return out.edit('', err.setDescription(':frowning: Where is your query?'))
+        if (!query) return bail();
 
-        const q = Number.isInteger(+query) ? { id: +query } : { skill: query, name: query }
+        let _id = +query;
+        if (isNaN(_id)) {
+            let res = await this.client.moduleHandler.findInstance(search)
+                .search(query);
+            if (!res.length) return bail();
+            _id = res[0].item.id;
+        }
+        const results = await constructQuery({ id: _id }, 1)
+            .select('name id activeSkill').exec();
 
-        const results = await constructQuery(q).select('name id activeSkill').exec();
-        if (!results.length)
-            return out.edit(
-                '', 
-                err.setDescription(':frowning: Sorry, but I could not find anything matching.')
-            )
-
-        await out.edit(
-            '',
-            wait.setDescription(`:hourglass: Found record for **${results[0].name}**. Please wait...`)
-                .setColor(INDETERMINATE_COLOR)
-        )
+        if (!results.length) return bail();
 
         const [{ id, name, activeSkill }] = results
 
-        let embed = new MessageEmbed().setColor(SUCCESS_COLOR).setTimestamp()
+        let embed = new MessageEmbed().setTimestamp()
             .setAuthor(`${id}. ${name}`)
             .setTitle('Active skills')
         
@@ -71,6 +64,6 @@ export = class extends FgoCommand {
             })
         })
 
-        out.edit('', embed)
+        m.channel.send(embed);
     }
 }
