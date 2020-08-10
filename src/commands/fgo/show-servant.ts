@@ -52,11 +52,7 @@ export = class extends FgoCommand {
             det = true;
         }
         else {
-            // check for tokenization matches
-            let ids = search_instance.tokenSearch(query);
             let res = await search_instance.search(query);
-            if (ids && ids.size)
-                res = res.filter(_ => ids.has(_.item.id));
             if (!res.length) return bail();
             _id = res[0].item.id;
         }

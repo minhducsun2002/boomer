@@ -25,8 +25,10 @@ export = class extends FgoModule {
      * @param s Search query
      */
     async search(s : string) {
-        if (!this.fuse || !this.initialized) await this.initialize();
-        return this.fuse.search(s);
+        let t = this.tokenSearch(s);
+        let res = await this.fuzzySearch(s);
+        if (t && t.size) res = res.filter(_ => t.has(_.item.id));
+        return res;
     }
 
     /**
@@ -36,6 +38,15 @@ export = class extends FgoModule {
      */
     tokenSearch(s : string) {
         return this.tokens.get(s.trim().toLowerCase());
+    }
+
+    /**
+     * Fuzzy search a servant by name
+     * @param s Search query
+     */
+    async fuzzySearch(s : string) {
+        if (!this.fuse || !this.initialized) await this.initialize();
+        return this.fuse.search(s);
     }
 
     private async verifyDupes(s : Servant[]) {
