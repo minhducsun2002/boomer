@@ -18,6 +18,7 @@ export = class extends FgoModule {
 
     private log = new componentLog('F/GO servant name search');
     private fuse : f<Servant>;
+    private tokens = new Map<string, Set<number>>();
 
     /**
      * Search a servant by name
@@ -26,6 +27,15 @@ export = class extends FgoModule {
     async search(s : string) {
         if (!this.fuse || !this.initialized) await this.initialize();
         return this.fuse.search(s);
+    }
+
+    /**
+     * Search a servant by name (exact match)
+     * @param s Search query
+     * @returns A set of servant collectionNo.
+     */
+    tokenSearch(s : string) {
+        return this.tokens.get(s.trim().toLowerCase());
     }
 
     private async verifyDupes(s : Servant[]) {
@@ -49,6 +59,23 @@ export = class extends FgoModule {
 
         // warning for dupes sh*t
         this.verifyDupes(records);
+
+        // preparing for token-based search
+        records.map(r => ({
+            token: [r.alias, r.name].flat().map(_ => _.toLowerCase()),
+            id: r.id
+        })).forEach(_ => {
+            // for each aliases
+            let t = _.token, { id } = _;
+            // register aliases
+            t.forEach(token => {
+                if (this.tokens.has(token))
+                    this.tokens.get(token).add(id);
+                else
+                    this.tokens.set(token, new Set([id]))
+            })
+        })
+        this.log.success(`Servant aliases tokenization complete.`);
 
         // building index
         let index = f.createIndex(['name', 'alias'], records);
