@@ -1,7 +1,7 @@
 import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
 import m, { Servant } from './servant-main-database';
-import { NA } from '@pepper/db/fgo';
+import { JP as NA } from '@pepper/db/fgo';
 import { decode, encode } from '@msgpack/msgpack'
 import { embedServantBase, embedServantDashboard, embedTreasureDeviceBase, renderPassiveSkill } from '@pepper/lib/fgo'
 import { Collection, MessageEmbed } from 'discord.js';
@@ -12,7 +12,7 @@ export = class extends FgoModule {
     }
 
     cache = new Collection<number, Buffer>();
-    private log = new componentLog(`F/GO servant details pre-processor`);
+    private log = new componentLog(`F/GO servant details`);
 
     push(s: number, d: any) {
         let b = encode(d);
@@ -29,8 +29,9 @@ export = class extends FgoModule {
                 if (!_) throw new Error(`Servant with ID ${s} not found!`)
                 this.push(_.id, await this.process(_));
                 return decode(this.cache.get(s)) as MessageEmbed[];
-            } catch {
-                throw new Error(`Key ${s} is not found in cache!`);
+            } catch (e) {
+                this.log.error(`Key ${s} is not found in cache & re-render failed!`);
+                this.log.error(e);
             }
         }
         return decode(this.cache.get(s)) as MessageEmbed[];
@@ -117,7 +118,9 @@ export = class extends FgoModule {
                     .then(s => this.process(s))
                     .then(e => e.map(e => e.toJSON()))
                     .then(o => this.push(id, o))
-                    .catch(() => this.log.error(`Error processing servant ${id}.`))
+                    .catch(e => this.log.error(`Error processing servant ${id}.\n${
+                        `${e.name} : ${e.message}\n${e.stack}`
+                    }`))
             }
         }
         Promise.resolve(f());

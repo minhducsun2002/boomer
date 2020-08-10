@@ -15,7 +15,7 @@ import type { mstSkill } from '@pepper/db/fgo/master/mstSkill';
 import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import { MessageEmbed } from 'discord.js';
 import { renderInvocation } from './func';
-import { NA } from '@pepper/db/fgo';
+import { JP as NA } from '@pepper/db/fgo';
 import { zip } from '@pepper/utils';
 import { parseVals } from './datavals';
 import { renderBuffStatistics, zippedNormalVals } from './buffView';

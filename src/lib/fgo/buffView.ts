@@ -3,7 +3,7 @@ import { ValueFields, Trait } from '@pepper/constants/fgo/strings';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
 import type { normalVals } from './datavals';
 import { renderInvocation } from './func';
-import { NA } from '@pepper/db/fgo';
+import { JP as NA } from '@pepper/db/fgo';
 
 // https://jpwilliams.dev/how-to-unpack-the-return-type-of-a-promise-in-typescript
 // type Unwrap<T> =

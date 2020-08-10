@@ -1,4 +1,4 @@
-import { NA } from '@pepper/db/fgo';
+import { JP as NA } from '@pepper/db/fgo';
 
 /**
  * Fetch a `mstBuff` by its ID.
