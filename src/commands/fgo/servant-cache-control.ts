@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
-import cache from '@pepper/modules/fgo/servant-details-cache';
+import cache from '@pepper/modules/fgo/servant-details-preprocess';
 import { plural as p } from '@pepper/utils';
 
 const commandName = `servant-cache-control`;

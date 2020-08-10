@@ -1,15 +1,9 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { constructQuery } from '../../lib/fgo/search';
-import { constructQuery as c,
-    embedServantBase, embedServantDashboard,
-    embedTreasureDeviceBase, renderPassiveSkill
-} from '@pepper/lib/fgo';
-import { NA } from '@pepper/db/fgo';
 import { FgoCommand } from './baseCommand';
 import { paginatedEmbed } from '@pepper/utils'
 import { ERROR_COLOR } from '@pepper/constants/colors';
 import search from '@pepper/modules/fgo/servant-name-search';
-import cache from '@pepper/modules/fgo/servant-details-cache';
+import cache from '@pepper/modules/fgo/servant-details-preprocess';
 
 const commandName = 'servant-info';
 const aliases = ['servant', 'servant-info', 's'];
@@ -28,11 +22,6 @@ export = class extends FgoCommand {
                 match: 'option',
                 description: 'Filtering by class',
                 flag: ['-c', '-c=', '/c:', '--class=', '/class:']
-            }, {
-                id: 'allTrait',
-                match: 'flag',
-                description: 'Show non-rendered traits',
-                flag: ['/a']
             }],
             typing: true,
             description: 'Show a servant\'s details.',
@@ -41,7 +30,7 @@ export = class extends FgoCommand {
     }
 
     async exec(m: Message,
-        { query, allTrait }: { query?: string, allTrait: boolean }
+        { query }: { query?: string }
     ) {
         const err = new MessageEmbed().setColor(ERROR_COLOR);
 
@@ -70,76 +59,76 @@ export = class extends FgoCommand {
 
         let e : MessageEmbed[] = [];
 
-        try {
-            let cached = cache_details.get(_id) as any[];
+        // try {
+            let cached = await cache_details.get(_id) as any[];
             cached.forEach(s => e.push(new MessageEmbed(s)));
-        } catch {
-            const results = await constructQuery({ id: _id }).limit(1).exec();
-            if (!results.length) return bail();
-            const [{ id, activeSkill }] = results;
+        // } catch {
+        //     const results = await constructQuery({ id: _id }).limit(1).exec();
+        //     if (!results.length) return bail();
+        //     const [{ id, activeSkill }] = results;
 
-            const [svt] = await c.mstSvt({ collectionNo: +id }).NA.exec();
-            let { baseSvtId, classId, classPassive } = svt;
-            const [mstSvtLimits, cards, { [0]: __class }] = await Promise.all([
-                await c.mstSvtLimit({ svtId: baseSvtId }).NA.limit(5).exec(),
-                await c.mstSvtCard({ svtId: baseSvtId }).NA.limit(4).exec(),
-                await c.mstClass({ id: classId }).NA.exec()
-            ]);
-            // render NP gain
-            const svtTdMapping = await NA.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
-            let [{ treasureDeviceId: tdId }] = svtTdMapping;
-            const [td_npGain] = await c.mstTreasureDeviceLv({ treaureDeviceId: tdId }).NA.exec();
-            const td = (await Promise.all(
-                svtTdMapping.map(
-                    a => NA.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
-                )
-            )).sort((a, b) => a.id - b.id);
+        //     const [svt] = await c.mstSvt({ collectionNo: +id }).NA.exec();
+        //     let { baseSvtId, classId, classPassive } = svt;
+        //     const [mstSvtLimits, cards, { [0]: __class }] = await Promise.all([
+        //         await c.mstSvtLimit({ svtId: baseSvtId }).NA.limit(5).exec(),
+        //         await c.mstSvtCard({ svtId: baseSvtId }).NA.limit(4).exec(),
+        //         await c.mstClass({ id: classId }).NA.exec()
+        //     ]);
+        //     // render NP gain
+        //     const svtTdMapping = await NA.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
+        //     let [{ treasureDeviceId: tdId }] = svtTdMapping;
+        //     const [td_npGain] = await c.mstTreasureDeviceLv({ treaureDeviceId: tdId }).NA.exec();
+        //     const td = (await Promise.all(
+        //         svtTdMapping.map(
+        //             a => NA.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
+        //         )
+        //     )).sort((a, b) => a.id - b.id);
 
-            let base = () => embedServantBase(svt, __class, mstSvtLimits);
+        //     let base = () => embedServantBase(svt, __class, mstSvtLimits);
 
-            let tdEmbed = (await Promise.all(
-                td.map(td => embedTreasureDeviceBase(td))
-            )).map((a, i) => 
-                base()
-                    .addFields(a)
-                    .setDescription(
-                        `[__${td[i].rank}__] `
-                        + `[**${td[i].name}** [**__${td[i].typeText}__**]](${
-                            `https://apps.atlasacademy.io/db/#/NA/noble-phantasm/${td[i].id}`
-                        })`
-                    )
-                    .setFooter(`Noble Phantasm`)
-            )
+        //     let tdEmbed = (await Promise.all(
+        //         td.map(td => embedTreasureDeviceBase(td))
+        //     )).map((a, i) => 
+        //         base()
+        //             .addFields(a)
+        //             .setDescription(
+        //                 `[__${td[i].rank}__] `
+        //                 + `[**${td[i].name}** [**__${td[i].typeText}__**]](${
+        //                     `https://apps.atlasacademy.io/db/#/NA/noble-phantasm/${td[i].id}`
+        //                 })`
+        //             )
+        //             .setFooter(`Noble Phantasm`)
+        //     )
 
-            let passives = await Promise.all(classPassive.map(_ => renderPassiveSkill(_)));
-            e = [
-                base()
-                    .addFields(
-                        await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, allTrait)
-                    )
-                    .setFooter(`Basic details`),
-                base()
-                .addField(
-                    'Active skill',
-                    activeSkill.map(a => {
-                        const upgrades = a.length, { name, rank, detail, condition } = a.pop();
-                        return (
-                            `**${name}** __[${rank}]__` + (upgrades > 1 ? ` (${upgrades} upgrades)` : '')
-                            + `\n${detail}`
-                            + `\n_${condition}_`
-                        )
-                    }).join('\n\n')
-                )
-                .setFooter(`Active skills`),
-                base().addFields(passives).setFooter(`Passive skills`),
-                ...tdEmbed
-            ]
-            .map((a, i, _) => a.setFooter(`${
-                a.footer?.text ? `${a.footer.text} • ` : ''
-            }Page ${++i}/${_.length}`));
+        //     let passives = await Promise.all(classPassive.map(_ => renderPassiveSkill(_)));
+        //     e = [
+        //         base()
+        //             .addFields(
+        //                 await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, allTrait)
+        //             )
+        //             .setFooter(`Basic details`),
+        //         base()
+        //         .addField(
+        //             'Active skill',
+        //             activeSkill.map(a => {
+        //                 const upgrades = a.length, { name, rank, detail, condition } = a.pop();
+        //                 return (
+        //                     `**${name}** __[${rank}]__` + (upgrades > 1 ? ` (${upgrades} upgrades)` : '')
+        //                     + `\n${detail}`
+        //                     + `\n_${condition}_`
+        //                 )
+        //             }).join('\n\n')
+        //         )
+        //         .setFooter(`Active skills`),
+        //         base().addFields(passives).setFooter(`Passive skills`),
+        //         ...tdEmbed
+        //     ]
+        //     .map((a, i, _) => a.setFooter(`${
+        //         a.footer?.text ? `${a.footer.text} • ` : ''
+        //     }Page ${++i}/${_.length}`));
 
-            cache_details.push(_id, e.map(e => e.toJSON()));
-        };
+        //     cache_details.push(_id, e.map(e => e.toJSON()));
+        // };
 
         let notice = det ? '' : (
             `Search may not bring up the expected result.`

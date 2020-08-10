@@ -13,7 +13,7 @@ export class ModuleHandler extends a {
     clientLog = new componentLog('Modules', '3b55ff', 'ffffff')
 
     constructor(...args : ConstructorParameters<typeof a>) {
-        super(...args);
+        super(args[0], Object.assign(args[1], args[1], { classToHandle: PepperModule }));
         this.on(
             'load', 
             (m : PepperModule) => {
