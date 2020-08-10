@@ -1,7 +1,7 @@
 import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
 import m, { Servant } from './servant-main-database';
-import { JP as NA } from '@pepper/db/fgo';
+import { JP } from '@pepper/db/fgo';
 import { decode, encode } from '@msgpack/msgpack'
 import { embedServantBase, embedServantDashboard, embedTreasureDeviceBase, renderPassiveSkill } from '@pepper/lib/fgo'
 import { Collection, MessageEmbed } from 'discord.js';
@@ -45,25 +45,27 @@ export = class extends FgoModule {
     }
 
     private async process(dataset : Servant) {
-        const { id, activeSkill } = dataset;
+        const { name, id, activeSkill } = dataset;
 
-        const svt = await NA.mstSvt.findOne({ collectionNo: +id }).exec();
+        const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
         let { baseSvtId, classId, classPassive } = svt;
         const [mstSvtLimits, cards, { [0]: __class }] = await Promise.all([
-            await NA.mstSvtLimit.find({ svtId: baseSvtId }).limit(5).exec(),
-            await NA.mstSvtCard.find({ svtId: baseSvtId }).limit(4).exec(),
-            await NA.mstClass.find({ id: classId }).exec()
+            await JP.mstSvtLimit.find({ svtId: baseSvtId }).limit(5).exec(),
+            await JP.mstSvtCard.find({ svtId: baseSvtId }).limit(4).exec(),
+            await JP.mstClass.find({ id: classId }).exec()
         ]);
         // render NP gain
-        const svtTdMapping = await NA.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
+        const svtTdMapping = await JP.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
         let [{ treasureDeviceId: tdId }] = svtTdMapping;
-        const td_npGain = await NA.mstTreasureDeviceLv.findOne({ treaureDeviceId: tdId }).exec();
+        const td_npGain = await JP.mstTreasureDeviceLv.findOne({ treaureDeviceId: tdId }).exec();
         const td = (await Promise.all(
             svtTdMapping.map(
-                a => NA.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
+                a => JP.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
             )
         )).sort((a, b) => a.id - b.id);
 
+        // overwrite name
+        svt.name = name;
         let base = () => embedServantBase(svt, __class, mstSvtLimits);
 
         let tdEmbed = (await Promise.all(
