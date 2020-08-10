@@ -6,7 +6,6 @@ import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
 const commandName = 'show-spot';
 const aliases = [commandName, 'spot', 'sp']
 const MAX_QUEST = 15;
-interface a { q?: string }
 
 export = class extends FgoCommand {
     constructor() {
@@ -20,9 +19,11 @@ export = class extends FgoCommand {
         })
     }
 
-    async exec(m: Message, { q }: a) {
+    async exec(m: Message, { q }: { q: string }) {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anything that matched.`)
+        if (!q) 
+            return m.channel.send(err.setDescription(`:frowning: Where's your query?`))
         try {
             let a = +q;
             let [{ name, id, warId, x, y }] = await c.mstSpot(isNaN(a) ? { name: q } : { id: a }).NA.exec();
@@ -30,7 +31,6 @@ export = class extends FgoCommand {
             let qs = await c.mstQuest({ spotId: id }, MAX_QUEST + 1).NA.select('name id actConsume').exec()
             
             let out = new MessageEmbed()
-                .setColor(SUCCESS_COLOR)
                 .setTitle(`${name} (\`${id}\`)`)
                 .addField(`Place`, `**${warName}** | (x, y) = (${x}, ${y})`)
                 .addField(
