@@ -5,6 +5,8 @@ import { JP, NA } from '@pepper/db/fgo';
 import { decode, encode } from '@msgpack/msgpack'
 import { embedServantBase, embedServantDashboard, embedTreasureDeviceBase, renderPassiveSkill } from '@pepper/lib/fgo'
 import { Collection, MessageEmbed } from 'discord.js';
+import { Queue } from 'queue-ts';
+import { cpus } from 'os';
 
 export = class extends FgoModule {
     constructor() {
@@ -114,17 +116,18 @@ export = class extends FgoModule {
         let _m = this.handler.findInstance(m);
         let _ = await _m.ids();
         // delegate this to another function to run in parallel
-        let f = async () => {
-            for (let { id } of _) {
-                await _m.get(id)
+        let queue = new Queue(cpus().length);
+
+        for (let { id } of _) {
+            queue.add(
+                () => _m.get(id)
                     .then(s => this.process(s))
                     .then(e => e.map(e => e.toJSON()))
                     .then(o => this.push(id, o))
                     .catch(e => this.log.error(`Error processing servant ${id}.\n${
                         `${e.name} : ${e.message}\n${e.stack}`
-                    }`))
-            }
-        }
-        Promise.resolve(f());
+                    }`))  
+            )
+        };
     }
 }
