@@ -1,7 +1,7 @@
 import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
 import m, { Servant } from './servant-main-database';
-import { JP } from '@pepper/db/fgo';
+import { JP, NA } from '@pepper/db/fgo';
 import { decode, encode } from '@msgpack/msgpack'
 import { embedServantBase, embedServantDashboard, embedTreasureDeviceBase, renderPassiveSkill } from '@pepper/lib/fgo'
 import { Collection, MessageEmbed } from 'discord.js';
@@ -52,7 +52,7 @@ export = class extends FgoModule {
         const [mstSvtLimits, cards, { [0]: __class }] = await Promise.all([
             await JP.mstSvtLimit.find({ svtId: baseSvtId }).limit(5).exec(),
             await JP.mstSvtCard.find({ svtId: baseSvtId }).limit(4).exec(),
-            await JP.mstClass.find({ id: classId }).exec()
+            await NA.mstClass.find({ id: classId }).exec()
         ]);
         // render NP gain
         const svtTdMapping = await JP.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
