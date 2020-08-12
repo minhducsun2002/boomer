@@ -50,7 +50,9 @@ export = class extends OsuCommand {
         if (!query)
             return m.channel.send(err.setDescription(`Please provide a search term.`));
         try {
-            let url = `https://bloodcat.com/osu/?mod=json&q=${query}&c=b&s=1,2,3,4&m=${
+            let url = `https://bloodcat.com/osu/?mod=json&q=${
+                encodeURIComponent(query)
+            }&c=b&s=1,2,3,4&m=${
                 _m.map(a => modes.indexOf(a)).join(',')
             }&p=1`;
             const _ = await axios.get(url, { validateStatus: () => true });
