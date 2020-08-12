@@ -55,6 +55,7 @@
     "ts-node": "^8.5.4",
     "ts-node-dev": "^1.0.0-pre.49",
     "ttypescript": "^1.5.10",
+    "type-fest": "^0.16.0",
     "typescript": "^3.9.6"
   },
   "engines": {

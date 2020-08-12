@@ -1,12 +1,17 @@
 import { createConnection, Connection, Model } from 'mongoose';
+import mongoose from 'mongoose';
 import { componentLog } from '@pepper/utils';
 import cfg from '../../config';
+
+require('mongoose-cache').install(mongoose, { max: 300, maxAge: 1000 * 60 * 60 * 30 }, mongoose.Aggregate)
+
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useUnifiedTopology', true);
 
 const log = new componentLog('Database');
 
 function a (s: string) { return `[F/GO] ${s}` }
-
-export const connections = new Map<string, Connection>()
 
 const prefix = 'database:fgo'
 
@@ -19,7 +24,7 @@ const master = {
         .on('open', () => log.success(a(`Successfully connected to master (JP) database.`)))
 }
 
-connections
+const connections = new Map<string, Connection>()
     .set('main', main)
     .set('master_NA', master.NA)
     .set('master_JP', master.JP)
@@ -78,3 +83,4 @@ const _ = (s : keyof typeof master) => {
 }
 
 export const NA = _('NA'), JP = _('JP')
+export type DBInstance = ReturnType<typeof _>;

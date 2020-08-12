@@ -1,4 +1,5 @@
 export const environmentMode = {
     development: 'development',
-    production: 'production'
+    production: 'production',
+    testing: 'test'
 }

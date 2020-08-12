@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
 import { constructQuery as c } from '../../lib/fgo/';
-import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
+import { ERROR_COLOR } from '../../constants/colors';
 
 const commandName = 'show-spot';
 const aliases = [commandName, 'spot', 'sp']

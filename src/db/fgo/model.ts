@@ -1,181 +1,160 @@
 import { Schema, Document } from 'mongoose';
 
-export interface ServantStat { hp: Number[], atk: Number[] }
-const ServantStatModel: Schema<ServantStat> = new Schema({ hp: [Number], atk: [Number] })
-// base : [0], max : [89/79/69], grailed : [99]
+const string = String, number = Number;
 
-export interface Material { name: String, icon: String }
-export interface MaterialSet { material: Material, amount: Number }
+interface MaterialSet { material: { name: string, icon: string }, amount: number }
+const SkillLevelModel: Schema<{ qp: Number, material: MaterialSet[] }> = new Schema({
+    qp: number,
+    material: [new Schema({
+        material: new Schema({ name: string, icon: string }),
+        amount: number
+    })]
+});
 
-const MaterialModel: Schema<Material> = new Schema({ name: String, icon: String })
-const MaterialSetModel: Schema<MaterialSet> = new Schema({ material: MaterialModel, amount: Number })
-
-export interface AscensionLevel { qp: Number, material: MaterialSet[] }
-export interface SkillLevel { qp: Number, material: MaterialSet[] }
-const AscensionLevelModel: Schema<AscensionLevel> = new Schema({ qp: Number, material: [MaterialSetModel] });
-const SkillLevelModel: Schema<SkillLevel> = new Schema({ qp: Number, material: [MaterialSetModel] });
-
-export interface ActiveSkillEffect { effectName: String, effectStrength: String[] }
-export interface ActiveSkill {
-    name: String,
-    rank: String,
-    detail: String,
-    condition: String,
-    records: ActiveSkillEffect[],
+interface ActiveSkill {
+    name: string,
+    rank: string,
+    detail: string,
+    condition: string,
+    records: { effectName: string, effectStrength: string[] }[],
     // for each level, there exists a record of statistics
-    icon: String,
+    icon: string,
     // thumbnail
-    cooldown: Number[]
+    cooldown: number[]
 }
-const ActiveSkillEffectModel: Schema<ActiveSkillEffect> = new Schema({ effectName: String, effectStrength: [String] });
 const ActiveSkillModel: Schema<ActiveSkill> = new Schema({
-    name: String,
-    rank: String,
-    detail: String,
-    condition: String,
-    records: [ActiveSkillEffectModel],
-    icon: String,
-    cooldown: [Number]
+    name: string,
+    rank: string,
+    detail: string,
+    condition: string,
+    records: [new Schema({ effectName: string, effectStrength: [string] })],
+    icon: string,
+    cooldown: [number]
 })
 
-export interface PassiveSkill { name: String, rank: String, detail: String, icon: String }
-const PassiveSkillModel: Schema<PassiveSkill> = new Schema({
-    name: String,
-    rank: String,
-    detail: String,
-    icon: String
-})
-
-export interface NoblePhantasmEffect { effectName: String, effectStrength: String[] }
-const NoblePhantasmEffectModel: Schema<NoblePhantasmEffect> = new Schema({ effectName: String, effectStrength: [String] });
-export interface NoblePhantasm {
-    name: String,
-    extendedName: String,
-    rank: String,
-    detail: String,
-    class: String,
-    hitcount: Number,
-    overchargeDetail: String,
+interface NoblePhantasmEffect { effectName: string, effectStrength: string[] }
+interface NoblePhantasm {
+    name: string,
+    extendedName: string,
+    rank: string,
+    detail: string,
+    class: string,
+    hitcount: number,
+    overchargeDetail: string,
     records: NoblePhantasmEffect[],
     overchargeRecords: NoblePhantasmEffect[],
-    condition: String
+    condition: string
 }
 const NoblePhantasmModel: Schema<NoblePhantasmEffect> = new Schema({
-    name: String,
-    extendedName: String,
-    rank: String,
-    detail: String,
-    class: String,
-    hitcount: Number,
-    overchargeDetail: String,
-    records: [NoblePhantasmEffectModel],
-    overchargeRecords: [NoblePhantasmEffectModel],
-    condition: String
+    name: string,
+    extendedName: string,
+    rank: string,
+    detail: string,
+    class: string,
+    hitcount: number,
+    overchargeDetail: string,
+    records: [new Schema({ effectName: string, effectStrength: [string] })],
+    overchargeRecords: [new Schema({ effectName: string, effectStrength: [string] })],
+    condition: string
 })
 
-export interface Hitcount { buster: Number, quick: Number, arts: Number, extra: Number, np: Number };
-export interface CardSet { buster: Number, quick: Number, arts: Number }
-export interface DmgDistribution { buster: Number[], quick: Number[], arts: Number[], extra: Number[], np: Number[] }
-const HitcountModel: Schema<Hitcount> = new Schema({ buster: Number, quick: Number, arts: Number, extra: Number, np: Number })
-const CardSetModel: Schema<CardSet> = new Schema({ buster: Number, quick: Number, arts: Number });
-const DmgDistributionModel: Schema<DmgDistribution> = new Schema({ buster: [Number], quick: [Number], arts: [Number], extra: [Number], np: [Number] })
-
-export interface BondCE { name: String, effect: String, icon: String }
-export interface Parameters { strength: String, agility: String, luck: String, endurance: String, mp: String, np: String }
-const BondCEModel: Schema<BondCE> = new Schema({ name: String, effect: String, icon: String });
-const ParametersModel: Schema<Parameters> = new Schema({ strength: String, agility: String, luck: String, endurance: String, mp: String, np: String })
-
-
 export interface Servant extends Document {
-    name: String,
+    name: string,
     // name
-    alias: String[],
+    alias: string[],
     // name + aliases for search
-    class: String,
+    class: string,
     // class
-    stats: ServantStat,
-    arts: String[],
+    stats: { hp: number[], atk: number[] },
+    arts: string[],
     // link to stage arts
-    id: Number,
+    id: number,
     // internal game servant ID,
-    rarity: Number,
-    cost: Number,
+    rarity: number,
+    cost: number,
 
-    attribute: String,
-    alignment: String,
-    gender: String,
-    origin: String,
-    illustrator: String,
-    voiceActor: String,
-    series: String,
+    attribute: string,
+    alignment: string,
+    gender: string,
+    origin: string,
+    illustrator: string,
+    voiceActor: string,
+    series: string,
 
-    parameters: Parameters,
+    parameters: { strength: string, agility: string, luck: string, endurance: string, mp: string, np: string },
 
-    growth: String,
-    instantDeathChance: String,
+    growth: string,
+    instantDeathChance: string,
 
-    ascension: AscensionLevel[],
-    activeSkillMaterial: SkillLevel[],
+    ascension: { qp: number, material: MaterialSet[] }[],
+    activeSkillMaterial: { qp: number, material: MaterialSet[] }[],
     activeSkill: ActiveSkill[][],
     // three Skill arrays; each array contains 1 or more skill in case of upgrades,
-    passiveSkill: PassiveSkill[],
+    passiveSkill: { name: string, rank: string, detail: string, icon: string }[],
     noblePhantasm: NoblePhantasm[],
     // an array of NP containing 1 or more depending on upgrades
 
-    npGainStat: String[],
+    npGainStat: string[],
     // [perHit, whenAttacked]
-    criticalStat: String[],
+    criticalStat: string[],
     // [absorption, genPerHit]
-    cardSet: CardSet,
+    cardSet: { buster: number, quick: number, arts: number },
 
-    hitcount: Hitcount,
-    dmgDistribution: DmgDistribution,
-    bond: Number[],
+    hitcount: { buster: number, quick: number, arts: number, extra: number, np: number },
+    dmgDistribution: { buster: number[], quick: number[], arts: number[], extra: number[], np: number[] },
+    bond: number[],
     // bond levels
-    bondCE: BondCE,
-    traits: String[],
+    bondCE: { name: string, effect: string, icon: string },
+    traits: string[],
 
-    releaseDate: String
+    releaseDate: string
 }
 export const ServantSchema : Schema<Servant> = new Schema({
-    name: String,
-    alias: [String],
-    class: String,
-    stats: ServantStatModel,
-    arts: [String],
-    id: Number,
-    rarity: Number,
-    cost: Number,
+    name: string,
+    alias: [string],
+    class: string,
+    stats: new Schema({ hp: [number], atk: [number] }),
+    arts: [string],
+    id: number,
+    rarity: number,
+    cost: number,
 
-    attribute: String,
-    alignment: String,
-    gender: String,
-    origin: String,
-    illustrator: String,
-    voiceActor: String,
-    series: String,
+    attribute: string,
+    alignment: string,
+    gender: string,
+    origin: string,
+    illustrator: string,
+    voiceActor: string,
+    series: string,
 
-    parameters: ParametersModel,
+    parameters: new Schema({ strength: string, agility: string, luck: string, endurance: string, mp: string, np: string }),
 
-    growth: String,
-    instantDeathChance: String,
+    growth: string,
+    instantDeathChance: string,
 
-    ascension: [AscensionLevelModel],
+    ascension: [new Schema({
+        qp: number,
+        material: [new Schema({ material: new Schema({ name: string, icon: string }), amount: number })] })
+    ],
     activeSkillMaterial: [SkillLevelModel],
     activeSkill: [[ActiveSkillModel]],
-    passiveSkill: [PassiveSkillModel],
+    passiveSkill: [
+        new Schema({
+            name: string, rank: string, detail: string, icon: string
+        })
+    ],
     noblePhantasm: [NoblePhantasmModel],
 
-    npGainStat: [String],
-    criticalStat: [String],
-    cardSet: CardSetModel,
+    npGainStat: [string],
+    criticalStat: [string],
+    cardSet: new Schema({ buster: number, quick: number, arts: number }),
 
-    hitcount: HitcountModel,
-    dmgDistribution: DmgDistributionModel,
-    bond: [Number],
+    hitcount: new Schema({ buster: number, quick: number, arts: number, extra: number, np: number }),
+    dmgDistribution: new Schema({ buster: [number], quick: [number], arts: [number], extra: [number], np: [number] }),
+    bond: [number],
 
-    bondCE: BondCEModel,
-    traits: [String],
+    bondCE: new Schema({ name: string, effect: string, icon: string }),
+    traits: [string],
 
-    releaseDate: String
+    releaseDate: string
 })

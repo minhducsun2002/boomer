@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import * as c from 'console';
 import ss from 'strip-ansi';
+import { environmentMode } from '@pepper/constants/configurations'
 
 type str = string;
 const Prefixes = {
@@ -18,6 +19,7 @@ const log = {
     success : gen(Prefixes.Success),
 
     log : (s: str, p : str) => {
+        if (process.env.NODE_ENV === environmentMode.testing) return;
         let _ = s.split('\n'), d = `${new Date().toJSON()}`; 
         c.log(`${chalk.magentaBright(d)}| ${p} ${_[0]}`);
         _.slice(1).forEach(a => c.log(`${' '.repeat(d.length)}| ${

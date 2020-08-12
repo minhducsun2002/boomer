@@ -1,7 +1,7 @@
 import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
 import m, { Servant } from './servant-main-database';
-import { JP, NA } from '@pepper/db/fgo';
+import { JP as jp, NA as na, DBInstance } from '@pepper/db/fgo';
 import { decode, encode } from '@msgpack/msgpack'
 import { embedServantBase, embedServantDashboard, embedTreasureDeviceBase, renderPassiveSkill } from '@pepper/lib/fgo'
 import { Collection, MessageEmbed } from 'discord.js';
@@ -46,7 +46,7 @@ export = class extends FgoModule {
         return _;
     }
 
-    private async process(dataset : Servant) {
+    private async process(dataset : Servant, NA : DBInstance = na, JP : DBInstance = jp) {
         const { name, id, activeSkill } = dataset;
 
         const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
