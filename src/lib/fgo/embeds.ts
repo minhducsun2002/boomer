@@ -32,8 +32,8 @@ export function embedServantBase(
             [...new Set(limits.map(a => a.rarity))].sort((a, b) => a - b).join('-')
         }☆ ${className}`)
         .setTitle(`${collectionNo}. **${name}** (\`${baseSvtId}\`)`)
-        .setURL(`https://apps.atlasacademy.io/db/#/NA/servant/${collectionNo}`)
-        .setThumbnail(`https://assets.atlasacademy.io/GameData/NA/Faces/f_${baseSvtId}0.png`)
+        .setURL(`https://apps.atlasacademy.io/db/#/JP/servant/${collectionNo}`)
+        .setThumbnail(`https://assets.atlasacademy.io/GameData/JP/Faces/f_${baseSvtId}0.png`)
 }
 
 export async function embedServantDashboard(
@@ -116,7 +116,7 @@ export async function embedTreasureDeviceBase(td : mstTreasureDevice) {
     return funcBase.map(_ => ({
         name: `${_.action} ${_.targets.map(a => `[${a.trim()}]`).join(', ')}`,
         value:
-            `[Link](https://apps.atlasacademy.io/db/#/NA/func/${_.id})`
+            `[Link](https://apps.atlasacademy.io/db/#/JP/func/${_.id})`
             + `\nAffects **${
                 _.affectTarget
                 + (_.traitVals.length
@@ -181,7 +181,7 @@ export async function renderPassiveSkill(skillId: number) {
         let details = await renderBuffStatistics(f.rawBuffs[0], vals as zippedNormalVals);
         return (
             `**[${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}]`
-            + `(https://apps.atlasacademy.io/db/#/NA/func/${f.id})**`
+            + `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})**`
             + ` on **${f.affectTarget}**\nMember of : **${f.affectWhenOnTeam}** team`
             + `${
                 (`\n` + details.map(_ => `${_.name} : ${

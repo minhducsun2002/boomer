@@ -78,7 +78,7 @@ export = class extends FgoModule {
                 .setDescription(
                     `[__${td[i].rank}__] `
                     + `[**${td[i].name}** [**__${td[i].typeText}__**]](${
-                        `https://apps.atlasacademy.io/db/#/NA/noble-phantasm/${td[i].id}`
+                        `https://apps.atlasacademy.io/db/#/JP/noble-phantasm/${td[i].id}`
                     })`
                 )
                 .setFooter(`Noble Phantasm`)
