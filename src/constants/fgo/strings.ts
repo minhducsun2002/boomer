@@ -302,6 +302,7 @@ export const BuffTypes = {
     [bType.NONE]: 'None',
     [bType.UP_NONRESIST_INSTANTDEATH]: 'Death Resist Down',    
     [bType.PIERCE_INVINCIBLE]: 'Ignore Invincible',
+    [bType.REDUCE_HP]: 'Reduce HP per turn',
     [bType.REGAIN_HP]: 'HP gain per turn',
     [bType.REGAIN_NP]: 'NP gain per turn',
     [bType.REGAIN_STAR]: 'Stars gain per turn',
