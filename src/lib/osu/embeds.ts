@@ -126,7 +126,9 @@ export function embedScoreset(
                     new Date(created_at)
                         .toLocaleString('vi-VN', { timeZone: 'UTC' })
                 }**`
-                + `\n${b.difficulty_rating} :star: - \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}**`
+                + `\n${b.difficulty_rating} :star: `
+                + `- \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}** `
+                + `- **${b.bpm}** BPM`
                 + `\n[[**Beatmap**]](https://osu.ppy.sh/b/${b.id}) `
                 + ` [[**Score**]](https://osu.ppy.sh/scores/${mode}/${id})`
             ))

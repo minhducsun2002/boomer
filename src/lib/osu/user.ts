@@ -38,7 +38,7 @@ export interface osuUserExtra {
         max_combo: number;
         beatmap: {
             version: string; id: number; beatmapset_id: number;
-            difficulty_rating: number;
+            difficulty_rating: number; bpm: number;
             cs: number, drain: number, accuracy: number, ar: number;
         };
         beatmapset: {
