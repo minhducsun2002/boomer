@@ -5,6 +5,7 @@ import {
     TargetType as tType,
     ApplyTarget as aType,
     Buff as bType,
+    ValsType as vType
 } from './';
 
 export const Gender = {
@@ -323,7 +324,18 @@ export const BuffTypes = {
     [bType.UP_TOLERANCE_SUBSTATE]: 'Cleanse Resist Up'
 }
 
-export enum ValueFields {
-    RATE = `Probability`,
-    VALUE = `Value`
+export const ValsType = {
+    [vType.Rate]: 'Probability',
+    [vType.Value]: 'Value'
+}
+
+export const ValsKey = {
+    [vType.Rate]: 'Rate',
+    [vType.UseRate]: 'UseRate',
+    [vType.Value]: 'Value',
+    [vType.Value2]: 'Value2',
+    [vType.Target]: 'Target',
+    [vType.Correction]: 'Correction',
+    [vType.Count]: 'Count',
+    [vType.Turn]: 'Turn'
 }

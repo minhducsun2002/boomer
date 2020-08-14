@@ -16,9 +16,9 @@ import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import { MessageEmbed } from 'discord.js';
 import { renderInvocation } from './func';
 import { JP as NA } from '@pepper/db/fgo';
-import { zip } from '@pepper/utils';
-import { parseVals } from './datavals';
-import { renderBuffStatistics, zippedNormalVals } from './buffView';
+import { zipMap } from '@pepper/utils';
+import { parseVals_enhanced } from './datavals';
+import { renderBuffStatistics } from './buffView';
 
 type tr = keyof typeof Trait;
 
@@ -142,12 +142,12 @@ async function renderSkill(s: mstSkill) {
             level => level.svals[level.funcId.findIndex(_ => _ === fid)]
         );
         let resolvedVals = await Promise.all(
-            vals.map(v => parseVals(v, cache.get(fid).funcType))
+            vals.map(v => parseVals_enhanced(v, cache.get(fid).funcType))
         );
         // zip them up
         return {
             funcId: fid,
-            vals: zip(resolvedVals)
+            vals: zipMap(resolvedVals)
         }
     })
 
@@ -170,15 +170,11 @@ export async function renderPassiveSkill(skillId: number) {
 
     let values = acts.map(async _ => {
         let { func: f, vals } = _;
-        // zip this up
-        Object.keys(vals).forEach(
-            (k : keyof typeof vals) => {
-                let _ = vals[k] as any[];
-                (vals[k] as any) = [...new Set(_)];
-            }
-        );
 
-        let details = await renderBuffStatistics(f.rawBuffs[0], vals as zippedNormalVals);
+        // dedupe the values
+        vals.forEach((v, k) => vals.set(k, [...new Set(v)]));
+
+        let details = await renderBuffStatistics(f.rawBuffs[0], vals);
         return (
             `**[${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}]`
             + `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})**`
