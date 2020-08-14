@@ -41,8 +41,9 @@ export = class extends OsuCommand {
         user = user.trim();
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
-        const err = new MessageEmbed().setColor(ERROR_COLOR)
-            .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
+        if (!user) return m.channel.send(
+            this.client.extras.Embeds.ERROR().setDescription('Who to check for recent scores?')
+        );
         try {
             let embeds : MessageEmbed[] = [];
             let { user: { id, username } } = await fetchUser(user, mode);
@@ -73,8 +74,7 @@ export = class extends OsuCommand {
                 )
         }
         catch (e) {
-            console.log(e);
-            m.channel.send(err.setDescription(`Sorry, an error occurred.`));
+            m.channel.send(this.client.extras.Embeds.ERROR(e));
         }
     }
 }
