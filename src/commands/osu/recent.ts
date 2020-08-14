@@ -2,9 +2,9 @@ import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
 import { ERROR_COLOR } from '../../constants/colors';
 import { modes } from '@pepper/constants/osu'
-import { fetchUser, fetchRecent, embedScoreset, fetchRecentApi, fetchMapset, embedScoresetApi } from '@pepper/lib/osu';
-import { paginatedEmbed, chunk } from '@pepper/utils';
-import { modToString, accuracy } from '@pepper/lib/osu';
+import { fetchUser, fetchRecent, embedScoreset, fetchRecentApi, embedScoresetApi } from '@pepper/lib/osu';
+import { paginatedEmbed } from '@pepper/utils';
+import { accuracy } from '@pepper/lib/osu';
 
 const commandName = 'recent';
 const aliases = [commandName, 'recentplay', 'rp'];
