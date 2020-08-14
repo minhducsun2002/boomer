@@ -67,3 +67,19 @@ export async function fetchRecent(user: number, mode: string, max_result: number
 export async function fetchBest(user: number, mode: string, max_result: number, max_single = 50) {
     return fetchScoreset('best', user, mode, max_result, max_single);
 }
+
+export async function fetchRecentApi(key: string, user : string, mode = 0, limit = 50) {
+    const _ = await axios.get(`https://osu.ppy.sh/api/get_user_recent?k=${key}&u=${
+        encodeURIComponent(user)
+    }&m=${mode}&limit=${limit}`, {
+        validateStatus: () => true
+    });
+    if (_.status === 404) throw new Error(`User not found`)
+    if (_.status !== 200) throw new Error(`Expected status 200, got status ${_.status}`);
+    return _.data as {
+        beatmap_id: string, score: string, maxcombo: string,
+        count50: string, count100: string, count300: string,
+        countmiss: string, countkatu: string, countgeki: string,
+        perfect: string, enabled_mods: string, user_id: string, date: string, rank: string
+    }[]
+}

@@ -4,6 +4,10 @@ import { mode_friendly, modes } from '@pepper/constants/osu';
 import type { Beatmapset } from './beatmapset';
 import type { Beatmap } from './beatmap';
 import { osuUserExtra } from './user';
+import { fetchRecentApi, fetchMapset } from './fetch';
+import type { PromiseValue } from 'type-fest';
+import { accuracy } from './utils';
+import { modbits } from 'ojsama';
 
 export function embedBeatmap(b: Beatmap, s: Beatmapset) {
     let {
@@ -128,4 +132,60 @@ export function embedScoreset(
             ))
             return out;
         })
+}
+
+export async function embedScoresetApi(
+    mode_int: keyof typeof accuracy,
+    scoreset: PromiseValue<ReturnType<typeof fetchRecentApi>>,
+    MAX_DIFF_PER_PAGE = 5
+) {
+    let maps = new Map<number, PromiseValue<ReturnType<typeof fetchMapset>>>();
+    let __ = [...new Set(scoreset.map(a => +a.beatmap_id))]
+        .map(async id => {
+            if (maps.has(id)) return;
+            let m = await fetchMapset(id);
+            m.beatmaps.forEach(b => maps.set(b.id, m));
+            m.converts.forEach(b => maps.set(b.id, m));
+        })
+    await Promise.all(__);
+    let _ = chunk(scoreset, MAX_DIFF_PER_PAGE).map(
+        async (a, i, c) => new MessageEmbed()
+            .setFooter(`Page ${i + 1}/${c.length} | All times are UTC`)
+            .addFields(
+                await Promise.all(a.map(async ({
+                    beatmap_id: id, enabled_mods, rank, perfect, date, maxcombo,
+                    count50, count100, count300, countkatu, countgeki, countmiss
+                }) => {
+                    let s = maps.get(+id)
+                    let b = s.beatmaps.concat(s.converts).find(a => a.id === +id);
+                    let mods = modbits.string(+enabled_mods);
+                    return {
+                        name: `${s.artist} - ${s.title} [${b.version}]`
+                        + (mods.length ? `+${mods}` : ''),
+                        value: `[**${rank}**] **${
+                            (accuracy[mode_int]({
+                                countMiss: +countmiss,
+                                count50: +count50,
+                                count100: +count100,
+                                count100k: +countkatu,
+                                count300: +count300,
+                                count300k: +countgeki
+                            }) * 100).toFixed(3)
+                        }**% `
+                        + `(${count300}/${count100}/${count50}/${countmiss}) `
+                        + `- **${maxcombo}**x`
+                        + (+perfect ? ' (FC)' : '')
+                        + `\n@ **${
+                            new Date(date)
+                                .toLocaleString('vi-VN', { timeZone: 'UTC' })
+                        }**`
+                        + `\n${b.difficulty_rating} :star: `
+                        + `- \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}** `
+                        + `- **${b.bpm}** BPM`
+                        + `\n[**Beatmap**](https://osu.ppy.sh/beatmaps/${id})`
+                    }
+                }))
+            )
+    );
+    return await Promise.all(_);
 }
