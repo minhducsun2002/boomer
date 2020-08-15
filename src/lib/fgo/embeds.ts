@@ -16,9 +16,10 @@ import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import { MessageEmbed } from 'discord.js';
 import { renderInvocation } from './func';
 import { JP as NA } from '@pepper/db/fgo';
-import { zipMap } from '@pepper/utils';
+import { zipMap, componentLog } from '@pepper/utils';
 import { parseVals_enhanced } from './datavals';
 import { renderBuffStatistics } from './buffView';
+import type { PromiseValue } from 'type-fest';
 
 type tr = keyof typeof Trait;
 
@@ -162,7 +163,7 @@ async function renderSkill(s: mstSkill) {
     return _;
 }
 
-export async function renderPassiveSkill(skillId: number) {
+export async function renderPassiveSkill(skillId: number, log = new componentLog(`Passive skill renderer`)) {
     let skill = await NA.mstSkill.findOne({ id: skillId }).exec();
     let acts = await renderSkill(skill);
 
@@ -175,7 +176,13 @@ export async function renderPassiveSkill(skillId: number) {
         // dedupe the values
         vals.forEach((v, k) => vals.set(k, [...new Set(v)]));
 
-        let details = await renderBuffStatistics(f.rawBuffs[0], vals);
+        let details : PromiseValue<ReturnType<typeof renderBuffStatistics>> = [];
+        if (f.rawBuffs.length)
+            details = await renderBuffStatistics(f.rawBuffs[0], vals)
+            .catch(e => {
+                log.error(`Rendering buff stats of function ${f.id} failed!`);
+                throw e;
+            })
         return (
             `**[${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}]`
             + `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})**`

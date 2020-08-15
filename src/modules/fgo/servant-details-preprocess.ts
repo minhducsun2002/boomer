@@ -120,13 +120,16 @@ export = class extends FgoModule {
 
         for (let { id } of _) {
             queue.add(
-                () => _m.get(id)
-                    .then(s => this.process(s))
-                    .then(e => e.map(e => e.toJSON()))
-                    .then(o => this.push(id, o))
-                    .catch(e => this.log.error(`Error processing servant ${id}.\n${
-                        `${e.name} : ${e.message}\n${e.stack}`
-                    }`))  
+                async () => {
+                    try {
+                        let s = await _m.get(id);
+                        let e = (await this.process(s)).map(e => e.toJSON());
+                        this.log.success(`Processed data of servant ${id} (${s.name})`);
+                        this.push(id, e);
+                    } catch (e) {
+                        this.log.error(`Error processing servant ${id}.\n${e.stack}`)
+                    };
+                }  
             )
         };
     }
