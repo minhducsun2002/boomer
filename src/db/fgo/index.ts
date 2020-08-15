@@ -55,32 +55,31 @@ import { mstSkillLvSchema, mstSkillLvDocument } from './master/mstSkillLv';
 
 export const ServantModel : Model<Servant> = connections.get('main').model('Servant', ServantSchema)
 
-const _ = (s : keyof typeof master) => {
-    let __ = master[s];
+const _ = (conn : Connection) => {
     return {
-        mstSvt: __.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
-        mstClass: __.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
-        mstAttriRelation: __.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
-        mstQuest: __.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
-        mstSpot: __.model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
-        mstWar: __.model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
-        mstSvtCard: __.model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>,
-        mstSvtComment: __.model('mstSvtComment', mstSvtCommentSchema, 'mstSvtComment') as Model<mstSvtCommentDocument>,
-        mstSvtSkill: __.model('mstSvtSkill', mstSvtSkillSchema, 'mstSvtSkill') as Model<mstSvtSkillDocument>,
-        mstSkillDetail: __.model('mstSkillDetail', mstSkillDetailSchema, 'mstSkillDetail') as Model<mstSkillDetailDocument>,
-        mstItem: __.model('mstItem', mstItemSchema, 'mstItem') as Model<mstItemDocument>,
-        mstQuestConsumeItem: __.model('mstQuestConsumeItem', mstQuestConsumeItemSchema, 'mstQuestConsumeItem') as Model<mstQuestConsumeItemDocument>,
-        mstQuestPhase: __.model('mstQuestPhase', mstQuestPhaseSchema, 'mstQuestPhase') as Model<mstQuestPhaseDocument>,
-        mstSvtLimit: __.model('mstSvtLimit', mstSvtLimitSchema, 'mstSvtLimit') as Model<mstSvtLimitDocument>,
-        mstSvtTreasureDevice: __.model('mstSvtTreasureDevice', mstSvtTreasureDeviceSchema, 'mstSvtTreasureDevice') as Model<mstSvtTreasureDeviceDocument>,
-        mstTreasureDeviceLv: __.model('mstTreasureDeviceLv', mstTreasureDeviceLvSchema, 'mstTreasureDeviceLv') as Model<mstTreasureDeviceLvDocument>,
-        mstTreasureDevice: __.model('mstTreasureDevice', mstTreasureDeviceSchema, 'mstTreasureDevice') as Model<mstTreasureDeviceDocument>,
-        mstFunc: __.model('mstFunc', mstFuncSchema, 'mstFunc') as Model<mstFuncDocument>,
-        mstBuff: __.model('mstBuff', mstBuffSchema, 'mstBuff') as Model<mstBuffDocument>,
-        mstSkill: __.model('mstSkill', mstSkillSchema, 'mstSkill') as Model<mstSkillDocument>,
-        mstSkillLv: __.model('mstSkillLv', mstSkillLvSchema, 'mstSkillLv') as Model<mstSkillLvDocument>,
+        mstSvt: conn.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
+        mstClass: conn.model('mstClass', mstClassSchema, 'mstClass') as Model<mstClassDocument>,
+        mstAttriRelation: conn.model('mstAttriRelation', mstAttriRelationSchema, 'mstAttriRelation') as Model<mstAttriRelationDocument>,
+        mstQuest: conn.model('mstQuest', mstQuestSchema, 'mstQuest') as Model<mstQuestDocument>,
+        mstSpot: conn.model('mstSpot', mstSpotSchema, 'mstSpot') as Model<mstSpotDocument>,
+        mstWar: conn.model('mstWar', mstWarSchema, 'mstWar') as Model<mstWarDocument>,
+        mstSvtCard: conn.model('mstSvtCard', mstSvtCardSchema, 'mstSvtCard') as Model<mstSvtCardDocument>,
+        mstSvtComment: conn.model('mstSvtComment', mstSvtCommentSchema, 'mstSvtComment') as Model<mstSvtCommentDocument>,
+        mstSvtSkill: conn.model('mstSvtSkill', mstSvtSkillSchema, 'mstSvtSkill') as Model<mstSvtSkillDocument>,
+        mstSkillDetail: conn.model('mstSkillDetail', mstSkillDetailSchema, 'mstSkillDetail') as Model<mstSkillDetailDocument>,
+        mstItem: conn.model('mstItem', mstItemSchema, 'mstItem') as Model<mstItemDocument>,
+        mstQuestConsumeItem: conn.model('mstQuestConsumeItem', mstQuestConsumeItemSchema, 'mstQuestConsumeItem') as Model<mstQuestConsumeItemDocument>,
+        mstQuestPhase: conn.model('mstQuestPhase', mstQuestPhaseSchema, 'mstQuestPhase') as Model<mstQuestPhaseDocument>,
+        mstSvtLimit: conn.model('mstSvtLimit', mstSvtLimitSchema, 'mstSvtLimit') as Model<mstSvtLimitDocument>,
+        mstSvtTreasureDevice: conn.model('mstSvtTreasureDevice', mstSvtTreasureDeviceSchema, 'mstSvtTreasureDevice') as Model<mstSvtTreasureDeviceDocument>,
+        mstTreasureDeviceLv: conn.model('mstTreasureDeviceLv', mstTreasureDeviceLvSchema, 'mstTreasureDeviceLv') as Model<mstTreasureDeviceLvDocument>,
+        mstTreasureDevice: conn.model('mstTreasureDevice', mstTreasureDeviceSchema, 'mstTreasureDevice') as Model<mstTreasureDeviceDocument>,
+        mstFunc: conn.model('mstFunc', mstFuncSchema, 'mstFunc') as Model<mstFuncDocument>,
+        mstBuff: conn.model('mstBuff', mstBuffSchema, 'mstBuff') as Model<mstBuffDocument>,
+        mstSkill: conn.model('mstSkill', mstSkillSchema, 'mstSkill') as Model<mstSkillDocument>,
+        mstSkillLv: conn.model('mstSkillLv', mstSkillLvSchema, 'mstSkillLv') as Model<mstSkillLvDocument>,
     }
 }
 
-export const NA = _('NA'), JP = _('JP')
+export const NA = _(master.NA), JP = _(master.JP)
 export type DBInstance = ReturnType<typeof _>;
