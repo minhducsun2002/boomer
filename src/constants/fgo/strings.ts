@@ -266,7 +266,7 @@ export const TargetType = {
 export const ApplyTarget = {
     [aType.ENEMY]: 'enemy',
     [aType.PLAYER]: 'player',
-    [aType.PLAYER_AND_ENEMY]: 'either'
+    [aType.PLAYER_AND_ENEMY]: ''
 }
 
 export const BuffTypes = {
@@ -326,7 +326,9 @@ export const BuffTypes = {
 
 export const ValsType = {
     [vType.Rate]: 'Probability',
-    [vType.Value]: 'Value'
+    [vType.Value]: 'Value',
+    [vType.Turn]: 'Turn',
+    [vType.Count]: 'Count'
 }
 
 export const ValsKey = {

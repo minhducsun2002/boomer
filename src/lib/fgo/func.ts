@@ -49,7 +49,7 @@ export async function renderInvocation({
         id,
         /** Popup text in game when this function is invoked. */
         popupText,
-        affectWhenOnTeam: teamApply,
+        onTeam: teamApply,
         affectTarget: target,
         rawBuffs: buff as mstBuff[]
     }

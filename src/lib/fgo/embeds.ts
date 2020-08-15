@@ -122,7 +122,8 @@ export async function embedTreasureDeviceBase(td : mstTreasureDevice) {
                 + (_.traitVals.length
                     ? ` with ${_.traitVals.map(_ => `[${_}]`).join(', ')}`
                     : ``)
-            }** when on **${_.affectWhenOnTeam}** team`
+            }**`
+            + (_.onTeam ? ` when on **${_.onTeam}** team` : '')
     }))
 }
 
@@ -178,7 +179,9 @@ export async function renderPassiveSkill(skillId: number) {
         return (
             `**[${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}]`
             + `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})**`
-            + ` on **${f.affectTarget}**\nMember of : **${f.affectWhenOnTeam}** team`
+            + ` on **${f.affectTarget}**${
+                (f.onTeam ? `\nMember of : **${f.onTeam}** team` : '')
+            }`
             + `${
                 (`\n` + details.map(_ => `${_.name} : ${
                     // _.value.join(' / ')
