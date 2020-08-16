@@ -18,8 +18,10 @@ import { renderInvocation } from './func';
 import { JP as NA } from '@pepper/db/fgo';
 import { zipMap, componentLog } from '@pepper/utils';
 import { parseVals_enhanced } from './datavals';
-import { renderBuffStatistics } from './buffView';
+import { renderBuffStatistics } from './buff';
 import type { PromiseValue } from 'type-fest';
+import type { DBInstance } from '@pepper/db/fgo';
+import type { Servant } from '@pepper/db/fgo/main';
 
 type tr = keyof typeof Trait;
 
@@ -203,4 +205,70 @@ export async function renderPassiveSkill(skillId: number, log = new componentLog
         name: skill.name,
         value: (await Promise.all(values)).join('\n\n') 
     };
+}
+
+export async function createEmbeds(dataset : Servant, NA : DBInstance, JP : DBInstance) {
+    const { name, id, activeSkill } = dataset;
+
+    const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
+    let { baseSvtId, classId, classPassive } = svt;
+    const [mstSvtLimits, cards, { [0]: __class }] = await Promise.all([
+        await JP.mstSvtLimit.find({ svtId: baseSvtId }).limit(5).exec(),
+        await JP.mstSvtCard.find({ svtId: baseSvtId }).limit(4).exec(),
+        await NA.mstClass.find({ id: classId }).exec()
+    ]);
+    // render NP gain
+    const svtTdMapping = await JP.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
+    let [{ treasureDeviceId: tdId }] = svtTdMapping;
+    const td_npGain = await JP.mstTreasureDeviceLv.findOne({ treaureDeviceId: tdId }).exec();
+    const td = (await Promise.all(
+        svtTdMapping.map(
+            a => JP.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
+        )
+    )).sort((a, b) => a.id - b.id);
+
+    // overwrite name
+    svt.name = name;
+    let base = () => embedServantBase(svt, __class, mstSvtLimits);
+
+    let tdEmbed = (await Promise.all(
+        td.map(td => embedTreasureDeviceBase(td))
+    )).map((a, i) => 
+        base()
+            .addFields(a)
+            .setDescription(
+                `[__${td[i].rank}__] `
+                + `[**${td[i].name}** [**__${td[i].typeText}__**]](${
+                    `https://apps.atlasacademy.io/db/#/JP/noble-phantasm/${td[i].id}`
+                })`
+            )
+            .setFooter(`Noble Phantasm`)
+    )
+
+    let passives = await Promise.all(classPassive.map(_ => renderPassiveSkill(_)));
+    return [
+        base()
+            .addFields(
+                await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, true)
+            )
+            .setFooter(`Basic details`),
+        base()
+        .addField(
+            'Active skill',
+            activeSkill.map(a => {
+                const upgrades = a.length, { name, rank, detail, condition } = a.pop();
+                return (
+                    `**${name}** __[${rank}]__` + (upgrades > 1 ? ` (${upgrades} upgrades)` : '')
+                    + `\n${detail}`
+                    + `\n_${condition}_`
+                )
+            }).join('\n\n')
+        )
+        .setFooter(`Active skills`),
+        base().addFields(passives).setFooter(`Passive skills`),
+        ...tdEmbed
+    ]
+    .map((a, i, _) => a.setFooter(`${
+        a.footer?.text ? `${a.footer.text} • ` : ''
+    }Page ${++i}/${_.length}`));
 }

@@ -1,12 +1,14 @@
 import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
-import m, { Servant } from './servant-main-database';
-import { JP as jp, NA as na, DBInstance } from '@pepper/db/fgo';
+import m from './servant-main-database';
+import { JP as jp, NA as na } from '@pepper/db/fgo';
 import { decode, encode } from '@msgpack/msgpack'
-import { embedServantBase, embedServantDashboard, embedTreasureDeviceBase, renderPassiveSkill } from '@pepper/lib/fgo'
+import { createEmbeds } from '@pepper/lib/fgo'
 import { Collection, MessageEmbed } from 'discord.js';
 import { Queue } from 'queue-ts';
 import { cpus } from 'os';
+
+type Servant = Parameters<typeof createEmbeds>[0];
 
 export = class extends FgoModule {
     constructor() {
@@ -46,71 +48,7 @@ export = class extends FgoModule {
         return _;
     }
 
-    private async process(dataset : Servant, NA : DBInstance = na, JP : DBInstance = jp) {
-        const { name, id, activeSkill } = dataset;
-
-        const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
-        let { baseSvtId, classId, classPassive } = svt;
-        const [mstSvtLimits, cards, { [0]: __class }] = await Promise.all([
-            await JP.mstSvtLimit.find({ svtId: baseSvtId }).limit(5).exec(),
-            await JP.mstSvtCard.find({ svtId: baseSvtId }).limit(4).exec(),
-            await NA.mstClass.find({ id: classId }).exec()
-        ]);
-        // render NP gain
-        const svtTdMapping = await JP.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
-        let [{ treasureDeviceId: tdId }] = svtTdMapping;
-        const td_npGain = await JP.mstTreasureDeviceLv.findOne({ treaureDeviceId: tdId }).exec();
-        const td = (await Promise.all(
-            svtTdMapping.map(
-                a => JP.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
-            )
-        )).sort((a, b) => a.id - b.id);
-
-        // overwrite name
-        svt.name = name;
-        let base = () => embedServantBase(svt, __class, mstSvtLimits);
-
-        let tdEmbed = (await Promise.all(
-            td.map(td => embedTreasureDeviceBase(td))
-        )).map((a, i) => 
-            base()
-                .addFields(a)
-                .setDescription(
-                    `[__${td[i].rank}__] `
-                    + `[**${td[i].name}** [**__${td[i].typeText}__**]](${
-                        `https://apps.atlasacademy.io/db/#/JP/noble-phantasm/${td[i].id}`
-                    })`
-                )
-                .setFooter(`Noble Phantasm`)
-        )
-
-        let passives = await Promise.all(classPassive.map(_ => renderPassiveSkill(_)));
-        return [
-            base()
-                .addFields(
-                    await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, true)
-                )
-                .setFooter(`Basic details`),
-            base()
-            .addField(
-                'Active skill',
-                activeSkill.map(a => {
-                    const upgrades = a.length, { name, rank, detail, condition } = a.pop();
-                    return (
-                        `**${name}** __[${rank}]__` + (upgrades > 1 ? ` (${upgrades} upgrades)` : '')
-                        + `\n${detail}`
-                        + `\n_${condition}_`
-                    )
-                }).join('\n\n')
-            )
-            .setFooter(`Active skills`),
-            base().addFields(passives).setFooter(`Passive skills`),
-            ...tdEmbed
-        ]
-        .map((a, i, _) => a.setFooter(`${
-            a.footer?.text ? `${a.footer.text} • ` : ''
-        }Page ${++i}/${_.length}`));
-    }
+    private process = (a : Servant) => createEmbeds(a, na, jp);
 
     async initialize() {
         let _m = this.handler.findInstance(m);
