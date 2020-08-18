@@ -1,10 +1,10 @@
 import { FgoCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
-import { constructQuery as c } from '../../lib/fgo/';
+import { NA } from '@pepper/db/fgo';
 import { plural as p } from '@pepper/utils'
 import __ from '../../lib/querifySubstring';
 import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import { SvtType } from '../../constants/fgo'
+import { SvtType } from '@pepper/constants/fgo'
 
 const commandName = 'search-craft-essence';
 const aliases = [commandName, 'ssc', 'ssce'];
@@ -33,7 +33,7 @@ export = class extends FgoCommand {
                 : `:frowning: Where's your query?`
             )
         if (!q) return m.channel.send(err);
-        const data = await c.mstSvt({ name: __(q) as any, type: SvtType.SERVANT_EQUIP }).NA.limit(MAX + 1).select('name id').exec();
+        const data = await NA.mstSvt.find({ name: __(q) as any, type: SvtType.SERVANT_EQUIP }).limit(MAX + 1).select('name id').exec();
         if (!data.length) return m.channel.send(err);
         m.channel.send(
             new MessageEmbed()
