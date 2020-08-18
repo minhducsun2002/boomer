@@ -12,12 +12,12 @@ import {
 
 export async function renderInvocation({
     vals, funcType, targetType, applyTarget, id, popupText, tvals
-} : mstFunc) {
+} : mstFunc, db : Parameters<typeof getBuffById>[1]) {
     // list of buff IDs
     let teamApply = aTgt[applyTarget],
         target = tTp[targetType];
     let buff = await Promise.all(
-        vals.map(buffId => getBuffById(buffId)
+        vals.map(buffId => getBuffById(buffId, db)
             .catch(() => ({ name: tr[buffId as keyof typeof tr], simple: 1 }))
         )
     );

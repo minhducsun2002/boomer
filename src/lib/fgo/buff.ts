@@ -2,14 +2,14 @@ import { Buff, ValsType as vType } from '@pepper/constants/fgo';
 import { ValsType, Trait, ValsKey } from '@pepper/constants/fgo/strings';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
 import { renderInvocation } from './func';
-import { JP } from '@pepper/db/fgo';
+import type { DBInstance } from '@pepper/db/fgo';
 
 /**
  * Fetch a `mstBuff` by its ID.
  * @param id Buff ID
  */
-export async function getBuffById(id: number) {
-    let _ = await JP.mstBuff.findOne({ id }).exec();
+export async function getBuffById(id: number, db : DBInstance) {
+    let _ = await db.mstBuff.findOne({ id }).exec();
     if (_ === null) throw new Error(`Could not find any buff with ID ${id}. Is that a trait?`);
     return _;
 }
@@ -17,7 +17,7 @@ export async function getBuffById(id: number) {
 /**
  * Render a buff with zipped vals into statistics.
  */
-export async function renderBuffStatistics(buff : mstBuff, val : Map<string, string[]>) {
+export async function renderBuffStatistics(buff : mstBuff, val : Map<string, string[]>, db : DBInstance) {
     let out = [] as { name: string, value: string[] }[];
         // len = val.get(val.keys().next().value).length;
     switch (buff.type) {
@@ -80,9 +80,9 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
             });
             {
                 let skills = val.get(ValsKey[vType.Value]).map(async (_sk, i) => {
-                    let skill = await JP.mstSkillLv.findOne({ skillId: +_sk }).exec();
+                    let skill = await db.mstSkillLv.findOne({ skillId: +_sk }).exec();
                     let f = await renderInvocation(
-                        await JP.mstFunc.findOne({ id: skill.funcId[0] }).exec()
+                        await db.mstFunc.findOne({ id: skill.funcId[0] }).exec(), db
                     );
                     let funcName = `${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}`
                     return `__[${funcName.trim()}] on **${f.affectTarget}**`

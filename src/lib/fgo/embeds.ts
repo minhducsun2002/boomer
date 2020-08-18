@@ -15,7 +15,6 @@ import type { mstSkill } from '@pepper/db/fgo/master/mstSkill';
 import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import { MessageEmbed } from 'discord.js';
 import { renderInvocation } from './func';
-import { JP as NA } from '@pepper/db/fgo';
 import { zipMap, componentLog } from '@pepper/utils';
 import { parseVals_enhanced } from './datavals';
 import { renderBuffStatistics } from './buff';
@@ -41,7 +40,8 @@ export function embedServantBase(
 
 export async function embedServantDashboard(
     svt: mstSvt, limits: mstSvtLimit[], cards: mstSvtCard[], 
-    { tdPoint, tdPointDef }: mstTreasureDeviceLv, allTrait = false
+    { tdPoint, tdPointDef }: mstTreasureDeviceLv,
+    JP : DBInstance, allTrait = false
 ) {
     let { hpBase, hpMax, atkBase, atkMax } = limits[0],
         { cardIds, starRate, relateQuestIds, individuality, baseSvtId,
@@ -95,7 +95,7 @@ export async function embedServantDashboard(
             name: `Related quests`,
             value: (await Promise.all(
                 relateQuestIds
-                    .map(id => NA.mstQuest.findOne({ id }).select('id name').exec())
+                    .map(id => JP.mstQuest.findOne({ id }).select('id name').exec())
             ))
                 .map(q => `\`${q.id}\` ${q.name}`)
                 .join('\n'),
@@ -105,15 +105,15 @@ export async function embedServantDashboard(
     return out;
 }
 
-export async function embedTreasureDeviceBase(td : mstTreasureDevice) {
+export async function embedTreasureDeviceBase(td : mstTreasureDevice, db : DBInstance) {
     let { id } = td;
-    let levels = await NA.mstTreasureDeviceLv.find({ treaureDeviceId: id }).exec();
+    let levels = await db.mstTreasureDeviceLv.find({ treaureDeviceId: id }).exec();
 
     let base = levels[0];
     let funcBase = await Promise.all(
         base.funcId.map(
-            id => NA.mstFunc.findOne({ id }).exec()
-                .then(f => renderInvocation(f))
+            id => db.mstFunc.findOne({ id }).exec()
+                .then(f => renderInvocation(f, db))
         )
     );
     return funcBase.map(_ => ({
@@ -130,15 +130,15 @@ export async function embedTreasureDeviceBase(td : mstTreasureDevice) {
     }))
 }
 
-async function renderSkill(s: mstSkill) {
-    let levels = await NA.mstSkillLv.find({ skillId: s.id }).exec();
+async function renderSkill(s: mstSkill, db : DBInstance) {
+    let levels = await db.mstSkillLv.find({ skillId: s.id }).exec();
     // precompiling stuff
     let cache = new Map<number, mstFunc>(),
         func = [...new Set(levels.map(l => l.funcId).flat())];
     await Promise.all(
         func.map(async f => cache.set(
             f,
-            await NA.mstFunc.findOne({ id: f }).exec()
+            await db.mstFunc.findOne({ id: f }).exec()
         ))
     )
     let _inv = func.map(async fid => {
@@ -158,16 +158,16 @@ async function renderSkill(s: mstSkill) {
     let invocations = await Promise.all(_inv);
     let _ = await Promise.all(invocations.map(
         async inv => ({
-            func: await renderInvocation(cache.get(inv.funcId)),
+            func: await renderInvocation(cache.get(inv.funcId), db),
             vals: inv.vals
         })
     ))
     return _;
 }
 
-export async function renderPassiveSkill(skillId: number, log = new componentLog(`Passive skill renderer`)) {
-    let skill = await NA.mstSkill.findOne({ id: skillId }).exec();
-    let acts = await renderSkill(skill);
+export async function renderPassiveSkill(skillId: number, db : DBInstance, log = new componentLog(`Passive skill renderer`)) {
+    let skill = await db.mstSkill.findOne({ id: skillId }).exec();
+    let acts = await renderSkill(skill, db);
 
     let funcs = new Map<number, typeof acts[0]['func']>();
     acts.forEach(_ => funcs.set(_.func.id, _.func));
@@ -180,7 +180,7 @@ export async function renderPassiveSkill(skillId: number, log = new componentLog
 
         let details : PromiseValue<ReturnType<typeof renderBuffStatistics>> = [];
         if (f.rawBuffs.length)
-            details = await renderBuffStatistics(f.rawBuffs[0], vals)
+            details = await renderBuffStatistics(f.rawBuffs[0], vals, db)
             .catch(e => {
                 log.error(`Rendering buff stats of function ${f.id} failed!`);
                 throw e;
@@ -207,7 +207,7 @@ export async function renderPassiveSkill(skillId: number, log = new componentLog
     };
 }
 
-export async function createEmbeds(dataset : Servant, NA : DBInstance, JP : DBInstance) {
+export async function createEmbeds(dataset : Servant, NA : DBInstance, JP : DBInstance) : Promise<MessageEmbed[]> {
     const { name, id, activeSkill } = dataset;
 
     const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
@@ -232,7 +232,7 @@ export async function createEmbeds(dataset : Servant, NA : DBInstance, JP : DBIn
     let base = () => embedServantBase(svt, __class, mstSvtLimits);
 
     let tdEmbed = (await Promise.all(
-        td.map(td => embedTreasureDeviceBase(td))
+        td.map(td => embedTreasureDeviceBase(td, JP))
     )).map((a, i) => 
         base()
             .addFields(a)
@@ -245,11 +245,11 @@ export async function createEmbeds(dataset : Servant, NA : DBInstance, JP : DBIn
             .setFooter(`Noble Phantasm`)
     )
 
-    let passives = await Promise.all(classPassive.map(_ => renderPassiveSkill(_)));
+    let passives = await Promise.all(classPassive.map(_ => renderPassiveSkill(_, JP)));
     return [
         base()
             .addFields(
-                await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, true)
+                await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, JP, true)
             )
             .setFooter(`Basic details`),
         base()
