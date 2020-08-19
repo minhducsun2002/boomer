@@ -7,6 +7,7 @@ import { createEmbeds } from '@pepper/lib/fgo'
 import { Collection, MessageEmbed } from 'discord.js';
 import { Queue } from 'queue-ts';
 import { cpus } from 'os';
+import c from 'chalk';
 
 type Servant = Parameters<typeof createEmbeds>[0];
 
@@ -54,7 +55,7 @@ export = class extends FgoModule {
         let _m = this.handler.findInstance(m);
         let _ = await _m.ids();
         // delegate this to another function to run in parallel
-        let queue = new Queue(cpus().length);
+        let queue = new Queue(cpus().length * 2);
 
         for (let { id } of _) {
             queue.add(
@@ -62,7 +63,9 @@ export = class extends FgoModule {
                     try {
                         let s = await _m.get(id);
                         let e = (await this.process(s)).map(e => e.toJSON());
-                        this.log.success(`Processed data of servant ${id} (${s.name})`);
+                        this.log.success(`Processed data of servant ${id}. ${
+                            c.bgBlue.yellowBright(s.name)
+                        }`);
                         this.push(id, e);
                     } catch (e) {
                         this.log.error(`Error processing servant ${id}.\n${e.stack}`)
