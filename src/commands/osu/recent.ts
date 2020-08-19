@@ -1,6 +1,5 @@
 import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
-import { ERROR_COLOR } from '../../constants/colors';
 import { modes } from '@pepper/constants/osu'
 import { fetchUser, fetchRecent, embedScoreset, fetchRecentApi, embedScoresetApi } from '@pepper/lib/osu';
 import { paginatedEmbed } from '@pepper/utils';
