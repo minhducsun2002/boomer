@@ -1,0 +1,19 @@
+name: Test F/GO servant pre-processing logic
+on: [push]
+jobs:
+  build:
+    name: Run test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Checkout config
+      uses: actions/checkout@v2
+      with: 
+        repository: ${{ secrets.CONFIG_REPOSITORY }}
+        path: config
+        token: ${{ secrets.CONFIG_TOKEN }}
+    - name: Install dependencies
+      run: yarn
+    - name: Run test
+      run: yarn test:fgo:preprocess
