@@ -5,6 +5,10 @@ jobs:
     name: Run test
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/setup-node@v1
+      name: Setup Node.js
+      with:
+        node-version: '14.x'
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Checkout config
