@@ -64,7 +64,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                 out = out.concat([
                     {
                         name: ValsType[vType.Value],
-                        value: val.get(ValsKey[vType.Value]).map(_ => `**${_}**%`)
+                        value: val.get(ValsKey[vType.Value]).map(_ => `**${_}**`)
                     },
                     {
                         name: ValsType[vType.Rate],
