@@ -14,70 +14,71 @@ export async function getBuffById(id: number, db : DBInstance) {
     return _;
 }
 
+
+type BuffEntry = { name: string, value: string[] };
+function renderTurn(s : string[]) : BuffEntry {
+    // only handle turns > 0
+    if (s.some(_ => +_ > 0)) return {
+        name: ValsType[vType.Turn],
+        value: s.map(_ => `${(+_ / 10)}`)
+    };
+}
+
+function renderCount(s : string[]) : BuffEntry {
+    if (s.some(_ => +_ > 0)) return {
+        name: ValsType[vType.Count],
+        value: s.map(_ => `${(+_ / 10)}`)
+    }
+}
+
+function renderChance(s : string[]) : BuffEntry {
+    return {
+        name: ValsType[vType.Rate],
+        value: s.map(_ => `${(+_ / 10)}%`)
+    }
+}
+
 /**
  * Render a buff with zipped vals into statistics.
  */
 export async function renderBuffStatistics(buff : mstBuff, val : Map<string, string[]>, db : DBInstance) {
-    let out = [] as { name: string, value: string[] }[];
-        // len = val.get(val.keys().next().value).length;
+    let out = [] as BuffEntry[];
+    let _ = {} as {
+        // special fields, rendered differently
+        // all of these can always be represented as buff entries
+        chance: string[],
+        turn: string[],
+        count: string[],
+        amount: string[],
+
+        other: BuffEntry[]
+    }
+
+    let chance = () => _.chance = renderChance(val.get(ValsKey[vType.Rate]))?.value;
+
     switch (buff.type) {
         case Buff.UP_TOLERANCE:     case Buff.DOWN_TOLERANCE:
-        case Buff.UP_COMMANDALL:
+        case Buff.UP_COMMANDALL:    case Buff.DOWN_COMMANDALL:
         case Buff.UP_GRANTSTATE:    case Buff.DOWN_GRANTSTATE:
         case Buff.UP_CRITICALPOINT: case Buff.DOWN_CRITICALPOINT:
         case Buff.UP_CRITICALRATE:  case Buff.DOWN_CRITICALRATE:
         case Buff.UP_CRITICALDAMAGE:case Buff.DOWN_CRITICALDAMAGE:
-            // for (let i = 0 ; i < len ; i++) {
-                out = out.concat([
-                    {
-                        name: ValsType[vType.Value],
-                        value: val.get(ValsKey[vType.Value]).map(_ => `**${(+_ / 10)}**%`)
-                    },
-                    {
-                        name: ValsType[vType.Rate],
-                        value: val.get(ValsKey[vType.Rate]).map(_ => `**${(+_ / 10)}**%`)
-                    }
-                ]);
-            // };
-            return out;
+            chance();
+            _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
+            break;
         case Buff.AVOID_INSTANTDEATH:
-            // for (let i = 0 ; i < len ; i++)
-                out = out.concat([
-                    {
-                        name: ValsType[vType.Rate],
-                        value: val.get(ValsKey[vType.Rate]).map(_ => `**${(+_ / 10)}**%`)
-                    }
-                ]);
-                if (+val.get(ValsKey[vType.Turn])[0] > 0)
-                    out.push({
-                        name: ValsType[vType.Turn],
-                        value: val.get(ValsKey[vType.Turn]).map(_ => `**${(+_ / 10)}**%`)
-                    });
-                if (+val.get(ValsKey[vType.Count])[0] > 0)
-                    out.push({
-                        name: ValsType[vType.Count],
-                        value: val.get(ValsKey[vType.Count]).map(_ => `**${(+_ / 10)}**%`)
-                    });
-            return out;
+            chance();
+            _.turn = renderTurn(val.get(ValsKey[vType.Turn]))?.value;
+            _.count = renderCount(val.get(ValsKey[vType.Count]))?.value;
+            break;
         case Buff.ADD_DAMAGE:       case Buff.DOWN_DAMAGE:
-            // for (let i = 0 ; i < len ; i++) 
-                out = out.concat([
-                    {
-                        name: ValsType[vType.Value],
-                        value: val.get(ValsKey[vType.Value]).map(_ => `**${_}**`)
-                    },
-                    {
-                        name: ValsType[vType.Rate],
-                        value: val.get(ValsKey[vType.Rate]).map(_ => `**${(+_ / 10)}**%`)
-                    }
-                ]);
-            return out;
+        case Buff.REGAIN_STAR:
+            chance();
+            _.amount = val.get(ValsKey[vType.Value]).map(_ => `${_}`);
+            break;
         case Buff.COMMANDATTACK_FUNCTION:
+            chance();
             let conditions = buff.ckSelfIndv.map(_ => Trait[_ as keyof typeof Trait]);
-            out.push({
-                name: ValsType[vType.Rate],
-                value: val.get("Rate").map(_ => `**${(+_ / 10)}**%`)
-            });
             {
                 let skills = val.get(ValsKey[vType.Value]).map(async (_sk, i) => {
                     let skill = await db.mstSkillLv.findOne({ skillId: +_sk }).exec();
@@ -97,9 +98,11 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                     }`,
                     value
                 });
-            }
-            return out;
-        default:
-            return out;
-    }
+            };
+            break;
+        case Buff.AVOID_STATE:
+            chance();
+    };
+    _.other = out;
+    return _;
 }

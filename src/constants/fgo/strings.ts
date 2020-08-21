@@ -331,7 +331,7 @@ export const ValsType = {
     [vType.Rate]: 'Probability',
     [vType.Value]: 'Value',
     [vType.Turn]: 'Turn',
-    [vType.Count]: 'Count'
+    [vType.Count]: 'Time'
 }
 
 export const ValsKey = {

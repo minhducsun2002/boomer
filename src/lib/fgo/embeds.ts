@@ -177,27 +177,23 @@ export async function renderPassiveSkill(skillId: number, db : DBInstance, log =
 
         // dedupe the values
         vals.forEach((v, k) => vals.set(k, [...new Set(v)]));
-
-        let details : PromiseValue<ReturnType<typeof renderBuffStatistics>> = [];
-        if (f.rawBuffs.length)
-            details = await renderBuffStatistics(f.rawBuffs[0], vals, db)
+        type r = PromiseValue<ReturnType<typeof renderBuffStatistics>>;
+        let stat : r;
+        if (f.rawBuffs.length) {
+            stat = await renderBuffStatistics(f.rawBuffs[0], vals, db)
             .catch(e => {
-                log.error(`Rendering buff stats of function ${f.id} failed!`);
+                log.error(`Rendering buff stats of function ${f.id}, skill ${skillId} failed!`);
                 throw e;
-            })
+            });
+        }
         return (
-            `**[${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}]`
+            (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '')
+            + (stat?.chance ? `**${stat.chance[0]}** chance to\n` : '')
+            + `**[${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}]`
             + `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})**`
-            + ` on **${f.affectTarget}**${
-                (f.onTeam ? `\nMember of : **${f.onTeam}** team` : '')
-            }`
-            + `${
-                (`\n` + details.map(_ => `${_.name} : ${
-                    // _.value.join(' / ')
-                    _.value[0]
-                    // a passive skill only has one degree of power?
-                }`).join('\n')).trimRight()
-            }`
+            + (stat?.amount ? ` of **${stat.amount[0]}**` : '')
+            + ` on **${f.affectTarget}**`
+            + (`\n` + stat?.other.map(_ => `${_.name} : ${_.value[0]}`).join('\n')).trimRight()
         )
     })
 
