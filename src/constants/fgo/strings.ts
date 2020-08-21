@@ -95,7 +95,7 @@ export const Trait = {
     [t.buffTargetFocus]: 'Target Focus',
     // Abigail Williams?
     [t.buffTerrorStunChanceAfterTurn]: 'Terror',
-    [t.canBeInBattle]: '',
+    [t.canBeInBattle]: 'Can be in battle',
     [t.cardArts]: 'Arts Cards',
     [t.cardBuster]: 'Buster Cards',
     [t.cardExtra]: 'Extra Cards',
@@ -103,6 +103,7 @@ export const Trait = {
     [t.cardQuick]: 'Quick Cards',
     [t.centaur]: 'Centaur',
     [t.chimera]: 'Chimera',
+    [t.childServant]: 'Child',
     [t.classAlterEgo]: 'Alter Ego',
     [t.classArcher]: 'Archer',
     [t.classAssassin]: 'Assassin',
@@ -147,7 +148,7 @@ export const Trait = {
     [t.genderUnknown]: 'Unknown',
     [t.genderUnknownServant]: 'Unknown Servant',
     [t.humanoid]: 'Humanoid',
-    [t.humanoidServant]: '',
+    [t.humanoidServant]: 'Humanoid Servant',
     [t.illya]: 'Illya',
     [t.king]: 'King',
     [t.riding]: 'Riding',
@@ -157,6 +158,8 @@ export const Trait = {
     [t.skyOrEarthExceptPseudoAndDemi]: 'Heaven or Earth (except Pseudo-Servants & Demi-Servants)',
     [t.threatToHumanity]: 'Threat to Humanity',
     [t.weakToEnumaElish]: 'Weak to Enuma Elish',
+    [t.wyvern]: 'Wyvern',
+    [t.zombie]: 'Zombie',
 }
 
 export const FuncTypes = {
