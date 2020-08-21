@@ -22,7 +22,6 @@ export = class extends FgoModule {
     push(s: number, d: any) {
         let b = encode(d);
         this.cache.set(s, Buffer.from(b.buffer, b.byteOffset, b.byteLength));
-        this.log.success(`Saved details for servant ${s}.`);
         return this;
     }
 
@@ -45,7 +44,6 @@ export = class extends FgoModule {
     clean() {
         let _ = this.cache.size;
         this.cache.clear();
-        this.log.info(`Cleared ${_} entries from cache.`);
         return _;
     }
 
