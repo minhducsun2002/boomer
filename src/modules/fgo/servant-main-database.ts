@@ -176,8 +176,9 @@ export default class extends FgoModule {
         return this.mod.find({}).select('id').exec();
     }
 
-    async initialize() {}
-    async onload() {
+    query = (...args : Parameters<Model<Servant>['find']>) => this.mod.find(...args);
+
+    async initialize() {
         let { main } = this.client.config.database.fgo as { [k: string]: string };
         this.mod = createConnection(main)
             .on('open', () => this.log.success(`Connected to main database.`))

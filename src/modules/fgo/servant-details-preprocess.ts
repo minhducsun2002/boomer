@@ -12,6 +12,7 @@ import c from 'chalk';
 type Servant = Parameters<typeof createEmbeds>[0];
 
 export = class extends FgoModule {
+    require = [new m().id];
     constructor() {
         super(`servant-details-preprocess`, {});
     }

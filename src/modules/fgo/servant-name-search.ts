@@ -2,14 +2,13 @@ import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
 import m from 'mongoose';
 import f from 'fuse.js';
+import db from './servant-main-database';
 
 interface Servant extends m.Document {
     name: string;
     alias: string[];
     id: number;
 }
-
-const Schema : m.Schema<Servant> = new m.Schema({ name: String, alias: [String], id: Number });
 
 export = class extends FgoModule {
     constructor() {
@@ -59,13 +58,12 @@ export = class extends FgoModule {
             )
     }
 
+    require = [new db().id];
+
     initialized = false;
     async initialize() {
-        let { main } = this.client.config.database.fgo as { [k: string]: string };
-        let mod : m.Model<Servant> = m.createConnection(main)
-            .on('open', () => this.log.success(`Connection to alias database succeeded.`))
-            .model('Servant', Schema)
-        let records = await mod.find({}).select('name alias id').exec();
+        let c = this.handler.findInstance(db);
+        let records = await c.query({}).select('name alias id').exec();
         this.log.info(`Found aliases for ${records.length} servants.`);
 
         // warning for dupes sh*t
