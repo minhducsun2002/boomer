@@ -7,4 +7,5 @@ export class PepperModule extends AkairoModule {
     async initialize() {};
     async onload() {};
     handler: ModuleHandler;
+    require: AkairoModule['id'][] = [];
 }

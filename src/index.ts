@@ -38,11 +38,11 @@ client.commandHandler
     })
     .loadAll();
 client.inhibitorHandler.loadAll();
-client.moduleHandler.loadAll();
-
 // initialize all modules
-Promise.all(
-    client.moduleHandler.modules.array()
-        .map(m => m.initialize())
-).then(() => client.login(process.env.DISCORD_TOKEN))
+client.moduleHandler.loadAll()
+    .initializeAll()
+    .then(succeeded => {
+        if (succeeded) client.login(process.env.DISCORD_TOKEN);
+        else process.exit(1);
+    })
 export { client };

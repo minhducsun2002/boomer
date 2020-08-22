@@ -39,7 +39,8 @@
     "ojsama": "^1.2.5",
     "queue-ts": "^0.1.0",
     "strip-ansi": "^6.0.0",
-    "timezonecomplete": "^5.11.0"
+    "timezonecomplete": "^5.11.0",
+    "trailduck": "https://github.com/cipherallies/trailduck/archive/47df7a9f4a8e2c5f356bbe051b4eeacf552212c4.tar.gz"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.16",

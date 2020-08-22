@@ -7,6 +7,7 @@ import { componentLog } from '@pepper/utils'
 import ch from 'chalk';
 import { relative } from 'path';
 import { PepperModule } from '../Module';
+import Trailduck from 'trailduck';
 
 export class ModuleHandler extends a {
     client: PepperClient;
@@ -42,6 +43,36 @@ export class ModuleHandler extends a {
         }).observe({ entryTypes: ['function'] });
         performance.timerify(() => super.loadAll(...args))();
         return this;
+    }
+
+
+    async initializeAll() {
+        let k = {} as { [k: string]: { children: string[] } };
+        for (let m of this.modules.keyArray()) {
+            for (let i of this.modules.get(m).require)
+                if (!this.modules.has(i)) {
+                    this.clientLog.error(`Module ${
+                        ch.yellowBright(m)
+                    } depends on non-existent module ${
+                        ch.yellowBright(i)
+                    }`)
+                    return false;
+                }
+            k[m] = { children: this.modules.get(m).require }
+        }
+
+        let { cycles, ordered } = new Trailduck(k);
+        if (cycles?.length) {
+            cycles.forEach(c => this.clientLog.error(
+                `Circular dependency detected :\n`
+                + c.map(i => `- ${i}`).join('\n')
+            ))
+            return false;
+        }
+
+        for (let i of ordered) 
+            await this.modules.get(i.name).initialize();
+        return true;
     }
 
     modules: Collection<string, PepperModule>;
