@@ -38,10 +38,29 @@ export function embedServantBase(
         .setThumbnail(`https://assets.atlasacademy.io/GameData/JP/Faces/f_${baseSvtId}0.png`)
 }
 
+export function embedTraits(
+    { individuality, baseSvtId, attri, genderType, classId }: mstSvt,
+    inline = false
+) {
+    let ind = new Set(individuality);
+        ind.delete(baseSvtId);
+        ind.delete(attri + attrMod);
+        ind.delete(genderType + genMod);
+        ind.delete(claMod + classId);
+    return {
+        name: 'Traits',
+        value: [...ind]
+            .map(a => Trait[a as tr] || a)
+            .map(a => `* **${a}**`)
+            .join('\n'),
+        inline
+    }
+}
+
 export async function embedServantDashboard(
     svt: mstSvt, limits: mstSvtLimit[], cards: mstSvtCard[], 
     { tdPoint, tdPointDef }: mstTreasureDeviceLv,
-    JP : DBInstance, allTrait = false
+    JP : DBInstance
 ) {
     let { hpBase, hpMax, atkBase, atkMax } = limits[0],
         { cardIds, starRate, relateQuestIds, individuality, baseSvtId,
@@ -75,15 +94,6 @@ export async function embedServantDashboard(
         name: `Critical stars`,
         value: `Weight : **${limits[0].criticalWeight}**`
             + `\nGeneration : **${(starRate / 10).toFixed(1)}**%`,
-        inline
-    }, {
-        name: 'Traits',
-        value: [...ind]
-            .map(a => Trait[a as tr] || a)
-            // filter out not defined mappings
-            .filter(a => allTrait ? 1 : isNaN(+a))
-            .map(a => `* **${a}**`)
-            .join('\n'),
         inline
     }, {
         name: 'Gender / Attribute', 
@@ -130,7 +140,7 @@ export async function embedTreasureDeviceBase(td : mstTreasureDevice, db : DBIns
     }))
 }
 
-async function renderSkill(s: mstSkill, db : DBInstance) {
+async function processSkill(s: mstSkill, db : DBInstance) {
     let levels = await db.mstSkillLv.find({ skillId: s.id }).exec();
     // precompiling stuff
     let cache = new Map<number, mstFunc>(),
@@ -167,7 +177,7 @@ async function renderSkill(s: mstSkill, db : DBInstance) {
 
 export async function renderPassiveSkill(skillId: number, db : DBInstance, log = new componentLog(`Passive skill renderer`)) {
     let skill = await db.mstSkill.findOne({ id: skillId }).exec();
-    let acts = await renderSkill(skill, db);
+    let acts = await processSkill(skill, db);
 
     let funcs = new Map<number, typeof acts[0]['func']>();
     acts.forEach(_ => funcs.set(_.func.id, _.func));
@@ -245,9 +255,12 @@ export async function createEmbeds(dataset : Servant, NA : DBInstance, JP : DBIn
     return [
         base()
             .addFields(
-                await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, JP, true)
+                await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, JP)
             )
             .setFooter(`Basic details`),
+        base()
+            .addFields([embedTraits(svt)])
+            .setFooter('Traits'),
         base()
         .addField(
             'Active skill',
