@@ -59,20 +59,13 @@ export function embedTraits(
 
 export async function embedServantDashboard(
     svt: mstSvt, limits: mstSvtLimit[], cards: mstSvtCard[], 
-    { tdPoint, tdPointDef }: mstTreasureDeviceLv,
-    JP : DBInstance
+    { tdPoint, tdPointDef }: mstTreasureDeviceLv
 ) {
     let { hpBase, hpMax, atkBase, atkMax } = limits[0],
-        { cardIds, starRate, relateQuestIds, individuality, baseSvtId,
-            attri, genderType, classId } = svt,
+        { cardIds, starRate, attri, genderType } = svt,
         ccount = (_ : Card) => cardIds.reduce((b, a) => a === _ ? b + 1 : b, 0),
         dmg = cards.sort((a, b) => a.cardId - b.cardId)
                 .map(a => a.normalDamage);
-    let ind = new Set(individuality);
-        ind.delete(baseSvtId);
-        ind.delete(attri + attrMod);
-        ind.delete(genderType + genMod);
-        ind.delete(claMod + classId);
     let inline = true;
     let out = [{
         name: 'HP/ATK',
@@ -100,18 +93,6 @@ export async function embedServantDashboard(
         value: `${Trait[(genderType + genMod) as tr]} / ${Trait[(attri + attrMod) as tr]}`,
         inline
     }];
-    if (relateQuestIds.length) 
-        out.push({
-            name: `Related quests`,
-            value: (await Promise.all(
-                relateQuestIds
-                    .map(id => JP.mstQuest.findOne({ id }).select('id name').exec())
-            ))
-                .map(q => `\`${q.id}\` ${q.name}`)
-                .join('\n'),
-            inline
-        })
-    
     return out;
 }
 
@@ -255,7 +236,7 @@ export async function createEmbeds(dataset : Servant, NA : DBInstance, JP : DBIn
     return [
         base()
             .addFields(
-                await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain, JP)
+                await embedServantDashboard(svt, mstSvtLimits, cards, td_npGain)
             )
             .setFooter(`Basic details`),
         base()
