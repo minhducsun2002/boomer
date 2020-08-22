@@ -12,6 +12,8 @@
         "target": "ES6",
         "esModuleInterop": true,
         "emitDecoratorMetadata": false,
+        "incremental": true,
+        "tsBuildInfoFile": "./.tsbuildinfo",
         "downlevelIteration": true,
         "paths": {
             "@pepper/utils": ["src/utils/index"],
