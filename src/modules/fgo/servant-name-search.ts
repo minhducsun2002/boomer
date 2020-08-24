@@ -1,14 +1,7 @@
 import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
-import m from 'mongoose';
 import f from 'fuse.js';
-import db from './servant-main-database';
-
-interface Servant extends m.Document {
-    name: string;
-    alias: string[];
-    id: number;
-}
+import db, { Servant } from './servant-main-database';
 
 export = class extends FgoModule {
     constructor() {
