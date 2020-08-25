@@ -24,7 +24,6 @@ export class ModuleHandler extends a {
                     + ch.blueBright(`./${relative(directory, filepath)}`)
                     + ` -> ${ch.yellowBright(`${id}`)}`
                 );
-                m.onload();
             }
         )
     }
