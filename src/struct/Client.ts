@@ -14,7 +14,7 @@ import * as utils from './util';
 
 type cfg = (ConstructorParameters<typeof AkairoClient>[0]); 
 
-type databaseMapping = { [key: string]: string };
+type databaseMapping = { [key: string]: string | databaseMapping };
 
 interface PepperConfiguration extends cfg {
     commandHandlerOptions?: ConstructorParameters<typeof CommandHandler>[1],
