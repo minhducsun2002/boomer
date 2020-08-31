@@ -3,6 +3,8 @@ import { componentLog } from '@pepper/utils';
 import f from 'fuse.js';
 import db, { Servant } from './servant-main-database';
 
+type fuzzySearchOpt = Parameters<f<Servant>['search']>[1];
+
 export = class extends FgoModule {
     constructor() {
         super(`servant-name-search`, {});
@@ -12,14 +14,24 @@ export = class extends FgoModule {
     private fuse : f<Servant>;
     private tokens = new Map<string, Set<number>>();
 
+    private _records : Servant[];
+    public get records() { return this._records };
+    
     /**
      * Search a servant by name
      * @param s Search query
      */
-    async search(s : string) {
+    async search(s : string, opt? : fuzzySearchOpt) {
         let t = this.tokenSearch(s);
-        let res = await this.fuzzySearch(s);
-        if (t && t.size) res = res.filter(_ => t.has(_.item.id));
+        let res = await this.fuzzySearch(s, opt);
+        if (t?.size) {
+            // instead of removing, prioritise
+            let match = [] as typeof res, mis = [] as typeof res;
+            // res = res.filter(_ => t.has(_.item.id))
+            for (let r of res) 
+                (t.has(r.item.id) ? match : mis).push(r);
+            res = [...match.sort((a, b) => a.score - b.score), ...mis];
+        }
         return res;
     }
 
@@ -36,9 +48,9 @@ export = class extends FgoModule {
      * Fuzzy search a servant by name
      * @param s Search query
      */
-    async fuzzySearch(s : string) {
+    async fuzzySearch(s : string, opt? : fuzzySearchOpt) {
         if (!this.fuse || !this.initialized) await this.initialize();
-        return this.fuse.search(s);
+        return this.fuse.search(s, Object.assign({}, { shouldSort: true }, opt));
     }
 
     private async verifyDupes(s : Servant[]) {
@@ -56,7 +68,8 @@ export = class extends FgoModule {
     initialized = false;
     async initialize() {
         let c = this.handler.findInstance(db);
-        let records = await c.query({}).select('name alias id').exec();
+        let records = await c.query({}).select('name alias id class rarity').exec();
+        this._records = records;
         this.log.info(`Found aliases for ${records.length} servants.`);
 
         // warning for dupes sh*t
