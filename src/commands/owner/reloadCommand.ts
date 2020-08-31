@@ -13,7 +13,7 @@ export = class extends OwnerCommand {
             description: 'Reload a(ll) command(s)',
             args: [{
                 id: 'cmd',
-                type: 'command'
+                type: 'commandAlias'
             }]
         })
     }
