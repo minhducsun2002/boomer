@@ -1,6 +1,7 @@
 import type { ArgumentOptions } from 'discord-akairo';
 import { Message, MessageEmbed } from 'discord.js';
 import { GeneralCommand } from './baseCommand';
+import i from './info';
 
 const commandName = 'help', aliases = [commandName];
 
@@ -107,6 +108,10 @@ export = class extends GeneralCommand {
                     ].map(([name, desc]) => `- \`${name}\` ${desc}`).join('\n')
                 )
         }
+
+        if (out instanceof MessageEmbed) 
+            out = out.setFooter(`Call ${prefix}${new i().aliases[0]} for info about me.`)
+                .setTimestamp()
 
         m.channel.send(out);
     }
