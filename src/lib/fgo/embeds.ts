@@ -66,17 +66,14 @@ export async function embedServantDashboard(
         ccount = (_ : Card) => cardIds.reduce((b, a) => a === _ ? b + 1 : b, 0),
         dmg = cards.sort((a, b) => a.cardId - b.cardId)
                 .map(a => a.normalDamage);
+
+    let b = ccount(Card.BUSTER), a = ccount(Card.ARTS), q = ccount(Card.QUICK), e = 1,
+        bc = dmg[Card.BUSTER - 1], ac = dmg[Card.ARTS - 1], qc = dmg[Card.QUICK - 1],
+        ec = dmg[Card.EXTRA - 1];
     let inline = true;
     let out = [{
         name: 'HP/ATK',
         value: `- Base : ${hpBase}/${atkBase}\n- Maximum : ${hpMax}/${atkMax}`,
-        inline
-    }, {
-        name: 'Cards / Damage distribution by %',
-        value: `- Buster : ${ccount(Card.BUSTER)} / ${dmg[Card.BUSTER - 1].join('-')}`
-            + `\n- Arts : ${ccount(Card.ARTS)} / ${dmg[Card.ARTS - 1].join('-')}`
-            + `\n- Quick : ${ccount(Card.QUICK)} / ${dmg[Card.QUICK - 1].join('-')}`
-            + `\n- Extra : 1 / ${dmg[Card.EXTRA - 1].join('-')}`,
         inline
     }, {
         name: 'NP generation',
@@ -92,6 +89,17 @@ export async function embedServantDashboard(
         name: 'Gender / Attribute', 
         value: `${Trait[(genderType + genMod) as tr]} / ${Trait[(attri + attrMod) as tr]}`,
         inline
+    }, {
+        name: 'Cards / Damage distribution by %',
+        value: [
+            '```',
+            '   Card   | Hit counts',
+            `${b}x Buster | ${bc.length} (${bc.join('-')})`,
+            `${a}x Arts   | ${ac.length} (${ac.join('-')})`,
+            `${q}x Quick  | ${qc.length} (${qc.join('-')})`,
+            `${e}x Extra  | ${ec.length} (${ec.join('-')})`,
+            '```'
+        ]
     }];
     return out;
 }
