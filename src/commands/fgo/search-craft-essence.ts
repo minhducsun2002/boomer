@@ -1,16 +1,11 @@
 import { FgoCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
-import { NA } from '@pepper/db/fgo';
-import { plural as p } from '@pepper/utils'
-import __ from '../../lib/querifySubstring';
-import { ERROR_COLOR, SUCCESS_COLOR } from '../../constants/colors';
-import { SvtType } from '@pepper/constants/fgo'
+import { chunk, paginatedEmbed } from '@pepper/utils'
+import { ERROR_COLOR } from '@pepper/constants/colors';
+import c from '@pepper/modules/fgo/ce-name-search';
 
 const commandName = 'search-craft-essence';
 const aliases = [commandName, 'ssc', 'ssce'];
-
-interface a { q?: string; }
-const MAX = 25;
 
 export = class extends FgoCommand {
     constructor() {
@@ -25,7 +20,9 @@ export = class extends FgoCommand {
         })
     }
 
-    async exec(m: Message, { q } : a) {
+    MAX_RESULTS = 15;
+
+    async exec(m: Message, { q } : { q?: string; }) {
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(
                 q
@@ -33,16 +30,25 @@ export = class extends FgoCommand {
                 : `:frowning: Where's your query?`
             )
         if (!q) return m.channel.send(err);
-        const data = await NA.mstSvt.find({ name: __(q) as any, type: SvtType.SERVANT_EQUIP }).limit(MAX + 1).select('name id').exec();
-        if (!data.length) return m.channel.send(err);
-        m.channel.send(
-            new MessageEmbed()
-                .setColor(SUCCESS_COLOR)
-                .setTitle(`Found ${data.slice(0, MAX).length} Craft Essence${p(data.length)}.`)
-                .setDescription(
-                    data.slice(0, MAX).map(({ name, id }) => `\`${id}\` **${name}**`).join('\n')
+        let results = await this.client.moduleHandler.findInstance(c).search(q);
+
+        if (!results.length)
+            return m.channel.send(`I found no matching results. :frowning:`);
+
+        let r = chunk(results.map(a => a.item), this.MAX_RESULTS);
+
+        let render = (_ : typeof r[0]) => new MessageEmbed()
+            .setTitle(`Search results` + (q ? ` for \`${q}\`` : ''))
+            .setDescription(_.map(s => `${s.collectionNo}. **${s.name}**`))
+
+        if (r.length === 1) 
+            return m.channel.send(render(r[0]));
+        else
+            paginatedEmbed()
+                .setChannel(m.channel)
+                .setEmbeds(
+                    r.map(render).map((m, i, a) => m.setFooter(`Page ${i + 1}/${a.length}`))
                 )
-                .setFooter(data.length === MAX + 1 ? `Only ${MAX} topmost results are shown.` : '')
-        )
+                .run({ idle: 20000, dispose: true })
     }
 }
