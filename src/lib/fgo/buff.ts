@@ -86,12 +86,12 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                         await db.mstFunc.findOne({ id: skill.funcId[0] }).exec(), db
                     );
                     let funcName = `${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}`
-                    return `__[${funcName.trim()}] on **${f.affectTarget}**`
-                    + (f.onTeam ? ` (**${f.onTeam}** team)` : '')
-                    + `\n  ${ValsType[vType.Rate]} : **${+val.get(ValsKey[vType.UseRate])[i] / 10}**%__`
+                    return `__**${+val.get(ValsKey[vType.UseRate])[i] / 10}**% chance to `
+                    + `[${funcName.trim()}] on **${f.affectTarget}**`
+                    + (f.onTeam ? ` (**${f.onTeam}** team)` : '') + '__'
                 });
                 let value = await Promise.all(skills);
-                value[0] += `\n`;
+                value[0] = '\n' + value[0];
                 out.push({
                     name: `Trigger skill on ${
                         (conditions.length ? conditions : ['all cases']).join('/')
