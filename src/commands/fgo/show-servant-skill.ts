@@ -1,8 +1,8 @@
 import { MessageEmbed, Message } from 'discord.js';
 import search from '@pepper/modules/fgo/servant-name-search';
 import sentence from '@pepper/lib/sentence';
-import { constructQuery } from '@pepper/lib/fgo/search';
 import { FgoCommand } from './baseCommand';
+import main from '@pepper/modules/fgo/servant-main-database';
 
 const commandName = 'servant-skills';
 const aliases = ['servant-skills', 'sk', 'sks', 'ssks', 'skills', 'skill'];
@@ -36,7 +36,9 @@ export = class extends FgoCommand {
             if (!res.length) return bail();
             _id = res[0].item.id;
         }
-        const results = await constructQuery({ id: _id }, 1)
+
+        const _main = this.client.moduleHandler.findInstance(main);
+        const results = await _main.query({ id: _id })
             .select('name id activeSkill').exec();
 
         if (!results.length) return bail();

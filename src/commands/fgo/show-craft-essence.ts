@@ -2,7 +2,6 @@ import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
 import { NA } from '@pepper/db/fgo';
 import { ERROR_COLOR } from '../../constants/colors';
-import __ from '../../lib/querifySubstring';
 import c from '@pepper/modules/fgo/ce-name-search';
 
 const commandName = 'show-craft-essence';

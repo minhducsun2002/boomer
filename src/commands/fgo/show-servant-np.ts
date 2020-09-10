@@ -1,9 +1,9 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { constructQuery } from '@pepper/lib/fgo/search';
 import { plural as p } from '@pepper/utils' ;
 import sentence from '@pepper/lib/sentence';
 import { FgoCommand } from './baseCommand';
 import search from '@pepper/modules/fgo/servant-name-search';
+import main from '@pepper/modules/fgo/servant-main-database';
 
 const commandName = 'servant-np';
 const aliases = ['servant-np', 'np', 'snp'];
@@ -36,7 +36,9 @@ export = class extends FgoCommand {
             if (!res.length) return bail();
             _id = res[0].item.id;
         }
-        const results = await constructQuery({ id: _id }, 1)
+
+        const _main = this.client.moduleHandler.findInstance(main);
+        const results = await _main.query({ id: _id })
             .select('name noblePhantasm id dmgDistribution.np').exec();
 
         if (!results.length) return bail();
