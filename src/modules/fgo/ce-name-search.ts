@@ -59,7 +59,7 @@ export = class extends FgoModule {
         let records = await this.handler.findInstance(mst)
             .JP.mstSvt.find({ type: SvtType.SERVANT_EQUIP })
             .select('name id collectionNo').exec();
-        let _ = await this.handler.findInstance(cmp).englishNames.find({}).select('name id').exec();
+        let _ = await this.handler.findInstance(cmp).svtObject.find({}).select('name id').exec();
         let m = new Map(_.map(a => [a.id, a.name]));
         for (let r of records) r.name = m.get(r.id) ?? r.name;
         let index = f.createIndex(['name'], records);
