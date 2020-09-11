@@ -21,6 +21,6 @@ export = class extends FgoModule {
         let { english_names } = (_ as Exclude<typeof _, string>)['complementary'] as { [k: string]: string };
         this.englishNames = createConnection(english_names)
             .on(`open`, () => this.log.success(`Connected to localized names collection.`))
-            .model('names', schema, 'names');
+            .model('svt', schema, 'svt');
     }
 }
