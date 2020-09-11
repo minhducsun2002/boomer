@@ -13,6 +13,7 @@ import type { mstTreasureDevice } from '@pepper/db/fgo/master/mstTreasureDevice'
 import type { mstSkill } from '@pepper/db/fgo/master/mstSkill';
 import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import type { mstCombineLimit } from '@pepper/db/fgo/master/mstCombineLimit';
+import type { mstCombineSkill } from '@pepper/db/fgo/master/mstCombineSkill';
 import { MessageEmbed, EmbedField } from 'discord.js';
 import { renderInvocation } from './func';
 import { zipMap, componentLog } from '@pepper/utils';
@@ -241,8 +242,8 @@ export class EmbedRenderer {
         return Promise.all(words);
     }
 
-    renderSkillItems = (combineLimits : mstCombineLimit[]) => {
-        let limits = combineLimits.sort((a, b) => a.svtLimit - b.svtLimit)
+    renderSkillItems = (combineLimits : mstCombineSkill[]) => {
+        let limits = combineLimits.sort((a, b) => a.skillLv - b.skillLv)
         let words = limits.map(async (limit, i) => {
             let { itemIds, itemNums, qp } = limit;
             let items = itemIds
