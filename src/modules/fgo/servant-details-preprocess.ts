@@ -1,18 +1,17 @@
 import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
 import m from './servant-main-database';
-import { JP as jp, NA as na } from '@pepper/db/fgo';
+import mst from './master-data';
+import comp from './complementary-data';
 import { decode, encode } from '@msgpack/msgpack'
-import { createEmbeds } from '@pepper/lib/fgo'
+import { EmbedRenderer } from '@pepper/lib/fgo'
 import { Collection, MessageEmbed } from 'discord.js';
 import { Queue } from 'queue-ts';
 import { cpus } from 'os';
 import c from 'chalk';
 
-type Servant = Parameters<typeof createEmbeds>[0];
-
 export = class extends FgoModule {
-    require = [new m().id];
+    require = [new m().id, new mst().id];
     constructor() {
         super(`servant-details-preprocess`, {});
     }
@@ -48,7 +47,15 @@ export = class extends FgoModule {
         return _;
     }
 
-    private process = (a : Servant) => createEmbeds(a, na, jp);
+    
+
+    private process = (
+        servantDataset : Parameters<EmbedRenderer['createEmbeds']>[0]
+    ) => {
+        let { NA, JP } = this.client.moduleHandler.findInstance(mst);
+        let _comp = this.client.moduleHandler.findInstance(comp);
+        return new EmbedRenderer(NA, JP, _comp).createEmbeds(servantDataset);
+    }
 
     async initialize() {
         let _m = this.handler.findInstance(m);
