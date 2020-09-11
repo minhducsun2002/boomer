@@ -24,6 +24,7 @@ import { mstBuffSchema, mstBuffDocument } from './master/mstBuff';
 import { mstSkillSchema, mstSkillDocument } from './master/mstSkill';
 import { mstSkillLvSchema, mstSkillLvDocument } from './master/mstSkillLv';
 import { mstCombineLimit, mstCombineLimitSchema } from './master/mstCombineLimit';
+import { mstCombineSkill, mstCombineSkillSchema } from './master/mstCombineSkill';
 
 export const initializeMasterModels = (conn : Connection) => ({
     mstSvt: conn.model('mstSvt', mstSvtSchema, 'mstSvt') as Model<mstSvtDocument>,
@@ -47,7 +48,8 @@ export const initializeMasterModels = (conn : Connection) => ({
     mstBuff: conn.model('mstBuff', mstBuffSchema, 'mstBuff') as Model<mstBuffDocument>,
     mstSkill: conn.model('mstSkill', mstSkillSchema, 'mstSkill') as Model<mstSkillDocument>,
     mstSkillLv: conn.model('mstSkillLv', mstSkillLvSchema, 'mstSkillLv') as Model<mstSkillLvDocument>,
-    mstCombineLimit: conn.model('mstCombineLimit', mstCombineLimitSchema, 'mstCombineLimit') as Model<mstCombineLimit>
+    mstCombineLimit: conn.model('mstCombineLimit', mstCombineLimitSchema, 'mstCombineLimit') as Model<mstCombineLimit>,
+    mstCombineSkill: conn.model('mstCombineSkill', mstCombineSkillSchema, 'mstCombineSkill') as Model<mstCombineSkill>
 })
 
 export const initializeServantModel = (c : Connection) => c.model('Servant', ServantSchema) as Model<Servant>

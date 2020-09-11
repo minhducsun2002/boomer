@@ -241,6 +241,23 @@ export class EmbedRenderer {
         return Promise.all(words);
     }
 
+    renderSkillItems = (combineLimits : mstCombineLimit[]) => {
+        let limits = combineLimits.sort((a, b) => a.svtLimit - b.svtLimit)
+        let words = limits.map(async (limit, i) => {
+            let { itemIds, itemNums, qp } = limit;
+            let items = itemIds
+                .map(async id => await this.complementary.item.findOne({ id }).exec())
+                .map((itemRecord, i) => itemRecord.then(item => `- **${itemNums[i]}**x **${item?.name}**`));
+            let itemRecord = (await Promise.all(items)).join('\n');
+            let numberFormatter = new Intl.NumberFormat('en-US', {style: 'decimal'});
+            return {
+                name: `Level ${i + 2} - ${numberFormatter.format(qp)} QP`,
+                value : `${itemRecord}\n`
+            }
+        })
+        return Promise.all(words);
+    }
+
     createEmbeds = async (dataset : Servant) : Promise<MessageEmbed[]> => {
         const { name, id, activeSkill } = dataset;
         let { NA, JP } = this;
@@ -279,9 +296,12 @@ export class EmbedRenderer {
         )
     
         let passives = await Promise.all(classPassive.map(_ => this.passiveSkill(_)));
-        let asc = await this.renderAscensionItems(
+        let ascItems = await this.renderAscensionItems(
             await this.JP.mstCombineLimit.find({ id: baseSvtId }).limit(5).exec()
-        )
+        );
+        let skillItems = await this.renderSkillItems(
+            await this.JP.mstCombineSkill.find({ id: baseSvtId }).limit(9).exec()
+        );
         return [
             base()
                 .addFields(this.servantDashboard(svt, limits, cards, td_npGain))
@@ -289,9 +309,11 @@ export class EmbedRenderer {
             base()
                 .addFields([this.traits(svt)]).setFooter('Traits'),
             // cover case where no ascension material
-            (asc.length
-            ? base().addFields(asc).setFooter(`Ascension materials`)
+            (ascItems.length
+            ? base().addFields(ascItems).setFooter(`Ascension materials`)
             : base().setDescription(`No materials needed.`).setFooter(`Ascension materials`)),
+            base()
+                .addFields(skillItems).setFooter(`Skill materials`),
             base()
             .addField(
                 'Active skill',
