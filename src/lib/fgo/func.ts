@@ -9,6 +9,7 @@ import {
     Trait as tr,
     BuffTypes as bTp
 } from '@pepper/constants/fgo/strings';
+import { FuncType } from '@pepper/constants/fgo';
 
 export async function renderInvocation({
     vals, funcType, targetType, applyTarget, id, popupText, tvals
@@ -24,6 +25,18 @@ export async function renderInvocation({
     // ignore the traits?
     buff = buff.filter(a => a);
     let action = fTp[funcType as keyof typeof fTp];
+    let traitVals = tvals.map(t => tr[t as keyof typeof tr]);
+    if (
+        [
+            FuncType.EVENT_DROP_UP,
+            FuncType.SUB_STATE,
+            FuncType.GAIN_NP_BUFF_INDIVIDUAL_SUM
+        ]
+            .includes(funcType)
+    ) {
+        traitVals = vals.map(t => tr[t as keyof typeof tr]);
+        buff = [];
+    }
     return {
         /** Action that this function executes. Should map to `FuncType`. */
         action,
@@ -44,7 +57,7 @@ export async function renderInvocation({
                 }`
             }
         }),
-        traitVals: tvals.map(t => tr[t as keyof typeof tr]),
+        traitVals,
         /** Function ID. */
         id,
         /** Popup text in game when this function is invoked. */

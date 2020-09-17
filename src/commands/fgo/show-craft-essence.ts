@@ -5,6 +5,7 @@ import { ERROR_COLOR } from '../../constants/colors';
 import { SvtType } from '@pepper/constants/fgo';
 import { mstSvtDocument } from '@pepper/db/fgo/master/mstSvt';
 import c from '@pepper/modules/fgo/ce-name-search';
+import ce from '@pepper/modules/fgo/ce-details-preprocess';
 
 const commandName = 'show-craft-essence';
 const aliases = [commandName, 'ce']
@@ -32,8 +33,7 @@ export = class extends FgoCommand {
                 )
         );
         if (!q) return bail();
-        let { JP: { mstSvt, mstSvtSkill, mstSkillDetail } } =
-            this.client.moduleHandler.findInstance(mst);
+        let { JP: { mstSvt } } = this.client.moduleHandler.findInstance(mst);
 
         // searching method :
         // 
@@ -50,33 +50,21 @@ export = class extends FgoCommand {
             useSearch = isNaN(+q) || (!Number.isSafeInteger(+q)) || (!(+q > 0));
         let data : mstSvtDocument;
         if (useSearch && results.length) {
-            data = await mstSvt.findOne({ id: results[0].item.id, type: SvtType.SERVANT_EQUIP }).exec();
+            data = await mstSvt.findOne({ id: results[0].item.id, type: SvtType.SERVANT_EQUIP }).select('id').exec();
         }
         else {
-            data = await mstSvt.findOne({ collectionNo: +q, type: SvtType.SERVANT_EQUIP }).exec();
+            data = await mstSvt.findOne({ collectionNo: +q, type: SvtType.SERVANT_EQUIP }).select('id').exec();
             if (!data)
-                data = await mstSvt.findOne({ id: +q, type: SvtType.SERVANT_EQUIP }).exec();
+                data = await mstSvt.findOne({ id: +q, type: SvtType.SERVANT_EQUIP }).select('id').exec();
             if (!data) {
                 if (!results.length) return bail();
-                data = await mstSvt.findOne({ id: results[0].item.id, type: SvtType.SERVANT_EQUIP }).exec();
+                data = await mstSvt.findOne({ id: results[0].item.id, type: SvtType.SERVANT_EQUIP }).select('id').exec();
             }
         }
 
         if (!data) return bail();
-        const { name, cost, collectionNo, id } = data;
-        const [[{ detail: base }], _] = await Promise.all(
-            (await mstSvtSkill.find({ svtId: id }).limit(2).exec())
-                .sort((a, b) => a.condLimitCount - b.condLimitCount)
-                .map(({ skillId }) => mstSkillDetail.find({ id: skillId }).exec())
-        ); 
 
-        const out = new MessageEmbed()
-            .setTitle(`${collectionNo}. ${name} (\`${id}\`)`)
-            .setDescription(`Cost : ${cost}`)
-            .addField('Base effect', base);
-        
-        if (_) out.addField(`Maximum limit break effect`, _[0].detail)
-
-        m.channel.send(out)
+        let _ = await this.client.moduleHandler.findInstance(ce).get(data.id);
+        m.channel.send(_);
     }
 }

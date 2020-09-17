@@ -215,7 +215,7 @@ export class EmbedRenderer {
                 + `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})**`
                 + (stat?.amount ? ` of **${stat.amount[0]}**` : '')
                 + ` on **${f.affectTarget}**`
-                + (`\n` + stat?.other.map(_ => `${_.name} : ${_.value[0]}`).join('\n')).trimRight()
+                + (`\n` + (stat?.other.map(_ => `${_.name} : ${_.value[0]}`).join('\n') || '')).trimRight()
             )
         })
     
@@ -334,5 +334,22 @@ export class EmbedRenderer {
         .map((a, i, _) => a.setFooter(`${
             a.footer?.text ? `${a.footer.text} • ` : ''
         }Page ${++i}/${_.length}`));
+    }
+
+    craftEssenceEmbed = async (id : number) => {
+        let mstSvt = await this.JP.mstSvt.findOne({ id }).exec();
+        const { name, cost, collectionNo } = mstSvt;
+        // get all skills
+        let skillIds = await this.JP.mstSvtSkill.find({ svtId: id }).exec().then(d => d.map(s => s.skillId));
+        // sort for MLB
+        skillIds = skillIds.sort((a, b) => a - b);
+
+        let [base, mlb] = await Promise.all(skillIds.slice(0, 2).map((id) => this.passiveSkill(id)));
+        base.name = `Base`;
+        if (mlb) mlb.name = `Maximum limit break`;
+        return new MessageEmbed()
+            .setTitle(`${collectionNo}. ${name} (\`${id}\`)`)
+            .setDescription(`Cost : ${cost}`)
+            .addFields([base, mlb]);
     }
 }
