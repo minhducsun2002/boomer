@@ -1,7 +1,9 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { FgoCommand } from './baseCommand';
-import { NA } from '@pepper/db/fgo';
+import mst from '@pepper/modules/fgo/master-data';
 import { ERROR_COLOR } from '../../constants/colors';
+import { SvtType } from '@pepper/constants/fgo';
+import { mstSvtDocument } from '@pepper/db/fgo/master/mstSvt';
 import c from '@pepper/modules/fgo/ce-name-search';
 
 const commandName = 'show-craft-essence';
@@ -21,26 +23,51 @@ export = class extends FgoCommand {
     }
 
     async exec(m: Message, { q } : { q: string }) {
-        const err = new MessageEmbed().setColor(ERROR_COLOR)
-            .setDescription(
-                q
-                ? `Sorry, couldn't find anything that matched.`
-                : `:frowning: Where's your query?`
-            )
-        if (!q) return m.channel.send(err);
-        if (!q) return m.channel.send(err);
-        let results = await this.client.moduleHandler.findInstance(c).search(q);
+        const bail = () => m.channel.send(
+            new MessageEmbed().setColor(ERROR_COLOR)
+                .setDescription(
+                    q
+                    ? `I found no matching results. :frowning:`
+                    : `:frowning: Where's your query?`
+                )
+        );
+        if (!q) return bail();
+        let { JP: { mstSvt, mstSvtSkill, mstSkillDetail } } =
+            this.client.moduleHandler.findInstance(mst);
 
-        if (!results.length)
-            return m.channel.send(`I found no matching results. :frowning:`);
+        // searching method :
+        // 
+        // Detect if the query is a valid number.
+        // A valid number satisfies the following conditions :
+        // - greater than 0
+        // - integer
+        // 1. valid number : use text search.
+        // 2. not valid number : try the following methods one by one:
+        //    - search as if the query was collectionNo
+        //    - search as if the query was id
+        //    - use text search
+        let results = await this.client.moduleHandler.findInstance(c).search(q),
+            useSearch = isNaN(+q) || (!Number.isSafeInteger(+q)) || (!(+q > 0));
+        let data : mstSvtDocument;
+        if (useSearch && results.length) {
+            data = await mstSvt.findOne({ id: results[0].item.id, type: SvtType.SERVANT_EQUIP }).exec();
+        }
+        else {
+            data = await mstSvt.findOne({ collectionNo: +q, type: SvtType.SERVANT_EQUIP }).exec();
+            if (!data)
+                data = await mstSvt.findOne({ id: +q, type: SvtType.SERVANT_EQUIP }).exec();
+            if (!data) {
+                if (!results.length) return bail();
+                data = await mstSvt.findOne({ id: results[0].item.id, type: SvtType.SERVANT_EQUIP }).exec();
+            }
+        }
 
-        const data = await NA.mstSvt.find({ id: results[0].item.id }).limit(1).exec();
-        if (!data.length) return m.channel.send(err);
-        const [{ name, cost, collectionNo, id }] = data;
+        if (!data) return bail();
+        const { name, cost, collectionNo, id } = data;
         const [[{ detail: base }], _] = await Promise.all(
-            (await NA.mstSvtSkill.find({ svtId: id }).limit(2).exec())
+            (await mstSvtSkill.find({ svtId: id }).limit(2).exec())
                 .sort((a, b) => a.condLimitCount - b.condLimitCount)
-                .map(({ skillId }) => NA.mstSkillDetail.find({ id: skillId }).exec())
+                .map(({ skillId }) => mstSkillDetail.find({ id: skillId }).exec())
         ); 
 
         const out = new MessageEmbed()
