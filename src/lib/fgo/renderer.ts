@@ -348,6 +348,7 @@ export class EmbedRenderer {
         base.name = `Base`;
         if (mlb) mlb.name = `Maximum limit break`;
         return new MessageEmbed()
+            .setURL(`https://apps.atlasacademy.io/db/#/JP/craft-essence/${id}`)
             .setTitle(`${collectionNo}. ${name} (\`${id}\`)`)
             .setDescription(`Cost : ${cost}`)
             .addFields([base, mlb]);
