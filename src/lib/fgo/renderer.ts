@@ -30,6 +30,9 @@ export class EmbedRenderer {
     NA : DBInstance;
     JP : DBInstance;
     complementary : comp;
+
+    singleLevelSkillLogger = new componentLog(`Single-level skill renderer`)
+
     constructor(NA : DBInstance, JP : DBInstance, _comp : comp) {
         this.NA = NA; this.JP = JP;
         this.complementary = _comp;
@@ -186,7 +189,12 @@ export class EmbedRenderer {
         return await Promise.all(_inv);
     }
 
-    passiveSkill = async (skillId: number, log = new componentLog(`Passive skill renderer`)) => {
+    /**
+     * Render skills that has only one level (i.e. CE skills or passive skills)
+     * @param skillId skill ID to render
+     * @param showTeam whether to include the side (player/enemy) that the skill applies
+     */
+    renderSingleLevelSkill = async (skillId: number, showTeam = true) => {
         let db = this.JP;
         let skill = await db.mstSkill.findOne({ id: skillId }).exec();
         let invocations = await this._prepareSkill(skill);
@@ -204,12 +212,13 @@ export class EmbedRenderer {
             if (f.rawBuffs.length) {
                 stat = await renderBuffStatistics(f.rawBuffs[0], vals, db)
                 .catch(e => {
-                    log.error(`Rendering buff stats of function ${f.id}, skill ${skillId} failed!`);
+                    this.singleLevelSkillLogger
+                        .error(`Rendering buff stats of function ${f.id}, skill ${skillId} failed!`);
                     throw e;
                 });
             }
             return (
-                (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '')
+                (showTeam && (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') || '')
                 + (stat?.chance ? `**${stat.chance[0]}** chance to\n` : '')
                 + `**[${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}]`
                 + `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})**`
@@ -296,7 +305,7 @@ export class EmbedRenderer {
                 .setFooter(`Noble Phantasm`)
         )
     
-        let passives = await Promise.all(classPassive.map(_ => this.passiveSkill(_)));
+        let passives = await Promise.all(classPassive.map(_ => this.renderSingleLevelSkill(_)));
         let ascItems = await this.renderAscensionItems(
             await this.JP.mstCombineLimit.find({ id: baseSvtId }).limit(5).exec()
         );
@@ -344,7 +353,7 @@ export class EmbedRenderer {
         // sort for MLB
         skillIds = skillIds.sort((a, b) => a - b);
 
-        let [base, mlb] = await Promise.all(skillIds.slice(0, 2).map((id) => this.passiveSkill(id)));
+        let [base, mlb] = await Promise.all(skillIds.slice(0, 2).map((id) => this.renderSingleLevelSkill(id, false)));
         base.name = `Base`;
         if (mlb) mlb.name = `Maximum limit break`;
         return new MessageEmbed()
