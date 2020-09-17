@@ -42,8 +42,8 @@ export = class extends FgoCommand {
         let search_instance = this.client.moduleHandler.findInstance(search);
         let cache_details = this.client.moduleHandler.findInstance(cache);
 
-        let bail = () => m.channel.send(
-            err.setDescription(':disappointed: Sorry, I could not find anything.')
+        let bail = (s? : string) => m.channel.send(
+            err.setDescription(s || ':disappointed: Sorry, I could not find anything.')
         )
 
         let _id : number, det = false;
@@ -57,10 +57,21 @@ export = class extends FgoCommand {
             _id = res[0].item.id;
         }
 
-        let e : MessageEmbed[] = [];
-        let cached = await cache_details.get(_id) as any[];
+        let e : MessageEmbed[] = [], cached: any[] = []
+        try {
+            cached = await cache_details.get(_id);
+        } catch {
+            if (det)
+            return bail(
+                `Did you search for servant with ID \`${_id}\`?`
+                + `\nIf you did, please note that I can only show playable servants,`
+                + `\nso Solomon, Tiamat & the likes won't be displayed. :frowning:`
+                + `\nIt is also possible that no servants with such ID exist.`
+            )
+        }
+
         cached.forEach(s => e.push(new MessageEmbed(s)));
-        
+            
         let notice = det ? '' : (
             `Search may not bring up the expected result.`
             + `\nPlease use \`${
