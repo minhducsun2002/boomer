@@ -1,8 +1,8 @@
 import {
     CardType as Card,
-    AttributeModifier as attrMod,
     GenderModifier as genMod,
-    ClassModifier as claMod
+    ClassModifier as claMod,
+    Attribute
 } from '@pepper/constants/fgo';
 import { Trait } from '@pepper/constants/fgo/strings';
 import type { mstSvt } from '@pepper/db/fgo/master/mstSvt';
@@ -25,6 +25,7 @@ import type { Servant } from '@pepper/db/fgo/main';
 import comp from '@pepper/modules/fgo/complementary-data';
 
 type tr = keyof typeof Trait;
+const attribs = Object.values(Attribute);
 
 export class EmbedRenderer {
     NA : DBInstance;
@@ -59,12 +60,12 @@ export class EmbedRenderer {
      * @param inline Whether to make the field inline
      */
     traits = (svt: mstSvt, inline = false) : EmbedField => {
-        let { individuality, baseSvtId, attri, genderType, classId } = svt;
+        let { individuality, baseSvtId, genderType, classId } = svt;
         let ind = new Set(individuality);
             ind.delete(baseSvtId);
-            ind.delete(attri + attrMod);
             ind.delete(genderType + genMod);
             ind.delete(claMod + classId);
+        for (let a of attribs) ind.delete(a);
         return {
             name: 'Traits',
             value: [...ind].map(a => `* **${Trait[a as tr] || a}**`).join('\n'),
@@ -91,7 +92,7 @@ export class EmbedRenderer {
         tdLv: mstTreasureDeviceLv
     ) => {
         let { hpBase, hpMax, atkBase, atkMax } = limits[0],
-            { cardIds, starRate, attri, genderType } = svt,
+            { cardIds, starRate, attri, genderType, individuality } = svt,
             { tdPoint, tdPointDef } = tdLv,
             ccount = (_ : Card) => cardIds.reduce((b, a) => a === _ ? b + 1 : b, 0),
             dmg = cards.sort((a, b) => a.cardId - b.cardId)
@@ -117,7 +118,9 @@ export class EmbedRenderer {
             inline
         }, {
             name: 'Gender / Attribute', 
-            value: `${Trait[(genderType + genMod) as tr]} / ${Trait[(attri + attrMod) as tr]}`,
+            value: `${Trait[(genderType + genMod) as tr]} / ${Trait[
+                individuality.find(a => attribs.includes(a)) as tr
+            ]}`,
             inline
         }, {
             name: 'Cards / Damage distribution by %',

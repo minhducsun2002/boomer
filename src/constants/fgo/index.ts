@@ -798,8 +798,6 @@ export const Attribute = {
     HEAVEN: Trait.attributeSky,
 }
 
-/** Plus mstSvt.attri to get trait */
-export const AttributeModifier = 199;
 /** Plus mstSvt.gender to get trait */
 export const GenderModifier = 0;
 /** Plus mstSvt.classId to get trait */
