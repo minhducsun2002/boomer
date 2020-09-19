@@ -105,6 +105,7 @@ export function parseVals_enhanced (s : string, f : FuncType) {
 
     let match = mappings.find(a => a.condition.includes(f));
     if (match) populate(match.values);
+    else populate(["Rate", "Value", "Target"])
     if (EVENT_FUNCTIONS.has(f) || FRIEND_FUNCTIONS.add(FuncType.CLASS_DROP_UP).has(f)) 
         out.set(+out.get("Type1") === 1 ? "AddCount" : "RateCount", out.get("Exp1"));
 
