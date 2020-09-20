@@ -367,6 +367,6 @@ export class EmbedRenderer {
             .setURL(`https://apps.atlasacademy.io/db/#/JP/craft-essence/${id}`)
             .setTitle(`${collectionNo}. ${name} (\`${id}\`)`)
             .setDescription(`Cost : ${cost}`)
-            .addFields([base, mlb]);
+            .addFields([base, mlb].filter(a => a));
     }
 }
