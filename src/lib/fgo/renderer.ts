@@ -196,8 +196,10 @@ export class EmbedRenderer {
      * Render skills that has only one level (i.e. CE skills or passive skills)
      * @param skillId skill ID to render
      * @param showTeam whether to include the side (player/enemy) that the skill applies
+     * @param showChance whether to show chance of skill trigger (CEs will not need this enabled)
+     * @param newline whether to include another newline to separate skill effects
      */
-    renderSingleLevelSkill = async (skillId: number, showTeam = true) => {
+    renderSingleLevelSkill = async (skillId: number, showTeam = true, showChance = true, newline = true) => {
         let db = this.JP;
         let skill = await db.mstSkill.findOne({ id: skillId }).exec();
         let invocations = await this._prepareSkill(skill);
@@ -224,9 +226,11 @@ export class EmbedRenderer {
                 stat = renderFunctionStatistics(f.rawType, vals);
             }
             let targets = f.targets.map(a => `[${a.trim()}]`).join(', ');
+            let team = showTeam ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
+            let chance = (stat?.chance ? `**${stat.chance[0]}** chance to\n` : '');
             return (
-                (showTeam && (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') || '')
-                + (stat?.chance ? `**${stat.chance[0]}** chance to\n` : '')
+                team
+                + (showChance ? chance : '')
                 + `**[${f.action}${targets ? ' ' + targets : ''}]`
                 + `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})**`
                 + (stat?.amount ? ` of **${stat.amount[0]}**` : '')
@@ -237,7 +241,7 @@ export class EmbedRenderer {
     
         return {
             name: skill.name,
-            value: (await Promise.all(values)).join('\n\n') 
+            value: (await Promise.all(values)).join(newline ? '\n\n' : '\n') 
         };
     }
 
@@ -360,7 +364,8 @@ export class EmbedRenderer {
         // sort for MLB
         skillIds = skillIds.sort((a, b) => a - b);
 
-        let [base, mlb] = await Promise.all(skillIds.slice(0, 2).map((id) => this.renderSingleLevelSkill(id, false)));
+        let [base, mlb] = await Promise.all(skillIds.slice(0, 2)
+            .map((id) => this.renderSingleLevelSkill(id, false, false, false)));
         base.name = `Base`;
         if (mlb) mlb.name = `Maximum limit break`;
         return new MessageEmbed()

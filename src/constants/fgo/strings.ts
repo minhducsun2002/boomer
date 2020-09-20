@@ -191,7 +191,7 @@ export const FuncTypes = {
     [fType.CHANGE_BG]: '',
     [fType.CHANGE_BGM]: '',
     [fType.CHANGE_SERVANT]: '',
-    [fType.CLASS_DROP_UP]: '',
+    [fType.CLASS_DROP_UP]: 'Increase drop up for class weak against this servant',
     [fType.DAMAGE]: 'Deal damage',
     [fType.DAMAGE_NP]: 'Deal NP damage',
     [fType.DAMAGE_NP_AND_CHECK_INDIVIDUALITY]: '',
