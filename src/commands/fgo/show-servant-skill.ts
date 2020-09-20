@@ -59,8 +59,10 @@ export = class extends FgoCommand {
                     detail.split('\n').filter(a=>a).map(a=>`- ${a}`).join('\n') 
                     + `\n`
                     + records.map(
-                        ({ effectName : n, effectStrength : s }) => `**[${sentence(n)}]** : ${s.join(' / ')}`
-                    ).join('\n')
+                        ({ effectName : n, effectStrength : s }) => n ? `**[${sentence(n)}]** : ${s.join(' / ')}` : ''
+                    )
+                    .filter(a => a)
+                    .join('\n')
                     + `\n_(${condition})_`
                 )
             })
