@@ -15,7 +15,7 @@ import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import type { mstCombineLimit } from '@pepper/db/fgo/master/mstCombineLimit';
 import type { mstCombineSkill } from '@pepper/db/fgo/master/mstCombineSkill';
 import { MessageEmbed, EmbedField } from 'discord.js';
-import { renderInvocation } from './func';
+import { renderInvocation, renderFunctionStatistics } from './func';
 import { zipMap, componentLog } from '@pepper/utils';
 import { parseVals_enhanced } from './datavals';
 import { renderBuffStatistics } from './buff';
@@ -211,7 +211,7 @@ export class EmbedRenderer {
     
             // dedupe the values
             vals.forEach((v, k) => vals.set(k, [...new Set(v)]));
-            let stat : PromiseValue<ReturnType<typeof renderBuffStatistics>>;
+            let stat : PromiseValue<ReturnType<typeof renderBuffStatistics>> | ReturnType<typeof renderFunctionStatistics>;
             if (f.rawBuffs.length) {
                 stat = await renderBuffStatistics(f.rawBuffs[0], vals, db)
                 .catch(e => {
@@ -220,14 +220,18 @@ export class EmbedRenderer {
                     throw e;
                 });
             }
+            else {
+                stat = renderFunctionStatistics(f.rawType, vals);
+            }
+            let targets = f.targets.map(a => `[${a.trim()}]`).join(', ');
             return (
                 (showTeam && (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') || '')
                 + (stat?.chance ? `**${stat.chance[0]}** chance to\n` : '')
-                + `**[${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}]`
+                + `**[${f.action}${targets ? ' ' + targets : ''}]`
                 + `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})**`
                 + (stat?.amount ? ` of **${stat.amount[0]}**` : '')
                 + ` on **${f.affectTarget}**`
-                + (`\n` + (stat?.other.map(_ => `${_.name} : ${_.value[0]}`).join('\n') || '')).trimRight()
+                + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value[0]}`).join('\n') || '')).trimRight()
             )
         })
     

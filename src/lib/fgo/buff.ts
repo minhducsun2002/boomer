@@ -15,8 +15,8 @@ export async function getBuffById(id: number, db : DBInstance) {
 }
 
 
-type BuffEntry = { name: string, value: string[] };
-function renderTurn(s : string[]) : BuffEntry {
+export type BuffEntry = { name: string, value: string[] };
+export function renderTurn(s : string[]) : BuffEntry {
     // only handle turns > 0
     if (s.some(_ => +_ > 0)) return {
         name: ValsType[vType.Turn],
@@ -24,35 +24,37 @@ function renderTurn(s : string[]) : BuffEntry {
     };
 }
 
-function renderCount(s : string[]) : BuffEntry {
+export function renderCount(s : string[]) : BuffEntry {
     if (s.some(_ => +_ > 0)) return {
         name: ValsType[vType.Count],
         value: s.map(_ => `${(+_ / 10)}`)
     }
 }
 
-function renderChance(s : string[]) : BuffEntry {
+export function renderChance(s : string[]) : BuffEntry {
     return {
         name: ValsType[vType.Rate],
         value: s.map(_ => `${(+_ / 10)}%`)
     }
 }
 
+export type Statistics = {
+    // special fields, rendered differently
+    // all of these can always be represented as buff entries
+    chance: string[],
+    turn: string[],
+    count: string[],
+    amount: string[],
+
+    other: BuffEntry[]
+};
+
 /**
  * Render a buff with zipped vals into statistics.
  */
 export async function renderBuffStatistics(buff : mstBuff, val : Map<string, string[]>, db : DBInstance) {
     let out = [] as BuffEntry[];
-    let _ = {} as {
-        // special fields, rendered differently
-        // all of these can always be represented as buff entries
-        chance: string[],
-        turn: string[],
-        count: string[],
-        amount: string[],
-
-        other: BuffEntry[]
-    }
+    let _ = {} as Statistics;
 
     let chance = () => _.chance = renderChance(val.get(ValsKey[vType.Rate]))?.value;
 

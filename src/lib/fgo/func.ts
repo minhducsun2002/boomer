@@ -1,6 +1,9 @@
 import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
 import { getBuffById } from './buff';
+import { ValsType as vType } from '@pepper/constants/fgo';
+import { ValsKey as vKey } from '@pepper/constants/fgo/strings';
+import { Statistics, renderChance, renderCount } from './buff';
 
 import {
     ApplyTarget as aTgt,
@@ -64,7 +67,8 @@ export async function renderInvocation({
         popupText,
         onTeam: teamApply,
         affectTarget: target,
-        rawBuffs: buff as mstBuff[]
+        rawBuffs: buff as mstBuff[],
+        rawType: funcType
     }
 }
 
@@ -73,4 +77,17 @@ function isSimpleEffect(_ : mstBuff | { name: string, simple: number }) : _ is {
     name: string, simple: number
 } {
     return (_ as mstBuff).type === undefined;
+}
+
+export function renderFunctionStatistics (f: FuncType, val : Map<string, string[]>) {
+    let out = {} as Statistics;
+
+    if (val.has('AddCount')) out.amount = val.get('AddCount');
+    if (val.has(vKey[vType.Rate])) out.chance = renderChance(val.get(vKey[vType.Rate]))?.value;
+    if (val.has(vKey[vType.Count])) out.amount = renderCount(val.get(vKey[vType.Count]))?.value;
+    if (val.has(vKey[vType.Value])) {
+        if (f === FuncType.GAIN_NP)
+            out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 100)}%`)
+    }
+    return out;
 }

@@ -5,7 +5,7 @@ import { ERROR_COLOR } from '../../constants/colors';
 import { SvtType } from '@pepper/constants/fgo';
 import { mstSvtDocument } from '@pepper/db/fgo/master/mstSvt';
 import c from '@pepper/modules/fgo/ce-name-search';
-import ce from '@pepper/modules/fgo/ce-details-preprocess';
+import ce from '@pepper/modules/fgo/ce-details-cache';
 
 const commandName = 'show-craft-essence';
 const aliases = [commandName, 'ce']
@@ -65,6 +65,6 @@ export = class extends FgoCommand {
         if (!data) return bail();
 
         let _ = await this.client.moduleHandler.findInstance(ce).get(data.id);
-        m.channel.send(_);
+        m.channel.send(new MessageEmbed(_));
     }
 }
