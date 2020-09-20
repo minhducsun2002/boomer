@@ -92,7 +92,7 @@ export class EmbedRenderer {
         tdLv: mstTreasureDeviceLv
     ) => {
         let { hpBase, hpMax, atkBase, atkMax } = limits[0],
-            { cardIds, starRate, attri, genderType, individuality } = svt,
+            { cardIds, starRate, genderType, individuality } = svt,
             { tdPoint, tdPointDef } = tdLv,
             ccount = (_ : Card) => cardIds.reduce((b, a) => a === _ ? b + 1 : b, 0),
             dmg = cards.sort((a, b) => a.cardId - b.cardId)
