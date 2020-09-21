@@ -49,7 +49,8 @@ export = class extends FgoCommand {
         let results = await this.client.moduleHandler.findInstance(c).search(q),
             useSearch = isNaN(+q) || (!Number.isSafeInteger(+q)) || (!(+q > 0));
         let data : mstSvtDocument;
-        if (useSearch && results.length) {
+        if (useSearch) {
+            if (!results.length) return bail();
             data = await mstSvt.findOne({ id: results[0].item.id, type: SvtType.SERVANT_EQUIP }).select('id').exec();
         }
         else {
