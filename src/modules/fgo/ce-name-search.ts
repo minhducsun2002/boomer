@@ -68,7 +68,7 @@ export = class extends FgoModule {
             {
                 keys: ['name'],
                 includeScore: true,
-                minMatchCharLength: 3,
+                minMatchCharLength: 1,
                 ignoreLocation: true
             },
             index

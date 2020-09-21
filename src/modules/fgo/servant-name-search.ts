@@ -102,7 +102,7 @@ export = class extends FgoModule {
                     weight: 1.5
                 }],
                 includeScore: true,
-                minMatchCharLength: 3,
+                minMatchCharLength: 1,
                 ignoreLocation: true
             },
             index
