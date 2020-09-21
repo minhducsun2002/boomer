@@ -4,6 +4,7 @@ import { paginatedEmbed } from '@pepper/utils'
 import { ERROR_COLOR } from '@pepper/constants/colors';
 import search from '@pepper/modules/fgo/servant-name-search';
 import cache from '@pepper/modules/fgo/servant-details-preprocess';
+import mst from '@pepper/modules/fgo/master-data';
 
 const commandName = 'servant-info';
 const aliases = ['servant', 'servant-info', 's'];
@@ -17,11 +18,6 @@ export = class extends FgoCommand {
                 match: 'rest',
                 description: 'Search query. Can be a servant ID.',
                 type: 'string'
-            }, {
-                id: 'class',
-                match: 'option',
-                description: 'Filtering by class',
-                flag: ['-c', '-c=', '/c:', '--class=', '/class:']
             }],
             typing: true,
             description: 'Show a servant\'s details.',
@@ -41,6 +37,7 @@ export = class extends FgoCommand {
 
         let search_instance = this.client.moduleHandler.findInstance(search);
         let cache_details = this.client.moduleHandler.findInstance(cache);
+        let master = this.client.moduleHandler.findInstance(mst);
 
         let bail = (s? : string) => m.channel.send(
             err.setDescription(s || ':disappointed: Sorry, I could not find anything.')
@@ -57,18 +54,25 @@ export = class extends FgoCommand {
             _id = res[0].item.id;
         }
 
-        let e : MessageEmbed[] = [], cached: any[] = []
+        let e : MessageEmbed[] = [], cached: any[] = [], found = true;
         try {
             cached = await cache_details.get(_id);
         } catch {
-            if (det)
-            return bail(
-                `Did you search for servant with ID \`${_id}\`?`
-                + `\nIf you did, please note that I can only show playable servants,`
-                + `\nso Solomon, Tiamat & the likes won't be displayed. :frowning:`
-                + `\nIt is also possible that no servants with such ID exist.`
-            )
+            // not found, last try
+            let svt = await master.JP.mstSvt.findOne({ id: _id }).select('collectionNo').exec();
+            if (!svt) found = false;
+            try { cached = await cache_details.get(svt.collectionNo); } catch { found = false; }
         }
+
+        if (!found)
+            return bail(
+                det ? (
+                    `Did you search for servant with ID \`${_id}\`?`
+                    + `\nIf you did, please note that I can only show playable servants,`
+                    + `\nso Solomon, Tiamat & the likes won't be displayed. :frowning:`
+                    + `\nIt is also possible that no servants with such ID exist.`
+                ) : ''
+            );
 
         cached.forEach(s => e.push(new MessageEmbed(s)));
             
