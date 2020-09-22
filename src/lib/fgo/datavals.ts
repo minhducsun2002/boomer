@@ -91,7 +91,7 @@ export function parseVals_enhanced (s : string, f : FuncType) {
         values: ["Individuality", "RateCount", "EventId"]
     }, {
         condition: [FuncType.FRIEND_POINT_UP, FuncType.FRIEND_POINT_UP_DUPLICATE],
-        value: ["AddCount"]
+        values: ["AddCount"]
     }, {
         condition: [...EVENT_FUNCTIONS],
         values: ["Individuality", "Type1", "Exp1", "EventId"]
