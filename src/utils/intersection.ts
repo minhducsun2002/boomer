@@ -1,3 +1,7 @@
+/**
+ * Find intersections of sets
+ * @param sets List of sets to find intersections
+ */
 export function findSetIntersection<T>(...sets: Set<T>[]) : Set<T> {
     if (!sets.length) return new Set();
     // check for index 

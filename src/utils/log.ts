@@ -11,27 +11,39 @@ const Prefixes = {
     Success: chalk.bgGreenBright.black('[✓]')
 }
 
-const gen = (ss: str) => (s: str, _ = '') => log.log(s, ss + _)
+/** Generate a logging function to prefix logs with a certain string */
+function gen (ss: str) {
+    return (s: str, _ = '') => log.log(s, ss + _)
+}
+
 const log = {
     error : gen(Prefixes.Error),
     warning : gen(Prefixes.Warning),
     info : gen(Prefixes.Info),
     success : gen(Prefixes.Success),
 
-    log : (s: str, p : str) => {
+    log : (log: str, prefix : str) => {
         if (process.env.NODE_ENV === environmentMode.testing) return;
-        let _ = `${s}`.split('\n'), d = `${new Date().toJSON()}`; 
-        c.log(`${chalk.magentaBright(d)}| ${p} ${_[0]}`);
+        let _ = `${log}`.split('\n'), d = `${new Date().toJSON()}`; 
+        c.log(`${chalk.magentaBright(d)}| ${prefix} ${_[0]}`);
         _.slice(1).forEach(a => c.log(`${' '.repeat(d.length)}| ${
-            ' '.repeat(ss(p).length)
+            ' '.repeat(ss(prefix).length)
         } ${a}`))
     }
 }
 
+/**
+ * Simple class to categorize log messages.
+ */
 export class componentLog {
     private p = '';
-    constructor(s : str, bg = '#ffffff', fg = '#000000') {
-        this.p = ' ' + chalk.bgHex(bg).hex(fg)(`[${s}]`);
+    /**
+     * @param tag "Tag" of the log. Will be printed after log category, but before log message
+     * @param bg Background colour of the tag text
+     * @param fg Foreground colour of the tag text
+     */
+    constructor(tag : str, bg = '#ffffff', fg = '#000000') {
+        this.p = ' ' + chalk.bgHex(bg).hex(fg)(`[${tag}]`);
     }
 
     error = (s : str) => log.error(s, this.p)
