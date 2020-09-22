@@ -37,7 +37,9 @@ export = class extends FgoModule {
             try {
                 // let _ = await this.handler.findInstance(m).get(s);
                 // if (!_) throw new Error(`CE with ID ${s} not found!`)
-                this.push(s, await this.process(s));
+                let rendered = await this.process(s)
+                this.push(s, rendered);
+                return rendered;
             } catch (e) {
                 this.log.error(`Key ${s} is not found in cache & re-render failed!`);
                 this.log.error(e.stack);
