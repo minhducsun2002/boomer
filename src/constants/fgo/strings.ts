@@ -227,7 +227,7 @@ export const FuncTypes = {
     [fType.FIX_COMMANDCARD]: 'Lock card deck',
     [fType.FORCE_ALL_BUFF_NOACT]: '',
     [fType.FORCE_INSTANT_DEATH]: 'Apply Instant Death',
-    [fType.FRIEND_POINT_UP]: 'Increase friend point gained',
+    [fType.FRIEND_POINT_UP]: 'Friend point gain up',
     [fType.GAIN_HP]: 'Gain HP',
     [fType.GAIN_HP_FROM_TARGETS]: 'Drain HP from target',
     [fType.GAIN_HP_PER]: 'Gain HP based on percentage',
