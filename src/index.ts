@@ -36,6 +36,10 @@ client.commandHandler
                 .addField('Reason', rr[r as keyof typeof rr]())
         )
     })
+    .on('error', (e, m, c) => {
+        if (!c) return;
+        m.reply(client.extras.Embeds.COMMAND_ERROR(`${e}`, c as any));
+    })
     .loadAll();
 client.inhibitorHandler.loadAll();
 // initialize all modules
