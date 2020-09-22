@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { Beatmapset } from './beatmapset';
 import type { osuUser, osuUserExtra } from './user';
+import type { Score } from './score';
 import cheerio from 'cheerio';
 /**
  * Fetch data of a certain beatmapset, given its ID
@@ -82,4 +83,14 @@ export async function fetchRecentApi(key: string, user : string, mode = 0, limit
         countmiss: string, countkatu: string, countgeki: string,
         perfect: string, enabled_mods: string, user_id: string, date: string, rank: string
     }[]
+}
+
+export async function fetchScore(id : number, mode : string) {
+    const response = await axios.get(`https://osu.ppy.sh/scores/${mode}/${id}`, {
+        validateStatus: () => true
+    });
+    if (response.status === 404) throw new Error(`Score not found`)
+    if (response.status !== 200) throw new Error(`Expected status 200, got status ${response.status}`);
+    const dom = cheerio.load(response.data);
+    return JSON.parse(dom('#json-show').contents().first().text()) as Score;
 }

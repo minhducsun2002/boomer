@@ -10,3 +10,10 @@ export function checkURL (url : string) : { set?: number; id?: number; mode?: st
     let [mode] = (url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)#(osu|taiko|fruits|mania)\/(\d+)/) || []).slice(2)
     return { set, id, mode };
 }
+
+export function checkScoreURL (url : string) {
+    let match = url.match(/http(?:s)*:\/\/osu\.ppy\.sh\/scores\/(osu|taiko|fruits|mania)\/(\d+)/);
+    let valid = !!match;
+    if (!valid) throw new TypeError(`Not a score URL`);
+    else return { mode : match[1], id: +match[2] };
+}
