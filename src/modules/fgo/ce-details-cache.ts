@@ -43,7 +43,7 @@ export = class extends FgoModule {
                 this.log.error(e.stack);
             }
         }
-        return decode(readFileSync(file)) as MessageEmbed;
+        else return decode(readFileSync(file)) as MessageEmbed;
     }
 
     clean() {
