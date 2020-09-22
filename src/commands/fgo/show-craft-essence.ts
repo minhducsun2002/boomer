@@ -66,6 +66,7 @@ export = class extends FgoCommand {
         if (!data) return bail();
 
         let _ = await this.client.moduleHandler.findInstance(ce).get(data.id);
+        if (!_) throw new Error(`CE ID ${data.id} not found or failed to process`);
         m.channel.send(new MessageEmbed(_));
     }
 }
