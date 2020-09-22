@@ -165,10 +165,10 @@ export = class extends OsuCommand {
 
             let {
                 difficulty_rating, mode_int, version,
-                max_combo, ar, accuracy, cs, drain, total_length, id
+                max_combo, ar, cs, drain, total_length, id
             } = score.beatmap
             let {
-                perfect, max_combo : combo, mods, rank, pp, id: score_id,
+                perfect, max_combo : combo, mods, rank, pp, id: score_id, accuracy,
                 statistics: { count_miss, count_50, count_100, count_300 }
             } = score;
 
@@ -179,7 +179,7 @@ export = class extends OsuCommand {
                 .setDescription(
                     `\n${difficulty_rating} :star:${max_combo ? ` | **${max_combo}**x` : ''} | `
                     + `${pad(2)(Math.floor(total_length / 60))}:${pad(2)(total_length % 60)} | `
-                    + `[Link](https://osu.ppy.sh/beatmaps/${id})`
+                    + `[Beatmap link](https://osu.ppy.sh/beatmaps/${id})`
                     + `\n\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${accuracy}** \`HP\`**${drain}**\n`
                     + '\n'
                     + `(${count_300}/${count_100}/${count_50}/${count_miss})\n`
