@@ -242,6 +242,7 @@ export class EmbedRenderer {
                 + (addLink ? `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})` : '')
                 + (stat?.amount ? ` of **${stat.amount[0]}**` : '')
                 + ` on **${f.affectTarget}**`
+                + (stat.onField?.length ? ' when the wearer is on field' : '')
                 + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value[0]}`).join('\n') || '')).trimRight()
             )
         })

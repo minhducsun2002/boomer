@@ -259,7 +259,9 @@ export const FuncTypes = {
     [fType.SEND_SUPPORT_FRIEND_POINT]: '',
     [fType.SERVANT_FRIENDSHIP_UP]: 'Increase Bond points gained',
     [fType.SUB_STATE]: 'Remove effect with',
-    [fType.TRANSFORM_SERVANT]: 'Swap servant'
+    [fType.TRANSFORM_SERVANT]: 'Swap servant',
+    // https://apps.atlasacademy.io/db/#/JP/skill/962854
+    [fType.USER_EQUIP_EXP_UP]: 'Increase Mystic Code EXP Gain'
 }
 
 export const TargetType = {
@@ -312,6 +314,7 @@ export const BuffTypes = {
     [bType.DONOT_SKILL]: 'Skill Seal',
     [bType.DOWN_CRITICALPOINT]: 'Decrease Critical Point',
     [bType.DOWN_CRITICALRATE]: 'Decrease Critical Rate',
+    [bType.DOWN_DAMAGE]: 'Special Damage Down',
     [bType.DOWN_DEFENCE]: 'DEF Down',
     [bType.DOWN_DEFENCECOMMANDALL]: 'Resistance Down',
     [bType.DOWN_GRANTSTATE]: `Buff Chance Down`,
@@ -340,6 +343,7 @@ export const BuffTypes = {
     [bType.UP_CRITICALDAMAGE]: 'Critical Damage Up',
     [bType.UP_CRITICALPOINT]: 'C. Star Drop Rate Up',
     [bType.UP_CRITICALRATE]: 'Critical Rate Up',
+    [bType.UP_DAMAGE]: 'Special Damage Up',
     [bType.UP_DEFENCE]: `DEF Up`,
     [bType.UP_DROPNP]: 'NP Gain Up',
     [bType.UP_GRANTSTATE]: `Buff Chance Up`,

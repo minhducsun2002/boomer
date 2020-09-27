@@ -45,6 +45,7 @@ export type Statistics = {
     turn: string[],
     count: string[],
     amount: string[],
+    onField: string[],
 
     other: BuffEntry[]
 };
@@ -58,6 +59,8 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
 
     let chance = () => _.chance = renderChance(val.get(ValsKey[vType.Rate]))?.value;
 
+    // bond CEs' effects require target servants to stay on field
+    _.onField = val.get("OnField");
     switch (buff.type) {
         case Buff.UP_TOLERANCE:     case Buff.DOWN_TOLERANCE:
         case Buff.UP_COMMANDALL:    case Buff.DOWN_COMMANDALL:
@@ -65,6 +68,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_CRITICALPOINT: case Buff.DOWN_CRITICALPOINT:
         case Buff.UP_CRITICALRATE:  case Buff.DOWN_CRITICALRATE:
         case Buff.UP_CRITICALDAMAGE:case Buff.DOWN_CRITICALDAMAGE:
+        case Buff.UP_DAMAGE:        case Buff.DOWN_DAMAGE:
             chance();
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
