@@ -366,7 +366,8 @@ export class EmbedRenderer {
 
     craftEssenceEmbed = async (id : number) => {
         let mstSvt = await this.JP.mstSvt.findOne({ id }).exec();
-        const { name, cost, collectionNo } = mstSvt;
+        let { name, cost, collectionNo } = mstSvt;
+        let englishName = await this.complementary.svtObject.findOne({ id }).exec();
         // get all skills
         let skillIds = await this.JP.mstSvtSkill.find({ svtId: id }).exec().then(d => d.map(s => s.skillId));
         // sort for MLB
@@ -380,7 +381,7 @@ export class EmbedRenderer {
         if (mlb) mlb.name = `Maximum limit break`;
         return new MessageEmbed()
             .setURL(`https://apps.atlasacademy.io/db/#/JP/craft-essence/${id}`)
-            .setTitle(`${collectionNo}. ${name} (\`${id}\`)`)
+            .setTitle(`${collectionNo}. ${englishName?.name || name} (\`${id}\`)`)
             .setDescription(`Cost : ${cost}`)
             .addFields([base, mlb].filter(a => a));
     }
