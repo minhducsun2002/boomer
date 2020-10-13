@@ -1,7 +1,7 @@
 import { Buff, ValsType as vType } from '@pepper/constants/fgo';
 import { ValsType, Trait, ValsKey } from '@pepper/constants/fgo/strings';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
-import { renderInvocation } from './func';
+import type { EmbedRenderer } from './renderer';
 import type { DBInstance } from '@pepper/db/fgo';
 
 /**
@@ -53,11 +53,11 @@ export type Statistics = {
 /**
  * Render a buff with zipped vals into statistics.
  */
-export async function renderBuffStatistics(buff : mstBuff, val : Map<string, string[]>, db : DBInstance) {
+export async function renderBuffStatistics(buff : mstBuff, val : Map<string, string[]>, renderer : EmbedRenderer) {
     let out = [] as BuffEntry[];
     let _ = {} as Statistics;
 
-    let chance = () => _.chance = renderChance(val.get(ValsKey[vType.Rate]))?.value;
+    let chance = () => _.chance = renderChance(val.get(ValsKey[vType.Rate]) || val.get(ValsKey[vType.UseRate]))?.value;
 
     // bond CEs' effects require target servants to stay on field
     _.onField = val.get("OnField");
@@ -70,6 +70,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_CRITICALDAMAGE:case Buff.DOWN_CRITICALDAMAGE:
         case Buff.UP_DAMAGE:        case Buff.DOWN_DAMAGE:
         case Buff.UP_GAIN_HP:       case Buff.DOWN_GAIN_HP:
+        case Buff.UP_DEFENCE:       case Buff.DOWN_DEFENCE:
         case Buff.UP_GIVEGAIN_HP:
         case Buff.UP_DAMAGEDROPNP:  case Buff.DOWN_DAMAGEDROPNP:
         case Buff.UP_DROPNP:        case Buff.DOWN_DROPNP:
@@ -91,18 +92,17 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${_}`);
             break;
         case Buff.COMMANDATTACK_FUNCTION:
+        case Buff.DEAD_FUNCTION:
             chance();
             let conditions = buff.ckSelfIndv.map(_ => Trait[_ as keyof typeof Trait]);
             {
-                let skills = val.get(ValsKey[vType.Value]).map(async (_sk, i) => {
-                    let skill = await db.mstSkillLv.findOne({ skillId: +_sk }).exec();
-                    let f = await renderInvocation(
-                        await db.mstFunc.findOne({ id: skill.funcId[0] }).exec(), db
-                    );
-                    let funcName = `${f.action} ${f.targets.map(a => `[${a.trim()}]`).join(', ')}`
-                    return `__**${+val.get(ValsKey[vType.UseRate])[i] / 10}**% chance to `
-                    + `[${funcName.trim()}] on **${f.affectTarget}**`
-                    + (f.onTeam ? ` (**${f.onTeam}** team)` : '') + '__'
+                let skills = val.get(ValsKey[vType.Value]).map(async (skillId, i) => {
+                    // if there's Value2, that indicates levels
+                    let level = (val.get(ValsKey[vType.Value2]) || [])[i] || '1';
+                    let effect = await renderer.renderSkill_asSingleLevel(+skillId, {
+                        showTeam: true, showChance: true, newline: false, addLink: false, level: (+level) - 1
+                    })
+                    return `__` + effect.value + `__`;
                 });
                 let value = await Promise.all(skills);
                 value[0] = '\n' + value[0];

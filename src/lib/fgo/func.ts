@@ -26,7 +26,7 @@ export async function renderInvocation({
         )
     );
     // ignore the traits?
-    buff = buff.filter(a => a);
+    buff = buff.filter(a => !(a as any)?.simple);
     let action = fTp[funcType as keyof typeof fTp];
     let traitVals = tvals.map(t => tr[t as keyof typeof tr]);
     if (
@@ -88,6 +88,8 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
     if (val.has(vKey[vType.Value])) {
         if (f === FuncType.GAIN_NP)
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 100)}%`)
+        if (f === FuncType.GAIN_HP)
+            out.amount = val.get(vKey[vType.Value])
     }
     return out;
 }

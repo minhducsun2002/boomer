@@ -158,6 +158,9 @@ export class EmbedRenderer {
         return await Promise.all(td);
     }
 
+    // return value :
+    // { func, vals }[]
+    // with vals being a Map<string, string[]>, with string[] being values of levels
     private _prepareSkill = async (s: mstSkill) => {
         let db = this.JP;
         let skillLevels = await db.mstSkillLv.find({ skillId: s.id }).exec();
@@ -193,15 +196,17 @@ export class EmbedRenderer {
     }
 
     /**
-     * Render skills that has only one level (i.e. CE skills or passive skills)
+     * Render skills that has only one level (i.e. CE skills or passive skills),
+     * or a level specified
      * @param skillId skill ID to render
      * @param opt.showTeam whether to include the side (player/enemy) that the skill applies
      * @param opt.showChance whether to show chance of skill trigger (CEs will not need this enabled)
      * @param opt.newline whether to include another newline to separate skill effects
      * @param opt.addLink whether to include link to function @ AA-DB
+     * @param opt.level choose skill levels to parse, certain skills have 2 levels
      */
-    renderSingleLevelSkill = async (skillId: number, opt = {
-        showTeam: true, showChance: true, newline: true, addLink: true
+    renderSkill_asSingleLevel = async (skillId: number, opt = {
+        showTeam: true, showChance: true, newline: true, addLink: true, level: 0
     }) => {
         let db = this.JP;
         let skill = await db.mstSkill.findOne({ id: skillId }).exec();
@@ -218,7 +223,7 @@ export class EmbedRenderer {
             vals.forEach((v, k) => vals.set(k, [...new Set(v)]));
             let stat : PromiseValue<ReturnType<typeof renderBuffStatistics>> | ReturnType<typeof renderFunctionStatistics>;
             if (f.rawBuffs.length) {
-                stat = await renderBuffStatistics(f.rawBuffs[0], vals, db)
+                stat = await renderBuffStatistics(f.rawBuffs[0], vals, this)
                 .catch(e => {
                     this.singleLevelSkillLogger
                         .error(`Rendering buff stats of function ${f.id}, skill ${skillId} failed!`);
@@ -229,22 +234,22 @@ export class EmbedRenderer {
                 stat = renderFunctionStatistics(f.rawType, vals);
             }
 
-            let { showTeam, showChance, addLink } = opt;
+            let { showTeam, showChance, addLink, level } = opt;
 
             let targets = f.targets.map(a => `[${a.trim()}]`).join(', ');
             let team = showTeam ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
-            let chance = (stat?.chance ? `**${stat.chance[0]}** chance to\n` : '');
+            let chance = (stat?.chance ? `**${stat.chance[level]}** chance to\n` : '');
             let functionAction = `**${f.action}${targets ? ' ' + targets : ''}**`;
             return (
                 team
                 + (showChance ? chance : '')
                 + (addLink ? `[${functionAction}]` : functionAction)
                 + (addLink ? `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})` : '')
-                + (stat?.amount ? ` of **${stat.amount[0]}**` : '')
+                + (stat?.amount ? ` of **${stat.amount[level]}**` : '')
                 + ` on **${f.affectTarget}**`
                 + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
                 + (stat.onField?.length ? ' when the wearer is on field' : '')
-                + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value[0]}`).join('\n') || '')).trimRight()
+                + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value[level]}`).join('\n') || '')).trimRight()
             )
         })
     
@@ -325,7 +330,7 @@ export class EmbedRenderer {
                 .setFooter(`Noble Phantasm`)
         )
     
-        let passives = await Promise.all(classPassive.map(_ => this.renderSingleLevelSkill(_)));
+        let passives = await Promise.all(classPassive.map(_ => this.renderSkill_asSingleLevel(_)));
         let ascItems = await this.renderAscensionItems(
             await this.JP.mstCombineLimit.find({ id: baseSvtId }).limit(5).exec()
         );
@@ -387,8 +392,8 @@ export class EmbedRenderer {
                 // sort skillIds for deterministicness
                 skillIds = skillIds.sort((a, b)=> a - b)
                 let resultsPromise = Promise.all(
-                    skillIds.map(id => this.renderSingleLevelSkill(id, {
-                        showTeam: false, showChance: false, newline: false, addLink: false
+                    skillIds.map(id => this.renderSkill_asSingleLevel(id, {
+                        showTeam: false, showChance: false, newline: false, addLink: false, level: 0
                     }))
                 )
                 let results = await resultsPromise;

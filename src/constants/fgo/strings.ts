@@ -306,6 +306,7 @@ export const BuffTypes = {
     [bType.BREAK_AVOIDANCE]: 'Sure Hit',
     [bType.CHANGE_COMMAND_CARD_TYPE]: 'Change card type',
     [bType.COMMANDATTACK_FUNCTION]: `Bonus effect on attacks`,
+    [bType.DEAD_FUNCTION]: 'Trigger skill upon death',
     [bType.DELAY_FUNCTION]: 'Trigger skill after duration',
     [bType.DONOT_ACT]: 'Stun',
     [bType.DONOT_NOBLE]: 'NP Seal',
