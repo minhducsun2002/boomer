@@ -369,20 +369,39 @@ export class EmbedRenderer {
         let { name, cost, collectionNo } = mstSvt;
         let englishName = await this.complementary.svtObject.findOne({ id }).exec();
         // get all skills
-        let skillIds = await this.JP.mstSvtSkill.find({ svtId: id }).exec().then(d => d.map(s => s.skillId));
+        let skillRecords = await this.JP.mstSvtSkill.find({ svtId: id }).exec();
+        // determining MLB skills
+        let condLimitCounts = skillRecords.map(a => a.condLimitCount);
+        let limitBase = Math.min(...condLimitCounts),
+            limitMax  = Math.max(...condLimitCounts);
         // sort for MLB
-        skillIds = skillIds.sort((a, b) => a - b);
+        let baseSkills = skillRecords.filter(a => a.condLimitCount === limitBase),
+            maxSkills  = skillRecords.filter(a => (a.condLimitCount === limitMax) && (a.condLimitCount !== limitBase));
+        
+        let [baseEffects, maxEffects] = [baseSkills, maxSkills]
+            .map(async (skills, idx) => {
+                let isBaseEffects = idx === 0;
+                let skillIds = skills.map(a => a.skillId);
 
-        let [base, mlb] = await Promise.all(skillIds.slice(0, 2)
-            .map((id) => this.renderSingleLevelSkill(id, {
-                showTeam: false, showChance: false, newline: false, addLink: false
-            })));
-        base.name = `Base`;
-        if (mlb) mlb.name = `Maximum limit break`;
+                // sort skillIds for deterministicness
+                skillIds = skillIds.sort((a, b)=> a - b)
+                let resultsPromise = Promise.all(
+                    skillIds.map(id => this.renderSingleLevelSkill(id, {
+                        showTeam: false, showChance: false, newline: false, addLink: false
+                    }))
+                )
+                let results = await resultsPromise;
+                // merge 
+                return {
+                    name: isBaseEffects ? 'Base' : 'Maximum limit break',
+                    value: results.map(a => a.value).join('\n')
+                };
+            })
+        let [base, max] = [await baseEffects, await maxEffects];
         return new MessageEmbed()
             .setURL(`https://apps.atlasacademy.io/db/#/JP/craft-essence/${id}`)
             .setTitle(`${collectionNo}. ${englishName?.name || name} (\`${id}\`)`)
             .setDescription(`Cost : ${cost}`)
-            .addFields([base, mlb].filter(a => a));
+            .addFields([base, max].filter(a => a.value));
     }
 }
