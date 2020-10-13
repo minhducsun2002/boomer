@@ -71,6 +71,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_DAMAGE:        case Buff.DOWN_DAMAGE:
         case Buff.UP_GAIN_HP:       case Buff.DOWN_GAIN_HP:
         case Buff.UP_GIVEGAIN_HP:
+        case Buff.UP_DAMAGEDROPNP:  case Buff.DOWN_DAMAGEDROPNP:
         case Buff.UP_DROPNP:        case Buff.DOWN_DROPNP:
         case Buff.UP_RESIST_INSTANTDEATH:
             chance();
