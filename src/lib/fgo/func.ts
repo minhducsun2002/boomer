@@ -76,7 +76,7 @@ export async function renderInvocation({
 function isSimpleEffect(_ : mstBuff | { name: string, simple: number }) : _ is {
     name: string, simple: number
 } {
-    return (_ as mstBuff).type === undefined;
+    return !!(_ as { simple: number })?.simple;
 }
 
 export function renderFunctionStatistics (f: FuncType, val : Map<string, string[]>) {
