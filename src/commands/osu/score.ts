@@ -164,7 +164,7 @@ export = class extends OsuCommand {
             let set = await fetchMapset(score.beatmapset.id, true);
 
             let {
-                difficulty_rating, mode_int, version,
+                difficulty_rating, mode_int, version, accuracy: od,
                 max_combo, ar, cs, drain, total_length, id
             } = score.beatmap
             let {
@@ -180,7 +180,7 @@ export = class extends OsuCommand {
                     `\n${difficulty_rating} :star:${max_combo ? ` | **${max_combo}**x` : ''} | `
                     + `${pad(2)(Math.floor(total_length / 60))}:${pad(2)(total_length % 60)} | `
                     + `[Beatmap link](https://osu.ppy.sh/beatmaps/${id})`
-                    + `\n\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${accuracy}** \`HP\`**${drain}**\n`
+                    + `\n\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${od}** \`HP\`**${drain}**\n`
                     + '\n'
                     + `(${count_300}/${count_100}/${count_50}/${count_miss})\n`
                     + `[**${rank}**] **${pp}**pp (**${combo}**x${+perfect ? '' : `/**${max_combo}**x`} | `
