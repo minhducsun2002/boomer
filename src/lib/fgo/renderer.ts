@@ -245,6 +245,7 @@ export class EmbedRenderer {
                 + (showChance ? chance : '')
                 + (addLink ? `[${functionAction}]` : functionAction)
                 + (addLink ? `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})` : '')
+                + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
                 + (stat?.amount ? ` of **${stat.amount[level]}**` : '')
                 + ` on **${f.affectTarget}**`
                 + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')

@@ -259,7 +259,7 @@ export const FuncTypes = {
     [fType.REVIVAL]: 'Revive',
     [fType.SEND_SUPPORT_FRIEND_POINT]: '',
     [fType.SERVANT_FRIENDSHIP_UP]: 'Increase Bond points gained',
-    [fType.SUB_STATE]: 'Remove effect with',
+    [fType.SUB_STATE]: 'Remove effects',
     [fType.TRANSFORM_SERVANT]: 'Swap servant',
     // https://apps.atlasacademy.io/db/#/JP/skill/962854
     [fType.USER_EQUIP_EXP_UP]: 'Increase Mystic Code EXP Gain'

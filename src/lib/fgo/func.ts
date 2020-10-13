@@ -28,7 +28,10 @@ export async function renderInvocation({
     // ignore the traits?
     buff = buff.filter(a => !(a as any)?.simple);
     let action = fTp[funcType as keyof typeof fTp];
+    // trait to determine eligibility
     let traitVals = tvals.map(t => tr[t as keyof typeof tr]);
+    // trait to affects
+    let traitToAffect = vals.map(t => tr[t as keyof typeof tr]);
     if (
         [
             FuncType.EVENT_DROP_UP,
@@ -37,7 +40,6 @@ export async function renderInvocation({
         ]
             .includes(funcType)
     ) {
-        traitVals = vals.map(t => tr[t as keyof typeof tr]);
         buff = [];
     }
     return {
@@ -61,6 +63,7 @@ export async function renderInvocation({
             }
         }),
         traitVals,
+        traitToAffect,
         /** Function ID. */
         id,
         /** Popup text in game when this function is invoked. */
