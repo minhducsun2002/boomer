@@ -182,8 +182,9 @@ export = class extends OsuCommand {
                     + `[Beatmap link](https://osu.ppy.sh/beatmaps/${id})`
                     + `\n\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${od}** \`HP\`**${drain}**\n`
                     + '\n'
-                    + `(${count_300}/${count_100}/${count_50}/${count_miss})\n`
-                    + `[**${rank}**] **${pp}**pp (**${combo}**x${+perfect ? '' : `/**${max_combo}**x`} | `
+                    + `[**${rank}**] **${pp}**pp ` 
+                    + `[${count_300}/${count_100}/${count_50}/${count_miss}]`
+                    + ` (**${combo}**x${+perfect ? '' : `/**${max_combo}**x`} | `
                     + `**${(accuracy * 100).toFixed(3)}**%) ${perfect ? '(FC)' : ''}\n`
                     + (mods.length ? `Mods : ${mods.join(', ')}\n` : '')
                     + `[Score link](https://osu.ppy.sh/scores/${modes[mode_int]}/${score_id})`
