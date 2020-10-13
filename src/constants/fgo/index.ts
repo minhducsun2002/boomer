@@ -715,6 +715,7 @@ export enum Trait {
     livingHuman = 2654,
     giant = 2666,
     childServant = 2667,
+    nobu = 2721,
     normalAttack0 = 3000,
     normalAttack1 = 3001,
     normalAttack2 = 3002,

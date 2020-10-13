@@ -159,6 +159,7 @@ export const Trait = {
     [t.illya]: 'Illya',
     [t.king]: 'King',
     [t.lamia]: 'Lamia',
+    [t.nobu]: 'Nobu',
     [t.oni]: 'Oni',
     [t.roman]: 'Roman',
     [t.riding]: 'Riding',
