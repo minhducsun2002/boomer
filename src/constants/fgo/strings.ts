@@ -316,6 +316,7 @@ export const BuffTypes = {
     [bType.DONOT_SKILL]: 'Skill Seal',
     [bType.DOWN_ATK]: 'ATK Down',
     [bType.DOWN_COMMANDALL]: 'Effectiveness Down',
+    [bType.DOWN_CRITICALDAMAGE]: 'Critical Damage Down',
     [bType.DOWN_CRITICAL_RATE_DAMAGE_TAKEN]: 'Critical Rate Resistance Up',
     [bType.DOWN_CRITICAL_STAR_DAMAGE_TAKEN]: 'C. Star Drop Resistance Up',
     [bType.DOWN_CRITICALPOINT]: 'C. Star Drop Rate Down',
