@@ -74,6 +74,8 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_DAMAGEDROPNP:  case Buff.DOWN_DAMAGEDROPNP:
         case Buff.UP_DROPNP:        case Buff.DOWN_DROPNP:
         case Buff.UP_RESIST_INSTANTDEATH:
+        case Buff.UP_NPDAMAGE:      case Buff.DOWN_NPDAMAGE:
+        case Buff.UP_COMMANDATK:    case Buff.DOWN_COMMANDATK:
             chance();
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
