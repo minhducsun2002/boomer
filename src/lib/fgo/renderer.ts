@@ -250,6 +250,7 @@ export class EmbedRenderer {
                 + ` on **${f.affectTarget}**`
                 + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
                 + (stat.onField?.length ? ' when the wearer is on field' : '')
+                + (f.fieldTraits.length ? ` if on ${f.fieldTraits.map(a => `__[${a}]__`).join(' & ')} field` : '')
                 + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value[level]}`).join('\n') || '')).trimRight()
             )
         })

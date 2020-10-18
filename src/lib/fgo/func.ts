@@ -15,7 +15,7 @@ import {
 import { FuncType } from '@pepper/constants/fgo';
 
 export async function renderInvocation({
-    vals, funcType, targetType, applyTarget, id, popupText, tvals
+    vals, funcType, targetType, applyTarget, id, popupText, tvals, questTvals
 } : mstFunc, db : Parameters<typeof getBuffById>[1]) {
     // list of buff IDs
     let teamApply = aTgt[applyTarget],
@@ -43,6 +43,7 @@ export async function renderInvocation({
         traitToAffect = vals.map(t => tr[t as keyof typeof tr]);
         buff = [];
     }
+    let fieldTraits = questTvals.map(trait => tr[trait as keyof typeof tr] || `${trait}`);
     return {
         /** Action that this function executes. Should map to `FuncType`. */
         action,
@@ -65,6 +66,8 @@ export async function renderInvocation({
         }),
         traitVals,
         traitToAffect,
+        /** Traits that on fields with them, this function is allowed to invoke. */
+        fieldTraits,
         /** Function ID. */
         id,
         /** Popup text in game when this function is invoked. */
