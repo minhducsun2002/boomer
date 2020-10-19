@@ -238,7 +238,9 @@ export class EmbedRenderer {
 
             let targets = f.targets.map(a => `[${a.trim()}]`).join(', ');
             let team = showTeam ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
-            let chance = (stat?.chance ? `**${stat.chance[level]}** chance to\n` : '');
+            let chance = stat?.chance?.[level] || stat?.chance?.[0];
+                // chance might be zipped
+                chance = (chance ? `**${chance}** chance to\n` : '');
             let functionAction = `**${f.action}${targets ? ' ' + targets : ''}**`;
             return (
                 team
