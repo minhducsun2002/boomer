@@ -111,7 +111,8 @@ export function embedScoreset(
                 .setFooter(`Page ${i + 1}/${c.length} | All times are UTC`)
             s.forEach(({
                 accuracy, mods, perfect, rank, max_combo,
-                beatmap: b, beatmapset: s, pp, created_at, id
+                beatmap: b, beatmapset: s, pp, created_at, id,
+                statistics: { count_miss, count_50, count_100, count_300 }
             }) => out.addField(
                 `${s.artist} - ${s.title} [${b.version}]`
                 + (mods.length ? `+${mods.join('')}` : ''),
@@ -122,13 +123,14 @@ export function embedScoreset(
                     : `**${(accuracy * 100).toFixed(3)}**% - **${max_combo}**x`
                 }`
                 + (perfect ? ` (FC)` : '')
-                + `\n@ **${
-                    new Date(created_at)
-                        .toLocaleString('vi-VN', { timeZone: 'UTC' })
-                }**`
                 + `\n${b.difficulty_rating} :star: `
                 + `- \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}** `
                 + `- **${b.bpm}** BPM`
+                + `\n[**${count_300}**/**${count_100}**/**${count_50}**/**${count_miss}**]`
+                + ` @ **${
+                    new Date(created_at)
+                        .toLocaleString('vi-VN', { timeZone: 'UTC' })
+                }**`
                 + `\n[[**Beatmap**]](https://osu.ppy.sh/b/${b.id}) `
                 + ` [[**Score**]](https://osu.ppy.sh/scores/${mode}/${id})`
             ))
