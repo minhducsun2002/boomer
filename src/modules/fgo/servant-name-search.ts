@@ -27,10 +27,15 @@ export = class extends FgoModule {
         if (t?.size) {
             // instead of removing, prioritise
             let match = [] as typeof res, mis = [] as typeof res;
-            // res = res.filter(_ => t.has(_.item.id))
             for (let r of res) 
                 (t.has(r.item.id) ? match : mis).push(r);
-            res = [...match.sort((a, b) => a.score - b.score), ...mis];
+            res = [...match.sort((a, b) => {
+                // compare by bucket count first
+                if (t.get(a.item.id) != t.get(b.item.id))
+                    return t.get(b.item.id) - t.get(a.item.id);
+                // if bucket count is the same, rely on score
+                return a.score - b.score;
+            }), ...mis];
         }
         return res;
     }
@@ -41,7 +46,24 @@ export = class extends FgoModule {
      * @returns A set of servant collectionNo.
      */
     tokenSearch(s : string) {
-        return this.tokens.get(s.trim().toLowerCase());
+        let queries = s.replace(/\s/g, ' ').split(' ').filter(Boolean);
+        let results = queries.map(q => this.tokens.get(q)).filter(Boolean);
+        console.log(results);
+        // split a query into an array of strings, called `tokens`
+        // get all servant IDs linked to a token, discarding tokens that link to no servants
+        let servants = new Set(results.map(tokenSet => [...tokenSet]).flat());
+        // sort all servants based on the number of buckets they appear in
+        let occurences = [...servants]
+            .map(
+                s => ({
+                    id: s,
+                    count: results.reduce((count, tokenSet) => count + (+!!tokenSet.has(s)), 0)
+                })
+            )
+            // sort descending
+            .sort((a, b) => b.count - a.count)
+
+        return new Map(occurences.map(({ id, count }) => [id, count]));
     }
 
     /**
@@ -75,21 +97,19 @@ export = class extends FgoModule {
         // warning for dupes sh*t
         this.verifyDupes(records);
 
-        // preparing for token-based search
-        records.map(r => ({
-            token: [r.alias, r.name].flat().map(_ => _.toLowerCase()),
-            id: r.id
-        })).forEach(_ => {
-            // for each aliases
-            let t = _.token, { id } = _;
-            // register aliases
-            t.forEach(token => {
+        for (let entry of records) {
+            let tokens = [entry.alias, entry.name].flat()
+                .map(a => a.replace(/\(/g, '').replace(/\)/g, ''))
+                .map(a => a.toLowerCase())
+                .map(a => a.split(' ').filter(Boolean))
+                .flat();
+            for (let token of tokens)
                 if (this.tokens.has(token))
-                    this.tokens.get(token).add(id);
+                    this.tokens.get(token).add(entry.id);
                 else
-                    this.tokens.set(token, new Set([id]))
-            })
-        })
+                    this.tokens.set(token, new Set([entry.id]));
+        }
+
         this.log.success(`Servant aliases tokenization complete.`);
 
         // building index
