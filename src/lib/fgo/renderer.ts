@@ -347,12 +347,6 @@ export class EmbedRenderer {
                 .setFooter(`Basic details`),
             base()
                 .addFields([this.traits(svt)]).setFooter('Traits'),
-            // cover case where no ascension material
-            (ascItems.length
-            ? base().addFields(ascItems).setFooter(`Ascension materials`)
-            : base().setDescription(`No materials needed.`).setFooter(`Ascension materials`)),
-            base()
-                .addFields(skillItems).setFooter(`Skill materials`),
             base()
             .addField(
                 'Active skill',
@@ -367,6 +361,12 @@ export class EmbedRenderer {
             )
             .setFooter(`Active skills`),
             base().addFields(passives).setFooter(`Passive skills`),
+            // cover case where no ascension material
+            (ascItems.length
+            ? base().addFields(ascItems).setFooter(`Ascension materials`)
+            : base().setDescription(`No materials needed.`).setFooter(`Ascension materials`)),
+            base()
+                .addFields(skillItems).setFooter(`Skill materials`),
             ...tdEmbed
         ]
         .map((a, i, _) => a.setFooter(`${
