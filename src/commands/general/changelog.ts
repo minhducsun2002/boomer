@@ -12,7 +12,7 @@ const client = new Octokit({
 const commandName = 'changelog';
 const aliases = [commandName, 'changes'];
 
-const max = 10;
+const max = 7;
 
 export = class extends GeneralCommand {
     constructor() {
@@ -36,7 +36,7 @@ export = class extends GeneralCommand {
             .setDescription(
                 data.map(({ html_url, sha, commit: { message }, committer: { login, html_url: c_url } }) => {
                     message = message.split('\n').filter(a=>a)[0];
-                    message = message.length > 55 ? message.slice(0, 55) + '...' : message;
+                    message = message.length > 50 ? message.slice(0, 50) + '...' : message;
                     return (
                         `[\`${sha.slice(0, 7)}\`](${html_url})|[\`${login}\`](${c_url}) ${message}`
                     )
