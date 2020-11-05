@@ -6,7 +6,7 @@ import { fetchUser, fetchBest, embedScoreset } from '@pepper/lib/osu';
 import { paginatedEmbed } from '@pepper/utils';
 
 const commandName = 'best';
-const aliases = [commandName];
+const aliases = [commandName, 'top'];
 
 const MAX_RESULTS = 100, MAX_SINGLE = 50;
 
