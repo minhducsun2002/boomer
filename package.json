@@ -10,10 +10,9 @@
   "scripts": {
     "transpile": "ttsc --project tsconfig.build.json",
     "start": "node dist/index.js",
-    "start:dev": "ts-node --compiler ttypescript src/index.ts",
     "build": "rimraf dist/ && npm run transpile",
     "build:test": "tsc --noEmit",
-    "dev": "ts-node-dev --compiler ttypescript --respawn --no-notify --prefer-ts --transpile-only src/index.ts",
+    "dev": "ts-node-dev --compiler ttypescript --respawn --no-notify --prefer-ts src/index.ts",
     "lint": "eslint src/**/* --ext .ts",
     "test:fgo:preprocess": "ts-node --compiler ttypescript tests/fgo/preprocess.ts"
   },
