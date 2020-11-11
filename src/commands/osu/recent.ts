@@ -30,13 +30,19 @@ export = class extends OsuCommand {
                 match: 'flag',
                 description: 'Whether to show failed plays. Use another method to get scores.',
                 flag: ['/f', '/failed']
+            }, {
+                id: 'limit',
+                match: 'option',
+                description: `Limit the number of plays to retrieve. Must not be greater than ${MAX_RESULTS}.`,
+                flag: ['/limit=', '/limit:'],
+                type: 'number'
             }],
             cooldown: 3 * 1000
             // 3s
         })
     }
 
-    async exec(m : Message, { user, mode, failed } = { user: '', mode: '', failed: false }) {
+    async exec(m : Message, { user, mode, failed, limit } = { user: '', mode: '', failed: false, limit: 20 }) {
         user = user.trim();
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
@@ -56,8 +62,11 @@ export = class extends OsuCommand {
                     .setURL(`https://osu.ppy.sh/users/${id}`)
                 
             } else {
+                // sanitize the number
+                if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
+                    limit = MAX_SINGLE;
                 // we got the ID, now we start fetching things
-                let recents = await fetchRecent(id, mode, MAX_RESULTS, MAX_SINGLE);
+                let recents = await fetchRecent(id, mode, limit, MAX_SINGLE);
                 embeds = embedScoreset(recents, username, id, mode)
                     .map(a => a.setTitle(`Recent plays of **${username}**`))
             }

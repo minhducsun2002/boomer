@@ -48,7 +48,7 @@ async function fetchScoreset(path : string, user: number, mode: string, max_resu
     while (init < max_result) {
         let _ = await axios.get(
             `https://osu.ppy.sh/users/${user}/scores/${path}?mode=${mode}`
-            + `&offset=${init}&limit=${max_single}`
+            + `&offset=${init}&limit=${Math.min(max_single, max_result - init)}`
         );
         if (_.status === 404) throw new Error(`User not found`)
         if (_.status !== 200) throw new Error(
@@ -58,6 +58,7 @@ async function fetchScoreset(path : string, user: number, mode: string, max_resu
         out = out.concat(_.data);
         if ((!_.data) || (!_.data.length)) break;
     }
+    if (out.length > max_result) out = out.slice(0, max_result);
     return out;
 }
 

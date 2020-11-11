@@ -24,13 +24,19 @@ export = class extends OsuCommand {
                 match: 'option',
                 description: `Gamemode to show. Can be ${modes.map(a => `\`${a}\``).join(', ')}.`,
                 flag: ['/']
+            }, {
+                id: 'limit',
+                match: 'option',
+                description: `Limit the number of plays to retrieve. Must not be greater than ${MAX_RESULTS}.`,
+                flag: ['/limit=', '/limit:'],
+                type: 'number'
             }],
             cooldown: 3 * 1000
             // 3s
         })
     }
 
-    async exec(m : Message, { user, mode } = { user: '', mode: '' }) {
+    async exec(m : Message, { user, mode, limit } = { user: '', mode: '', limit: 20 }) {
         user = user.trim();
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
@@ -40,7 +46,7 @@ export = class extends OsuCommand {
             let { user: { id, username } } = await fetchUser(user, mode);
             // we got the ID, now we start fetching things
 
-            let recents = await fetchBest(id, mode, MAX_RESULTS, MAX_SINGLE);
+            let recents = await fetchBest(id, mode, limit, MAX_SINGLE);
             
             if (recents.length) 
                 paginatedEmbed()
