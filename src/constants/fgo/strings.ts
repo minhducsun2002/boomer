@@ -266,13 +266,16 @@ export const FuncTypes = {
 }
 
 export const TargetType = {
+    [tType.COMMAND_TYPE_SELF_TREASURE_DEVICE]: '',
     [tType.ENEMY]: 'a single enemy on field',
     [tType.ENEMY_ALL]: 'all enemies on field',
     [tType.ENEMY_ANOTHER]: '',
     [tType.ENEMY_FULL]: 'all enemies',
+    [tType.ENEMY_ONE_ANOTHER_RANDOM]: '',
     [tType.ENEMY_OTHER]: '',
     [tType.ENEMY_OTHER_FULL]: '',
     [tType.ENEMY_RANDOM]: 'a random single enemy on field',
+    [tType.FIELD_OTHER]: 'everyone',
     [tType.PTSELECT_ONE_SUB]: 'a (chosen) backrow ally',
     [tType.PTSELECT_SUB]: '',
     [tType.PT_ALL]: 'all allies on field',
@@ -280,6 +283,11 @@ export const TargetType = {
     [tType.PT_FULL]: 'all allies',
     [tType.PT_ONE]: 'a (chosen) ally',
     [tType.PT_ONE_ANOTHER_RANDOM]: '',
+    [tType.PT_SELF_AFTER]: '',
+    [tType.PT_SELF_ANOTHER_FIRST]: 'first ally except self',
+    [tType.PT_SELF_ANOTHER_LAST]: '',
+    [tType.PT_SELF_ANOTHER_RANDOM]: 'a random ally except self',
+    [tType.PT_SELF_BEFORE]: '',
     [tType.PT_ONE_OTHER]: 'allies on field except the chosen one',
     [tType.PT_OTHER]: 'other allies on field',
     [tType.PT_OTHER_FULL]: 'other allies',
