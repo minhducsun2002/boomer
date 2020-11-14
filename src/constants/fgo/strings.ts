@@ -275,7 +275,7 @@ export const TargetType = {
     [tType.ENEMY_OTHER]: '',
     [tType.ENEMY_OTHER_FULL]: '',
     [tType.ENEMY_RANDOM]: 'a random single enemy on field',
-    [tType.FIELD_OTHER]: 'everyone',
+    [tType.FIELD_OTHER]: 'everyone on field except self',
     [tType.PTSELECT_ONE_SUB]: 'a (chosen) backrow ally',
     [tType.PTSELECT_SUB]: '',
     [tType.PT_ALL]: 'all allies on field',
