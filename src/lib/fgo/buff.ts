@@ -78,6 +78,8 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_NPDAMAGE:      case Buff.DOWN_NPDAMAGE:
         case Buff.UP_COMMANDATK:    case Buff.DOWN_COMMANDATK:
         case Buff.UP_STARWEIGHT:    case Buff.DOWN_STARWEIGHT:
+        case Buff.GUTS_RATIO:
+        case Buff.UP_GRANT_INSTANTDEATH:
             chance();
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
@@ -89,8 +91,9 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.ADD_DAMAGE:       case Buff.DOWN_DAMAGE:
         case Buff.REGAIN_STAR:
         case Buff.UP_DAMAGE_INDIVIDUALITY_ACTIVEONLY:
+        case Buff.SUB_MAXHP:
             chance();
-            _.amount = val.get(ValsKey[vType.Value]).map(_ => `${_}`);
+            _.amount = val.get(ValsKey[vType.Value]);
             break;
         case Buff.COMMANDATTACK_FUNCTION:
         case Buff.DEAD_FUNCTION:
