@@ -64,7 +64,7 @@ export = class extends OsuCommand {
             } else {
                 // sanitize the number
                 if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
-                    limit = MAX_SINGLE;
+                    limit = 20;
                 // we got the ID, now we start fetching things
                 let recents = await fetchRecent(id, mode, limit, MAX_SINGLE);
                 embeds = embedScoreset(recents, username, id, mode)

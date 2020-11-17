@@ -46,6 +46,8 @@ export = class extends OsuCommand {
             let { user: { id, username } } = await fetchUser(user, mode);
             // we got the ID, now we start fetching things
 
+            if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
+                limit = 20;
             let recents = await fetchBest(id, mode, limit, MAX_SINGLE);
             
             if (recents.length) 
@@ -59,7 +61,7 @@ export = class extends OsuCommand {
             else
                 m.channel.send(
                     new MessageEmbed()
-                        .setDescription(`No recent play found for user [**${username}**](https://osu.ppy.sh/users/${id}).`)
+                        .setDescription(`No top play found for user [**${username}**](https://osu.ppy.sh/users/${id}).`)
                 )
         }
         catch (e) {
