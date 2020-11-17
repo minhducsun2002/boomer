@@ -48,7 +48,6 @@ export = class extends FgoModule {
     tokenSearch(s : string) {
         let queries = s.replace(/\s/g, ' ').split(' ').filter(Boolean);
         let results = queries.map(q => this.tokens.get(q)).filter(Boolean);
-        console.log(results);
         // split a query into an array of strings, called `tokens`
         // get all servant IDs linked to a token, discarding tokens that link to no servants
         let servants = new Set(results.map(tokenSet => [...tokenSet]).flat());
