@@ -19,10 +19,10 @@ import { renderInvocation, renderFunctionStatistics } from './func';
 import { zipMap, componentLog } from '@pepper/utils';
 import { parseVals_enhanced } from './datavals';
 import { renderBuffStatistics } from './buff';
-import type { PromiseValue } from 'type-fest';
+import type { PromiseValue, RequireAtLeastOne } from 'type-fest';
 import type { DBInstance } from '@pepper/db/fgo';
 import type { Servant } from '@pepper/db/fgo/main';
-import comp from '@pepper/modules/fgo/complementary-data';
+import comp, { ComplementaryDataModel } from '@pepper/modules/fgo/complementary-data';
 
 type tr = keyof typeof Trait;
 const attribs = Object.values(Attribute);
@@ -30,11 +30,11 @@ const attribs = Object.values(Attribute);
 export class EmbedRenderer {
     NA : DBInstance;
     JP : DBInstance;
-    complementary : comp;
+    complementary : ComplementaryDataModel;
 
     singleLevelSkillLogger = new componentLog(`Single-level skill renderer`)
 
-    constructor(NA : DBInstance, JP : DBInstance, _comp : comp) {
+    constructor(NA : DBInstance, JP : DBInstance, _comp : ComplementaryDataModel) {
         this.NA = NA; this.JP = JP;
         this.complementary = _comp;
     }

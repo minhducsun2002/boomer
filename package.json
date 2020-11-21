@@ -14,7 +14,7 @@
     "build:test": "tsc --noEmit",
     "dev": "ts-node-dev --compiler ttypescript --respawn --no-notify --prefer-ts src/index.ts",
     "lint": "eslint src/**/* --ext .ts",
-    "test:fgo:preprocess": "ts-node --compiler ttypescript tests/fgo/preprocess.ts"
+    "prepare:ce": "ts-node --compiler ttypescript scripts/prepareCE.ts"
   },
   "author": "Minh Duc Vo <minhducsun2002@gmail.com>",
   "license": "CC-BY-4.0",
@@ -51,6 +51,7 @@
     "@types/node": "^12.12.17",
     "@types/rimraf": "^3.0.0",
     "@types/ws": "^7.2.1",
+    "@types/yargs": "^15.0.10",
     "@typescript-eslint/eslint-plugin": "^3.5.0",
     "@typescript-eslint/parser": "^3.5.0",
     "@zerollup/ts-transform-paths": "^1.7.18",
@@ -59,7 +60,8 @@
     "ts-node-dev": "^1.0.0-pre.49",
     "ttypescript": "^1.5.10",
     "type-fest": "^0.16.0",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.6",
+    "yargs": "^16.1.1"
   },
   "engines": {
     "node": ">=13.8.0"

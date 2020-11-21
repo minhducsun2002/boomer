@@ -2,24 +2,22 @@ import { componentLog } from '@pepper/utils';
 import { FgoModule } from './base';
 import { createConnection, Schema, Document, Model } from 'mongoose';
 
-interface SvtObject extends Document {
-    name: string; id: number;
+interface DataObject extends Document { name: string; id: number; } 
+const object = new Schema<DataObject>({ name: String, id: Number });
+const item = new Schema<DataObject>({ name: String, id: Number });
+export { object, item };
+export interface ComplementaryDataModel {
+    svtObject: Model<DataObject>;
+    item: Model<DataObject>;
 }
 
-const object = new Schema<SvtObject>({ name: String, id: Number });
-
-interface Item extends Document {
-    name: string; id: number;
-}
-const item = new Schema<Item>({ name: String, id: Number });
-
-export = class extends FgoModule {
+export default class extends FgoModule implements ComplementaryDataModel {
     constructor() {
         super(`complementary-data`)
     }
 
-    svtObject: Model<SvtObject>;
-    item: Model<Item>;
+    svtObject: Model<DataObject>;
+    item: Model<DataObject>;
     private log = new componentLog(`F/GO localized names`);
 
     async initialize() {
