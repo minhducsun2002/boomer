@@ -24,10 +24,10 @@ export function renderTurn(s : string[]) : BuffEntry {
     };
 }
 
-export function renderCount(s : string[]) : BuffEntry {
+export function renderCount(s : string[], tenfold = true) : BuffEntry {
     if (s.some(_ => +_ > 0)) return {
         name: ValsType[vType.Count],
-        value: s.map(_ => `${(+_ / 10)}`)
+        value: s.map(_ => `${tenfold ? (+_ / 10) : _}`)
     }
 }
 
@@ -58,6 +58,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
     let _ = {} as Statistics;
 
     let chance = () => _.chance = renderChance(val.get(ValsKey[vType.Rate]) || val.get(ValsKey[vType.UseRate]))?.value;
+    let count = (tenfold = true) => _.count = renderCount(val.get(ValsKey[vType.Count]), tenfold)?.value;
 
     // bond CEs' effects require target servants to stay on field
     _.onField = val.get("OnField");
@@ -78,20 +79,25 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_NPDAMAGE:      case Buff.DOWN_NPDAMAGE:
         case Buff.UP_COMMANDATK:    case Buff.DOWN_COMMANDATK:
         case Buff.UP_STARWEIGHT:    case Buff.DOWN_STARWEIGHT:
-        case Buff.GUTS_RATIO:
         case Buff.UP_GRANT_INSTANTDEATH:
             chance();
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
+        case Buff.GUTS_RATIO:
+            chance();
+            count(false);
+            _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
+            break;
         case Buff.AVOID_INSTANTDEATH:
             chance();
+            count();
             _.turn = renderTurn(val.get(ValsKey[vType.Turn]))?.value;
-            _.count = renderCount(val.get(ValsKey[vType.Count]))?.value;
             break;
         case Buff.ADD_DAMAGE:       case Buff.DOWN_DAMAGE:
         case Buff.REGAIN_STAR:
         case Buff.UP_DAMAGE_INDIVIDUALITY_ACTIVEONLY:
         case Buff.SUB_MAXHP:
+        case Buff.OVERWRITE_CLASSRELATIO_ATK:
             chance();
             _.amount = val.get(ValsKey[vType.Value]);
             break;
