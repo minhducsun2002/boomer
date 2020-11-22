@@ -19,10 +19,10 @@ import { renderInvocation, renderFunctionStatistics } from './func';
 import { zipMap, componentLog } from '@pepper/utils';
 import { parseVals_enhanced } from './datavals';
 import { renderBuffStatistics } from './buff';
-import type { PromiseValue, RequireAtLeastOne } from 'type-fest';
+import type { PromiseValue } from 'type-fest';
 import type { DBInstance } from '@pepper/db/fgo';
 import type { Servant } from '@pepper/db/fgo/main';
-import comp, { ComplementaryDataModel } from '@pepper/modules/fgo/complementary-data';
+import { ComplementaryDataModel } from '@pepper/modules/fgo/complementary-data';
 
 type tr = keyof typeof Trait;
 const attribs = Object.values(Attribute);
