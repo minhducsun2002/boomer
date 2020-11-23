@@ -1,5 +1,8 @@
 name: Linting check
-on: [push]
+on:
+  push:
+    paths:
+    - 'src/**'
 jobs:
   build:
     name: Linting
