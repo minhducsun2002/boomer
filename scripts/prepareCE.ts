@@ -28,22 +28,24 @@ const { masterData: { JP, NA }, complementary: { english_names } } = config.data
 const conns = { JP: createConnection(JP), NA: createConnection(NA), comp: createConnection(english_names) };
 const models = { JP: initializeMasterModels(conns.JP), NA: initializeMasterModels(conns.NA) }
 const renderer = new EmbedRenderer(
-    models.JP,
     models.NA,
+    models.JP,
     { svtObject: conns.comp.model('svt', object, 'svt'), item: conns.comp.model('items', item, 'items') }
 );
 
 models.JP.mstSvt.find({ type: SvtType.SERVANT_EQUIP }).select('id name')
     .exec()
     .then(async _ => {
+        let count = 0;
         log.info(`Found ${_.length} Craft Essences.`);
         for (let { id, name } of _)
             try {
                 let embed = await renderer.craftEssenceEmbed(id);
-                log.success(`Processed data of CE ${id}. ${chalk.bgBlue.yellowBright(name)}`);
+                let indexString = `[${`${count++}`.padStart(`${_.length}`.length, '0')}/${_.length}]`;
+                log.success(`${indexString} Processed data of CE ${id}. ${chalk.bgBlue.yellowBright(name)}`);
                 writeFileSync(join(path, `${id}.pepper.msgpack`), encode(embed));
             } catch (e) {
                 log.error(`Error processing CE ${id}.\n${e.stack}`)
             };
-        process.exit()
+        process.exit();
     })
