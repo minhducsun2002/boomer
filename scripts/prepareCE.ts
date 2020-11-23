@@ -10,7 +10,7 @@ import { componentLog } from '../src/utils';
 import { object, item } from '../src/modules/fgo/complementary-data';
 import { initializeMasterModels } from '../src/db/fgo/models'
 import { SvtType } from '../src/constants/fgo';
-const config = require('../config/development.json');
+const config = require('../config/test.json');
 
 import '../src/globals';
 

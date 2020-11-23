@@ -1,23 +1,77 @@
 name: Prepare FGO CE data
-on: [push]
+on:
+  push:
+    paths:
+    - '.github/workflows/ce.yml'
+    - 'src/**'
+    - 'scripts/prepareCE.ts'
 jobs:
   build:
     name: Prepare CE data
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # prepare the DB
+    - name: Prepare MongoDB instance
+      run: |
+        mkdir -p /tmp/mongodb
+        sudo mongod --fork --noauth --logpath /tmp/mongo.log --dbpath /tmp/mongodb --bind_ip_all --port 27017
+        echo '
+          use admin
+          db.createUser({
+              user: "test",pwd: "test",
+              roles: [{role:"userAdminAnyDatabase",db:"admin"},"readWriteAnyDatabase"]
+          })
+        ' | mongo --port 27017
+
+    # load game data
+    - name: Checkout database synchronizer
+      uses: actions/checkout@v2
+      with:
+        repository: minhducsun2002/atlasacademy-mongo
+        path: 'database'
+
+    - name: Checkout JP dataset
+      uses: actions/checkout@v2
+      with:
+        repository: atlasacademy/fgo-game-data
+        ref: JP
+        path: 'database/dataset/JP'
+        token: ${{ secrets.CONFIG_TOKEN }}  
+    - name: Checkout NA dataset
+      uses: actions/checkout@v2
+      with:
+        repository: atlasacademy/fgo-game-data
+        ref: NA
+        path: 'database/dataset/NA'
+        token: ${{ secrets.CONFIG_TOKEN }}
+      
+    - name: Sync dataset to local instance
+      run: cd database && env > env && docker build -t run . && docker run --network host --env-file env -t run
+      env:
+        HOST: localhost
+        USER: test
+        PASSWORD: test
+        SSL: ""
+
+    # run the script
     - uses: actions/setup-node@v1
       name: Setup Node.js
       with:
         node-version: '14.x'
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Install packages
+      run: yarn
     - name: Checkout config
       uses: actions/checkout@v2
       with: 
         repository: ${{ secrets.CONFIG_REPOSITORY }}
         path: config
         token: ${{ secrets.CONFIG_TOKEN }}
-    - name: Install packages
-      run: yarn
+    - name: Set test configuration to use local instance
+      run: |
+        cat config/test.json | jq '.database.fgo.masterData.JP = "mongodb://localhost/JP" | .database.fgo.masterData.NA = "mongodb://localhost/NA"' > config/test_new.json;
+        mv config/test_new.json config/test.json
     - name: Run the prepare script
       run: yarn prepare:ce
