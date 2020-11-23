@@ -1,0 +1,23 @@
+name: Prepare FGO CE data
+on: [push]
+jobs:
+  build:
+    name: Prepare CE data
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-node@v1
+      name: Setup Node.js
+      with:
+        node-version: '14.x'
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Checkout config
+      uses: actions/checkout@v2
+      with: 
+        repository: ${{ secrets.CONFIG_REPOSITORY }}
+        path: config
+        token: ${{ secrets.CONFIG_TOKEN }}
+    - name: Install packages
+      run: yarn
+    - name: Run the prepare script
+      run: yarn prepare:ce
