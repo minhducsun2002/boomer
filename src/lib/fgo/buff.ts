@@ -80,6 +80,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_COMMANDATK:    case Buff.DOWN_COMMANDATK:
         case Buff.UP_STARWEIGHT:    case Buff.DOWN_STARWEIGHT:
         case Buff.UP_GRANT_INSTANTDEATH:
+        case Buff.UP_FUNC_HP_REDUCE:
             chance();
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
@@ -105,24 +106,24 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.DEAD_FUNCTION:
             chance();
             let conditions = buff.ckSelfIndv.map(_ => Trait[_ as keyof typeof Trait]);
-            {
-                let skills = val.get(ValsKey[vType.Value]).map(async (skillId, i) => {
-                    // if there's Value2, that indicates levels
-                    let level = (val.get(ValsKey[vType.Value2]) || [])[i] || '1';
-                    let effect = await renderer.renderSkill_asSingleLevel(+skillId, {
-                        showTeam: true, showChance: true, newline: false, addLink: false, level: (+level) - 1
-                    })
-                    return `__` + effect.value + `__`;
-                });
-                let value = await Promise.all(skills);
-                value[0] = '\n' + value[0];
-                out.push({
-                    name: `Trigger skill on ${
-                        (conditions.length ? conditions : ['all cases']).join('/')
-                    }`,
-                    value
-                });
-            };
+            
+            let skills = val.get(ValsKey[vType.Value]).map(async (skillId, i) => {
+                // if there's Value2, that indicates levels
+                let level = (val.get(ValsKey[vType.Value2]) || [])[i] || '1';
+                let effect = await renderer.renderSkill_asSingleLevel(+skillId, {
+                    showTeam: true, showChance: true, newline: false, addLink: false, level: (+level) - 1
+                })
+                return `__` + effect.value + `__`;
+            });
+            let value = await Promise.all(skills);
+            value[0] = '\n' + value[0];
+            out.push({
+                name: `Trigger skill on ${
+                    (conditions.length ? conditions : ['all cases']).join('/')
+                }`,
+                value
+            });
+            
             break;
         case Buff.AVOID_STATE:
             chance();

@@ -375,6 +375,8 @@ export const BuffTypes = {
     [bType.UP_DAMAGE_INDIVIDUALITY_ACTIVEONLY]: 'Special Damage Plus',
     [bType.UP_DEFENCE]: `DEF Up`,
     [bType.UP_DROPNP]: 'NP Gain Up',
+    // [bType.UP_FUNC_HP_REDUCE]: 'Damage-per-turn Effectiveness Up',
+    [bType.UP_FUNC_HP_REDUCE]: 'Damage Up',
     [bType.UP_GAIN_HP]: 'Healing Up',
     [bType.UP_GIVEGAIN_HP]: 'Healing Up',
     [bType.UP_GRANTSTATE]: `Buff Chance Up`,
