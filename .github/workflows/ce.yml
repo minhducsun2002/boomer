@@ -74,4 +74,9 @@ jobs:
         cat config/test.json | jq '.database.fgo.masterData.JP = "mongodb://localhost/JP" | .database.fgo.masterData.NA = "mongodb://localhost/NA"' > config/test_new.json;
         mv config/test_new.json config/test.json
     - name: Run the prepare script
-      run: yarn prepare:ce
+      run: yarn prepare:ce --path /tmp/pepper_CE
+    - name: Push output as artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: pepper_CE_${{ github.sha }}
+        path: /tmp/pepper_CE
