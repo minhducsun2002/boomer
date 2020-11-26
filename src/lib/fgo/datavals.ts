@@ -24,8 +24,24 @@ function keyedArguments (s : string) : [string, string] {
     return [$, _];
 }
 
+function nestedSplitting (s : string) : string[] {
+    let out : string[] = [], depth = 0, current = '';
+    for (let char of s.split('')) {
+        if (char == ',' && !depth) {
+            out.push(current);
+            current = '';
+            continue;
+        }
+        if (char == '[') depth++;
+        if (char == ']') depth--;
+        current += char;
+    }
+    out.push(current);
+    return out;
+}
+
 export function parseVals (s : string, f : FuncType) {
-    let raw = s.replace('[', '').replace(']', '').split(',').filter(_ => _);
+    let raw = nestedSplitting(s.replace('[', '').replace(new RegExp(']$'), ''));
     let out = new Map<string, string>();
     
     let raw_clean = raw.filter(a => !isNaN(+a));
