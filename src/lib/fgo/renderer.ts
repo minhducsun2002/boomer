@@ -16,7 +16,7 @@ import type { mstCombineLimit } from '@pepper/db/fgo/master/mstCombineLimit';
 import type { mstCombineSkill } from '@pepper/db/fgo/master/mstCombineSkill';
 import { MessageEmbed, EmbedField } from 'discord.js';
 import { renderInvocation, renderFunctionStatistics } from './func';
-import { zipMap } from '@pepper/utils';
+import { deduplicate, zipMap } from '@pepper/utils';
 import { parseVals_enhanced } from './datavals';
 import { renderBuffStatistics } from './buff';
 import type { PromiseValue } from 'type-fest';
@@ -219,7 +219,7 @@ export class EmbedRenderer {
             let { func: f, vals } = _;
     
             // dedupe the values
-            vals.forEach((v, k) => vals.set(k, [...new Set(v)]));
+            vals.forEach((values, key) => vals.set(key, deduplicate(values)));
             let stat = f.rawBuffs.length
                 ? await renderBuffStatistics(f.rawBuffs[0], vals, this)
                 : renderFunctionStatistics(f.rawType, vals);
