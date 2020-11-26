@@ -2,9 +2,10 @@ import {
     CardType as Card,
     GenderModifier as genMod,
     ClassModifier as claMod,
-    Attribute
+    Attribute,
+    ApplyTarget
 } from '@pepper/constants/fgo';
-import { Trait } from '@pepper/constants/fgo/strings';
+import { ApplyTarget as aTgt, Trait } from '@pepper/constants/fgo/strings';
 import type { mstSvt } from '@pepper/db/fgo/master/mstSvt';
 import type { mstSvtLimit } from '@pepper/db/fgo/master/mstSvtLimit';
 import type { mstSvtCard } from '@pepper/db/fgo/master/mstSvtCard';
@@ -243,6 +244,10 @@ export class EmbedRenderer {
         let targets = f.targets.map(a => `[${a.trim()}]`).join(', ');
         let team = side ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
         let functionAction = `${targets ? f.action : '**' + f.action + '**'}${targets ? ' ' + targets : ''}`;
+        
+        // Active skills are only possessed by servants.
+        // We usually don't care how a servant acts on the enemy side, I guess.
+        if (f.onTeam === aTgt[ApplyTarget.ENEMY]) return '';
         let amount = stat.amount?.length 
             ? (stat.amount?.length > 3 ? '\n ' : ' ') + 'of '
                 + stat.amount.map(a => `**${a}**`).join(' / ')
@@ -411,7 +416,7 @@ export class EmbedRenderer {
         let svt = await this.JP.mstSvt.findOne({ collectionNo }).exec();
         let skillIds = await this.JP.mstSvtSkill.find({ svtId: svt.id }).exec();
         let skills = skillIds.map(
-            async _ => await this.renderSkill(_.skillId, { chance: true, side: true, newline: true })
+            async _ => await this.renderSkill(_.skillId, { chance: true, side: false, newline: true })
         );
 
         const [limits, __class] = await Promise.all([
