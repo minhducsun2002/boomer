@@ -340,6 +340,7 @@ export const BuffTypes = {
     [bType.DOWN_NPDAMAGE]: `NP Damage Down`,
     [bType.ENTRY_FUNCTION]: 'Trigger skill on entry',
     [bType.FIELD_INDIVIDUALITY]: 'Change Field Type',
+    [bType.FIX_COMMANDCARD]: 'Lock Command Card',
     [bType.GUTS]: 'Guts',
     [bType.GUTS_RATIO]: 'Guts',
     [bType.INVINCIBLE]: 'Invincible',
