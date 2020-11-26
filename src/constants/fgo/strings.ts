@@ -124,7 +124,7 @@ export const Trait = {
     [t.classSaber]: 'Saber',
     [t.classShielder]: 'Shielder',
     [t.classrider]: 'Rider',
-    [t.criticalHit]: '',
+    [t.criticalHit]: 'Critical Hit',
     [t.daemon]: 'Daemon',
     [t.demonBeast]: 'Demon Beast',
     [t.demonGodPillar]: 'Demon God Pillar',
