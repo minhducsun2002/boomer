@@ -231,7 +231,7 @@ export class EmbedRenderer {
     
         return {
             name: skill.name,
-            value: (await Promise.all(values)).join(opt.newline ? '\n\n' : '\n') 
+            value: (await Promise.all(values)).filter(Boolean).join(opt.newline ? '\n\n' : '\n') 
         };
     }
 
@@ -239,7 +239,7 @@ export class EmbedRenderer {
         stat : statistics,
         f : PromiseValue<ReturnType<typeof renderInvocation>>,
         opt : Partial<SkillRenderOptions> = {}) {
-        let { side, chance } = opt;
+        let { side, chance: showChance } = opt;
         let targets = f.targets.map(a => `[${a.trim()}]`).join(', ');
         let team = side ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
         let functionAction = `${targets ? f.action : '**' + f.action + '**'}${targets ? ' ' + targets : ''}`;
@@ -247,20 +247,25 @@ export class EmbedRenderer {
             ? (stat.amount?.length > 3 ? '\n ' : ' ') + 'of '
                 + stat.amount.map(a => `**${a}**`).join(' / ')
                 + (stat.amount?.length > 3 ? '\n' : '')
-            : ''
+            : '';
+        let chance = stat.chance?.length
+            ? stat.chance.map(a => `**${a}**`).join(' / ') 
+                + ' chance to'
+                + (stat.chance?.length > 3 ? '\n' : ' ')
+            : '';
         return (
             team
-            + (chance ? (stat.chance?.length ? `**${stat.chance}** chance to\n` : '') : '')
+            + (showChance ? chance : '')
             + functionAction
             + ` on **${f.affectTarget}**`
             + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
-            + amount
             + (stat?.count ? ` (**${stat.count}** time(s))` : '')
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
+            + amount
             + (stat.onField?.length ? ' when the wearer is on field' : '')
             + (f.fieldTraits.length ? ` if on ${f.fieldTraits.map(a => `__[${a}]__`).join(' & ')} field` : '')
             + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value}`).join('\n') || '')).trimRight()
-        )
+        ).trimRight();
     }
 
 
