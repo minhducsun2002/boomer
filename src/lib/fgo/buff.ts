@@ -57,11 +57,14 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
     let out = [] as BuffEntry[];
     let _ = {} as Statistics;
 
-    let chance = () => _.chance = renderChance(val.get(ValsKey[vType.Rate]) || val.get(ValsKey[vType.UseRate]))?.value;
+    _.chance = renderChance(val.get(ValsKey[vType.Rate]) || val.get(ValsKey[vType.UseRate]))?.value;
+    _.turn = renderTurn(val.get(ValsKey[vType.Turn]))?.value;
     let count = (tenfold = true) => _.count = renderCount(val.get(ValsKey[vType.Count]), tenfold)?.value;
 
     // bond CEs' effects require target servants to stay on field
     _.onField = val.get("OnField");
+    let conditions = buff.ckSelfIndv.map(_ => Trait[_ as keyof typeof Trait]);
+
     switch (buff.type) {
         case Buff.UP_TOLERANCE:     case Buff.DOWN_TOLERANCE:
         case Buff.UP_COMMANDALL:    case Buff.DOWN_COMMANDALL:
@@ -81,37 +84,33 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_STARWEIGHT:    case Buff.DOWN_STARWEIGHT:
         case Buff.UP_GRANT_INSTANTDEATH:
         case Buff.UP_FUNC_HP_REDUCE:
-            chance();
+        case Buff.UP_ATK:           case Buff.DOWN_ATK:
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
         case Buff.GUTS_RATIO:
-            chance();
             count(false);
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
         case Buff.AVOID_INSTANTDEATH:
-            chance();
             count();
-            _.turn = renderTurn(val.get(ValsKey[vType.Turn]))?.value;
             break;
         case Buff.ADD_DAMAGE:       case Buff.DOWN_DAMAGE:
         case Buff.REGAIN_STAR:
         case Buff.UP_DAMAGE_INDIVIDUALITY_ACTIVEONLY:
-        case Buff.SUB_MAXHP:
+        case Buff.ADD_MAXHP:        case Buff.SUB_MAXHP:
         case Buff.OVERWRITE_CLASSRELATIO_ATK:
-            chance();
+        case Buff.REGAIN_HP:
             _.amount = val.get(ValsKey[vType.Value]);
             break;
         case Buff.COMMANDATTACK_FUNCTION:
-        case Buff.DEAD_FUNCTION:
-            chance();
-            let conditions = buff.ckSelfIndv.map(_ => Trait[_ as keyof typeof Trait]);
-            
+        case Buff.DEAD_FUNCTION:    
+        case Buff.DELAY_FUNCTION:            
             let skills = val.get(ValsKey[vType.Value]).map(async (skillId, i) => {
                 // if there's Value2, that indicates levels
-                let level = (val.get(ValsKey[vType.Value2]) || [])[i] || '1';
+                let levels = val.get(ValsKey[vType.Value2]);
+                let level = (levels || [])[i] || '1';
                 let effect = await renderer.renderSkill(+skillId, {
-                    side: true, chance: true, newline: false, level: (+level) - 1
+                    side: true, chance: true, newline: false, level: (levels?.length > 1 ? undefined : (+level) - 1)
                 })
                 return `__` + effect.value + `__`;
             });
@@ -123,10 +122,9 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                 }`,
                 value
             });
-            
             break;
         case Buff.AVOID_STATE:
-            chance();
+        case Buff.DONOT_SKILL:
     };
     _.other = out;
     return _;
