@@ -248,6 +248,10 @@ export class EmbedRenderer {
         // Active skills are only possessed by servants.
         // We usually don't care how a servant acts on the enemy side, I guess.
         if (f.onTeam === aTgt[ApplyTarget.ENEMY]) return '';
+        // By default, everything is 100%.
+        // We omit if that's the case to reduce clutter.
+        if (stat.chance?.length === 1 && stat.chance[0] === '100%') stat.chance = [];
+
         let amount = stat.amount?.length 
             ? (stat.amount?.length > 3 ? '\n ' : ' ') + 'of '
                 + stat.amount.map(a => `**${a}**`).join(' / ')
