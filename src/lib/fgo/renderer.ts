@@ -19,7 +19,7 @@ import { renderInvocation, renderFunctionStatistics } from './func';
 import { deduplicate, zipMap } from '@pepper/utils';
 import { parseVals_enhanced } from './datavals';
 import { renderBuffStatistics } from './buff';
-import type { PromiseValue } from 'type-fest';
+import type { PromiseValue, SetRequired } from 'type-fest';
 import type { DBInstance } from '@pepper/db/fgo';
 import type { Servant } from '@pepper/db/fgo/main';
 import { ComplementaryDataModel } from '@pepper/modules/fgo/complementary-data';
@@ -27,6 +27,15 @@ import { ComplementaryDataModel } from '@pepper/modules/fgo/complementary-data';
 type tr = keyof typeof Trait;
 type statistics = PromiseValue<ReturnType<typeof renderBuffStatistics>> | ReturnType<typeof renderFunctionStatistics>;
 const attribs = Object.values(Attribute);
+
+interface SkillRenderOptions {
+    /** Show/hide the side (player/enemy/both) on which the function applies. */
+    side: boolean;
+    /** Show/hide the probability of a skill triggerring. */
+    chance: boolean;
+    /** Whether to separate skill functions with an empty line. */
+    newline: boolean;
+}
 
 export class EmbedRenderer {
     NA : DBInstance;
@@ -169,24 +178,19 @@ export class EmbedRenderer {
             // list all function IDs that ever appeared in any skill
             functionIds = [...new Set(skillLevels.map(l => l.funcId).flat())];
         // pre-fetch all functions
-        for (let f of functionIds) {
-            functionCache.set(
-                f,
-                await db.mstFunc.findOne({ id: f }).exec()
-            )
-        }
+        for (let f of functionIds) 
+            functionCache.set(f, await db.mstFunc.findOne({ id: f }).exec())
+        
         // for each function
         let _inv = functionIds.map(async fid => {
             // parse datavals for current function
-            let vals = skillLevels.sort((a, b) => a.lv - b.lv).map(
-                level => level.svals[level.funcId.findIndex(_ => _ === fid)]
-            );
+            let vals = skillLevels
+                .sort((a, b) => a.lv - b.lv)
+                .map(level => level.svals[level.funcId.findIndex(_ => _ === fid)]);
 
-            let resolvedVals = await Promise.all(
-                vals.map(v => parseVals_enhanced(v, functionCache.get(fid).funcType))
-            );
+            let resolvedVals = await Promise.all(vals.map(v => parseVals_enhanced(v, functionCache.get(fid).funcType)));
 
-            // stringify the current function into human-friendly format
+            // process the current function into human-friendly format
             let func = await renderInvocation(functionCache.get(fid), db);
             return { func, vals: zipMap(resolvedVals) };
         })
@@ -195,18 +199,11 @@ export class EmbedRenderer {
     }
 
     /**
-     * Render skills that has only one level (i.e. CE skills or passive skills),
-     * or a level specified
+     * Render skills
      * @param skillId skill ID to render
-     * @param opt.showTeam whether to include the side (player/enemy) that the skill applies
-     * @param opt.showChance whether to show chance of skill trigger (CEs will not need this enabled)
-     * @param opt.newline whether to include another newline to separate skill effects
-     * @param opt.addLink whether to include link to function @ AA-DB
-     * @param opt.level choose skill levels to parse, certain skills have 2 levels
+     * @param opt rendering options
      */
-    renderSkill = async (skillId: number, opt = {
-        showTeam: true, showChance: true, newline: true, addLink: true, level: 0
-    }) => {
+    renderSkill = async (skillId: number, opt : Partial<SkillRenderOptions & { level?: number }> = {}) => {
         let db = this.JP;
         let skill = await db.mstSkill.findOne({ id: skillId }).exec();
         let invocations = await this._prepareSkill(skill);
@@ -224,7 +221,12 @@ export class EmbedRenderer {
                 ? await renderBuffStatistics(f.rawBuffs[0], vals, this)
                 : renderFunctionStatistics(f.rawType, vals);
             
-            return this.serializeSkillRepresentation(stat, f, opt)
+
+            return (
+                ('level' in opt && Number.isSafeInteger(opt.level))
+                    ? this.serializeSingleSkillRepresentation(stat, f, <SetRequired<typeof opt, 'level'>>opt)
+                    : this.serializeActiveSkillRepresentation(stat, f, opt)
+            ) 
         })
     
         return {
@@ -233,31 +235,59 @@ export class EmbedRenderer {
         };
     }
 
-    private serializeSkillRepresentation(stat : statistics, f : PromiseValue<ReturnType<this['_prepareSkill']>>[0]['func'], opt = {
-        showTeam: true, showChance: true, addLink: true, level: 0
-    }) {
-        let { showTeam, showChance, addLink, level } = opt;
-        let multipleLevels = level === -1;
-
+    private serializeActiveSkillRepresentation(
+        stat : statistics,
+        f : PromiseValue<ReturnType<typeof renderInvocation>>,
+        opt : Partial<SkillRenderOptions> = {}) {
+        let { side, chance } = opt;
         let targets = f.targets.map(a => `[${a.trim()}]`).join(', ');
-        let team = showTeam ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
-        let chance = multipleLevels ? stat.chance : (stat?.chance?.[level] || stat?.chance?.[0]);
+        let team = side ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
+        let functionAction = `${targets ? f.action : '**' + f.action + '**'}${targets ? ' ' + targets : ''}`;
+        let amount = stat.amount?.length 
+            ? (stat.amount?.length > 3 ? '\n ' : ' ') + 'of '
+                + stat.amount.map(a => `**${a}**`).join(' / ')
+                + (stat.amount?.length > 3 ? '\n' : '')
+            : ''
+        return (
+            team
+            + (chance ? (stat.chance?.length ? `**${stat.chance}** chance to\n` : '') : '')
+            + functionAction
+            + ` on **${f.affectTarget}**`
+            + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
+            + amount
+            + (stat?.count ? ` (**${stat.count}** time(s))` : '')
+            + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
+            + (stat.onField?.length ? ' when the wearer is on field' : '')
+            + (f.fieldTraits.length ? ` if on ${f.fieldTraits.map(a => `__[${a}]__`).join(' & ')} field` : '')
+            + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value}`).join('\n') || '')).trimRight()
+        )
+    }
+
+
+    private serializeSingleSkillRepresentation(
+        stat : statistics,
+        f : PromiseValue<ReturnType<typeof renderInvocation>>,
+        opt : SetRequired<Partial<SkillRenderOptions & { level: number }>, 'level'> = { side: true, chance: true, level: 0 }
+    ) {
+        let { side, chance, level } = opt;
+        let targets = f.targets.map(a => `[${a.trim()}]`).join(', ');
+        let team = side ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
+        let _chance = stat?.chance?.[level] || stat?.chance?.[0];
             // chance might be zipped
-            chance = (chance ? `**${chance}** chance to\n` : '');
+            _chance = (_chance ? `**${_chance}** chance to\n` : '');
         let functionAction = `**${f.action}${targets ? ' ' + targets : ''}**`;
         return (
             team
-            + (showChance ? chance : '')
-            + (addLink ? `[${functionAction}]` : functionAction)
-            + (addLink ? `(https://apps.atlasacademy.io/db/#/JP/func/${f.id})` : '')
+            + (chance ? _chance : '')
+            + functionAction
             + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
-            + (stat?.amount?.length ? ` of **${multipleLevels ? stat?.amount : stat.amount[level]}**` : '')
-            + (stat?.count ? ` (**${multipleLevels ? stat.count : stat.count[level]}** time(s))` : '')
+            + (stat?.amount?.length ? ` of **${stat.amount[level]}**` : '')
+            + (stat?.count ? ` (**${stat.count[level]}** time(s))` : '')
             + ` on **${f.affectTarget}**`
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
             + (stat.onField?.length ? ' when the wearer is on field' : '')
             + (f.fieldTraits.length ? ` if on ${f.fieldTraits.map(a => `__[${a}]__`).join(' & ')} field` : '')
-            + (`\n` + (stat?.other?.map(_ => `${_.name} : ${multipleLevels ? _.value : _.value[level]}`).join('\n') || '')).trimRight()
+            + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value[level]}`).join('\n') || '')).trimRight()
         )
     }
 
@@ -332,7 +362,7 @@ export class EmbedRenderer {
                 .setFooter(`Noble Phantasm`)
         )
     
-        let passives = await Promise.all(classPassive.map(_ => this.renderSkill(_)));
+        let passives = await Promise.all(classPassive.map(_ => this.renderSkill(_, { level: 0, side: true, newline: true })));
         let ascItems = await this.renderAscensionItems(
             await this.JP.mstCombineLimit.find({ id: baseSvtId }).limit(5).exec()
         );
@@ -376,9 +406,7 @@ export class EmbedRenderer {
         let svt = await this.JP.mstSvt.findOne({ collectionNo }).exec();
         let skillIds = await this.JP.mstSvtSkill.find({ svtId: svt.id }).exec();
         let skills = skillIds.map(
-            async _ => await this.renderSkill(_.skillId, {
-                level: -1, addLink: false, showChance: true, showTeam: true, newline: true
-            })
+            async _ => await this.renderSkill(_.skillId, { chance: true, side: true, newline: true })
         );
 
         const [limits, __class] = await Promise.all([
@@ -386,6 +414,8 @@ export class EmbedRenderer {
             await this.NA.mstClass.findOne({ id: svt.classId }).exec()
         ]);
         return this.servantBase(svt, __class.name, Math.max(...limits.map(_ => _.rarity)))
+            // remove thumbnail for a bit of space
+            .setThumbnail(null)
             .addFields(await Promise.all(skills))
     }
 
@@ -410,12 +440,9 @@ export class EmbedRenderer {
 
                 // sort skillIds for deterministicness
                 skillIds = skillIds.sort((a, b)=> a - b)
-                let resultsPromise = Promise.all(
-                    skillIds.map(id => this.renderSkill(id, {
-                        showTeam: false, showChance: false, newline: false, addLink: false, level: 0
-                    }))
+                let results = await Promise.all(
+                    skillIds.map(id => this.renderSkill(id, { level: 0 }))
                 )
-                let results = await resultsPromise;
                 // merge 
                 return {
                     name: isBaseEffects ? 'Base' : 'Maximum limit break',

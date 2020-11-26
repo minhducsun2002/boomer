@@ -38,6 +38,6 @@ export = class extends FgoCommand {
 
         let cache_details = this.client.moduleHandler.findInstance(skill);
 
-        m.channel.send(await cache_details.get(_id));
+        m.channel.send(new MessageEmbed(await cache_details.get(_id)));
     }
 }
