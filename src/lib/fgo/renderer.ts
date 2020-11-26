@@ -179,7 +179,7 @@ export class EmbedRenderer {
         // for each function
         let _inv = functionIds.map(async fid => {
             // parse datavals for current function
-            let vals = skillLevels.map(
+            let vals = skillLevels.sort((a, b) => a.lv - b.lv).map(
                 level => level.svals[level.funcId.findIndex(_ => _ === fid)]
             );
 
