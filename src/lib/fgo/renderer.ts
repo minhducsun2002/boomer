@@ -207,6 +207,9 @@ export class EmbedRenderer {
     renderSkill = async (skillId: number, opt : Partial<SkillRenderOptions & { level?: number }> = {}) => {
         let db = this.JP;
         let skill = await db.mstSkill.findOne({ id: skillId }).exec();
+        let turns = await db.mstSkillLv.find({ skillId }).select('chargeTurn').exec()
+            .then(levels => new Set(levels.map(lv => lv.chargeTurn)))
+            .then(set => [...set].sort((a, b) => b - a));
         let invocations = await this._prepareSkill(skill);
     
         // function lookup table
@@ -229,9 +232,12 @@ export class EmbedRenderer {
                     : this.serializeActiveSkillRepresentation(stat, f, opt)
             ) 
         })
-    
+
+        // try to get skill name in NA
+        let NAskillName = await this.NA.mstSkill.findOne({ id: skillId }).select('name').exec().then(s => s?.name);
+
         return {
-            name: skill.name,
+            name: (NAskillName ?? skill.name) + ` (${turns.join('-')})`,
             value: (await Promise.all(values)).filter(Boolean).join(opt.newline ? '\n\n' : '\n') 
         };
     }
