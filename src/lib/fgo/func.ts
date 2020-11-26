@@ -93,9 +93,9 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
     if (val.has(vKey[vType.Rate])) out.chance = renderChance(val.get(vKey[vType.Rate]))?.value;
     if (val.has(vKey[vType.Count])) out.amount = renderCount(val.get(vKey[vType.Count]))?.value;
     if (val.has(vKey[vType.Value])) {
-        if (f === FuncType.GAIN_NP)
+        if ([FuncType.GAIN_NP, FuncType.LOSS_NP].includes(f))
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 100)}%`)
-        if (f === FuncType.GAIN_HP)
+        if ([FuncType.GAIN_HP, FuncType.GAIN_STAR].includes(f))
             out.amount = val.get(vKey[vType.Value])
     }
     return out;
