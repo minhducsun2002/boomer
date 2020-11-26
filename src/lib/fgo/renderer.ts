@@ -247,7 +247,7 @@ export class EmbedRenderer {
         f : PromiseValue<ReturnType<typeof renderInvocation>>,
         opt : Partial<SkillRenderOptions> = {}) {
         let { side, chance: showChance } = opt;
-        let targets = f.targets.map(a => `[${a.trim()}]`).join(', ');
+        let targets = f.targets.map(a => `**[${a.trim()}]**`).join(', ');
         let team = side ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
         let functionAction = `${targets ? f.action : '**' + f.action + '**'}${targets ? ' ' + targets : ''}`;
         
@@ -272,7 +272,7 @@ export class EmbedRenderer {
             team
             + (showChance ? chance : '')
             + functionAction
-            + ` on **${f.affectTarget}**`
+            + ` on ${f.affectTarget}`
             + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
             + (stat?.count ? ` (**${stat.count}** time(s))` : '')
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
