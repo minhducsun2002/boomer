@@ -17,7 +17,7 @@ import type { mstCombineSkill } from '@pepper/db/fgo/master/mstCombineSkill';
 import { MessageEmbed, EmbedField } from 'discord.js';
 import { renderInvocation, renderFunctionStatistics } from './func';
 import { deduplicate, zipMap } from '@pepper/utils';
-import { parseVals_enhanced } from './datavals';
+import { parseVals } from './datavals';
 import { renderBuffStatistics } from './buff';
 import type { PromiseValue, SetRequired } from 'type-fest';
 import type { DBInstance } from '@pepper/db/fgo';
@@ -188,7 +188,7 @@ export class EmbedRenderer {
                 .sort((a, b) => a.lv - b.lv)
                 .map(level => level.svals[level.funcId.findIndex(_ => _ === fid)]);
 
-            let resolvedVals = await Promise.all(vals.map(v => parseVals_enhanced(v, functionCache.get(fid).funcType)));
+            let resolvedVals = await Promise.all(vals.map(v => parseVals(v, functionCache.get(fid).funcType)));
 
             // process the current function into human-friendly format
             let func = await renderInvocation(functionCache.get(fid), db);
