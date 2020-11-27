@@ -110,7 +110,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                 let levels = val.get(ValsKey[vType.Value2]);
                 let level = (levels || [])[i] || '1';
                 let effect = await renderer.renderSkill(+skillId, {
-                    side: true, chance: true, newline: false, level: (levels?.length > 1 ? undefined : (+level) - 1)
+                    side: true, chance: false, newline: false, level: (levels?.length > 1 ? undefined : (+level) - 1)
                 })
                 return `__` + effect.value + `__`;
             });
