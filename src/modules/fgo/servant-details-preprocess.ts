@@ -50,11 +50,11 @@ export = class extends FgoModule {
     
 
     private process = (
-        servantDataset : Parameters<EmbedRenderer['createEmbeds']>[0]
+        servantDataset : Parameters<EmbedRenderer['servantDashboardEmbed']>[0]
     ) => {
         let { NA, JP } = this.client.moduleHandler.findInstance(mst);
         let _comp = this.client.moduleHandler.findInstance(comp);
-        return new EmbedRenderer(NA, JP, _comp).createEmbeds(servantDataset);
+        return new EmbedRenderer(NA, JP, _comp).servantDashboardEmbed(servantDataset);
     }
 
     async initialize() {

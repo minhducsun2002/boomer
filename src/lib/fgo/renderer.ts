@@ -323,7 +323,7 @@ export class EmbedRenderer {
         return Promise.all(words);
     } 
 
-    createEmbeds = async (dataset : Servant) : Promise<MessageEmbed[]> => {
+    servantDashboardEmbed = async (dataset : Servant) : Promise<MessageEmbed[]> => {
         const { name, id, activeSkill } = dataset;
         let { NA, JP } = this;
     
