@@ -20,7 +20,7 @@ import { renderInvocation, renderFunctionStatistics } from './func';
 import { deduplicate, zipMap } from '@pepper/utils';
 import { parseVals } from './datavals';
 import { renderBuffStatistics } from './buff';
-import type { PromiseValue, SetRequired } from 'type-fest';
+import type { PromiseValue, SetOptional, SetRequired } from 'type-fest';
 import type { DBInstance } from '@pepper/db/fgo';
 import type { Servant } from '@pepper/db/fgo/main';
 import { ComplementaryDataModel } from '@pepper/modules/fgo/complementary-data';
@@ -311,26 +311,20 @@ export class EmbedRenderer {
         )
     }
 
-    renderAscensionItems = (combineLimits : mstCombineLimit[]) => {
-        let limits = combineLimits.sort((a, b) => a.svtLimit - b.svtLimit).slice(0, 4);
-        let words = limits.map(async (limit, i) => {
-            let { itemIds, itemNums, qp } = limit;
-            let items = itemIds
-                .map(async id => await this.complementary.item.findOne({ id }).exec())
-                .map((itemRecord, i) => itemRecord.then(item => `- **${itemNums[i]}**x **${item?.name}**`));
-            let itemRecord = (await Promise.all(items)).join('\n');
-            let numberFormatter = new Intl.NumberFormat('en-US', {style: 'decimal'});
-            return {
-                name: `Stage ${i + 1} - ${numberFormatter.format(qp)} QP`,
-                value : `${itemRecord}\n`
-            }
-        })
-        return Promise.all(words);
+    renderItems = (combineLimits : mstCombineLimit[] | mstCombineSkill[], type : 'ascension' | 'skill') => {
+        let limits : typeof combineLimits, words : Promise<SetOptional<EmbedField, 'inline'>>[];
+        let name = '', shift = 0;
+        switch (type) {
+            case 'ascension':
+                limits = (<mstCombineLimit[]>combineLimits).sort((a, b) => a.svtLimit - b.svtLimit).slice(0, 4);
+                name = 'Stage';
+                shift = 1;
+            case 'skill':
+                limits = (<mstCombineSkill[]>combineLimits).sort((a, b) => a.skillLv - b.skillLv);
+                name = 'Level';
+                shift = 2;
     }
-
-    renderSkillItems = (combineLimits : mstCombineSkill[]) => {
-        let limits = combineLimits.sort((a, b) => a.skillLv - b.skillLv)
-        let words = limits.map(async (limit, i) => {
+        words = limits.map(async (limit, i) => {
             let { itemIds, itemNums, qp } = limit;
             let items = itemIds
                 .map(async id => await this.complementary.item.findOne({ id }).exec())
@@ -338,7 +332,7 @@ export class EmbedRenderer {
             let itemRecord = (await Promise.all(items)).join('\n');
             let numberFormatter = new Intl.NumberFormat('en-US', {style: 'decimal'});
             return {
-                name: `Level ${i + 2} - ${numberFormatter.format(qp)} QP`,
+                name: `${name} ${i + shift} - ${numberFormatter.format(qp)} QP`,
                 value : `${itemRecord}\n`
             }
         })
@@ -383,12 +377,8 @@ export class EmbedRenderer {
         )
     
         let passives = await Promise.all(classPassive.map(_ => this.renderSkill(_, { level: 0, side: true, newline: true })));
-        let ascItems = await this.renderAscensionItems(
-            await this.JP.mstCombineLimit.find({ id: baseSvtId }).limit(5).exec()
-        );
-        let skillItems = await this.renderSkillItems(
-            await this.JP.mstCombineSkill.find({ id: baseSvtId }).limit(9).exec()
-        );
+        let ascItems = await this.renderItems(await this.JP.mstCombineLimit.find({ id: baseSvtId }).limit(5).exec(), 'ascension');
+        let skillItems = await this.renderItems(await this.JP.mstCombineSkill.find({ id: baseSvtId }).limit(9).exec(), 'skill');
         return [
             base()
                 .addFields(this.servantDashboard(svt, limits, cards, td_npGain))
