@@ -24,6 +24,7 @@ import type { PromiseValue, SetOptional, SetRequired } from 'type-fest';
 import type { DBInstance } from '@pepper/db/fgo';
 import type { Servant } from '@pepper/db/fgo/main';
 import { ComplementaryDataModel } from '@pepper/modules/fgo/complementary-data';
+import { EmbedFieldData } from 'discord.js';
 
 type tr = keyof typeof Trait;
 type statistics = PromiseValue<ReturnType<typeof renderBuffStatistics>> | ReturnType<typeof renderFunctionStatistics>;
@@ -380,10 +381,26 @@ export class EmbedRenderer {
 
     skillEmbed = async (collectionNo : number) => {
         let svt = await this.JP.mstSvt.findOne({ collectionNo }).exec();
-        let skillIds = await this.JP.mstSvtSkill.find({ svtId: svt.id }).exec();
-        let skills = skillIds.map(
-            async _ => await this.renderSkill(_.skillId, { chance: true, side: false, newline: true, cooldown: true })
-        );
+        let records = await this.JP.mstSvtSkill.find({ svtId: svt.id }).exec();
+
+        // sort into positions
+        let numMap = new Map<number, (typeof records[0])[]>();
+        for (let rec of records)
+            if (numMap.has(rec.num)) numMap.get(rec.num).push(rec);
+            else numMap.set(rec.num, [rec]);
+        let skills = [...numMap].map(rec => rec[1].sort((a, b) => a.priority - b.priority));
+
+        let output : SetOptional<EmbedFieldData, 'inline'>[][] = [];
+        for (let position of skills) {
+            let out : typeof output[0] = [];
+            for (let record of position) {
+                out.push(
+                    await this.renderSkill(record.skillId, { chance: true, side: false, newline: true, cooldown: true })
+                )
+            }
+            output.push([...out, { name: '\u200b', value: '\u200b' }]);
+        }
+        let skillText = output.flat(); skillText.pop();
 
         const [limits, __class] = await Promise.all([
             await this.JP.mstSvtLimit.find({ svtId: svt.id }).limit(5).exec(),
@@ -392,7 +409,7 @@ export class EmbedRenderer {
         return this.servantBase(svt, __class.name, Math.max(...limits.map(_ => _.rarity)))
             // remove thumbnail for a bit of space
             .setThumbnail(null)
-            .addFields(await Promise.all(skills))
+            .addFields(skillText)
     }
 
     craftEssenceEmbed = async (id : number) => {
