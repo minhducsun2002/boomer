@@ -36,6 +36,8 @@ interface SkillRenderOptions {
     chance: boolean;
     /** Whether to separate skill functions with an empty line. */
     newline: boolean;
+    /** Whether to show skill cooldown */
+    cooldown: boolean;
 }
 
 export class EmbedRenderer {
@@ -185,9 +187,13 @@ export class EmbedRenderer {
     renderSkill = async (skillId: number, opt : Partial<SkillRenderOptions & { level?: number }> = {}) => {
         let db = this.JP;
         let skill = await db.mstSkill.findOne({ id: skillId }).exec();
-        let turns = await db.mstSkillLv.find({ skillId }).select('chargeTurn').exec()
+        let turns = (
+            opt.cooldown 
+            ? await db.mstSkillLv.find({ skillId }).select('chargeTurn').exec()
             .then(levels => new Set(levels.map(lv => lv.chargeTurn)))
-            .then(set => [...set].sort((a, b) => b - a));
+            .then(set => [...set].sort((a, b) => b - a))
+            : []
+        );
         let invocations = await this._prepareSkill(skill);
     
         // function lookup table
@@ -215,7 +221,7 @@ export class EmbedRenderer {
         let NAskillName = await this.NA.mstSkill.findOne({ id: skillId }).select('name').exec().then(s => s?.name);
 
         return {
-            name: (NAskillName ?? skill.name) + ` (${turns.join('-')})`,
+            name: (NAskillName ?? skill.name) + (turns.length ? ` (${turns.join('-')})` : ''),
             value: (await Promise.all(values)).filter(Boolean).join(opt.newline ? '\n\n' : '\n') 
         };
     }
@@ -376,7 +382,7 @@ export class EmbedRenderer {
         let svt = await this.JP.mstSvt.findOne({ collectionNo }).exec();
         let skillIds = await this.JP.mstSvtSkill.find({ svtId: svt.id }).exec();
         let skills = skillIds.map(
-            async _ => await this.renderSkill(_.skillId, { chance: true, side: false, newline: true })
+            async _ => await this.renderSkill(_.skillId, { chance: true, side: false, newline: true, cooldown: true })
         );
 
         const [limits, __class] = await Promise.all([
