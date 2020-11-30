@@ -145,28 +145,6 @@ export class EmbedRenderer {
         }];
     }
 
-    treasureDeviceBase = async  ({ id } : mstTreasureDevice) => {
-        let db = this.JP;
-        let level = await db.mstTreasureDeviceLv.findOne({ treaureDeviceId: id }).exec();
-        let td = level.funcId.map(
-            id => db.mstFunc.findOne({ id }).exec()
-                .then(f => renderInvocation(f, db))
-                .then(_ => ({
-                    name: `${_.action} ${_.targets.map(a => `[${a.trim()}]`).join(', ')}`,
-                    value:
-                        `[Link](https://apps.atlasacademy.io/db/#/JP/func/${_.id})`
-                        + `\nAffects **${
-                            _.affectTarget
-                            + (_.traitVals.length
-                                ? ` with ${_.traitVals.map(_ => `[${_}]`).join(', ')}`
-                                : ``)
-                        }**`
-                        + (_.onTeam ? ` when on **${_.onTeam}** team` : '')
-                }))
-        );
-        return await Promise.all(td);
-    }
-
     // return value :
     // { func, vals }[]
     // with vals being a Map<string, string[]>, with string[] being values of levels
@@ -323,7 +301,7 @@ export class EmbedRenderer {
                 limits = (<mstCombineSkill[]>combineLimits).sort((a, b) => a.skillLv - b.skillLv);
                 name = 'Level';
                 shift = 2;
-    }
+        }
         words = limits.map(async (limit, i) => {
             let { itemIds, itemNums, qp } = limit;
             let items = itemIds
@@ -337,7 +315,7 @@ export class EmbedRenderer {
             }
         })
         return Promise.all(words);
-    }
+    } 
 
     createEmbeds = async (dataset : Servant) : Promise<MessageEmbed[]> => {
         const { name, id, activeSkill } = dataset;
@@ -354,28 +332,11 @@ export class EmbedRenderer {
         const svtTdMapping = await JP.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
         let [{ treasureDeviceId: tdId }] = svtTdMapping;
         const td_npGain = await JP.mstTreasureDeviceLv.findOne({ treaureDeviceId: tdId }).exec();
-        const td = (await Promise.all(
-            svtTdMapping.map(
-                a => JP.mstTreasureDevice.findOne({ id: a.treasureDeviceId }).exec()
-            )
-        )).sort((a, b) => a.id - b.id);
     
         // overwrite name
         svt.name = name;
         let base = () => this.servantBase(svt, __class.name, Math.max(...limits.map(_ => _.rarity)));
-    
-        let tdEmbed = (await Promise.all(td.map(this.treasureDeviceBase))).map((a, i) => 
-            base()
-                .addFields(a)
-                .setDescription(
-                    `[__${td[i].rank}__] `
-                    + `[**${td[i].name}** [**__${td[i].typeText}__**]](${
-                        `https://apps.atlasacademy.io/db/#/JP/noble-phantasm/${td[i].id}`
-                    })`
-                )
-                .setFooter(`Noble Phantasm`)
-        )
-    
+
         let passives = await Promise.all(classPassive.map(_ => this.renderSkill(_, { level: 0, side: true, newline: true })));
         let ascItems = await this.renderItems(await this.JP.mstCombineLimit.find({ id: baseSvtId }).limit(5).exec(), 'ascension');
         let skillItems = await this.renderItems(await this.JP.mstCombineSkill.find({ id: baseSvtId }).limit(9).exec(), 'skill');
@@ -404,8 +365,7 @@ export class EmbedRenderer {
             ? base().addFields(ascItems).setFooter(`Ascension materials`)
             : base().setDescription(`No materials needed.`).setFooter(`Ascension materials`)),
             base()
-                .addFields(skillItems).setFooter(`Skill materials`),
-            ...tdEmbed
+                .addFields(skillItems).setFooter(`Skill materials`)
         ]
         .map((a, i, _) => a.setFooter(`${
             a.footer?.text ? `${a.footer.text} • ` : ''
