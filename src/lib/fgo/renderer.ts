@@ -17,7 +17,7 @@ import type { mstCombineLimit } from '@pepper/db/fgo/master/mstCombineLimit';
 import type { mstCombineSkill } from '@pepper/db/fgo/master/mstCombineSkill';
 import { MessageEmbed, EmbedField } from 'discord.js';
 import { renderInvocation, renderFunctionStatistics } from './func';
-import { deduplicate, zipMap } from '@pepper/utils';
+import { deduplicate, zipMap, plural_wrap } from '@pepper/utils';
 import { parseVals } from './datavals';
 import { renderBuffStatistics } from './buff';
 import type { PromiseValue, SetOptional, SetRequired } from 'type-fest';
@@ -259,7 +259,9 @@ export class EmbedRenderer {
             + functionAction
             + ` on ${f.affectTarget}`
             + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
-            + (stat?.count ? ` (**${stat.count}** time(s))` : '')
+            + (stat?.count ? ` (**${stat.count}** ${
+                stat.count.length === 1 ? plural_wrap(+stat.count[0], 'time') : 'times'
+            })` : '')
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
             + amount
             + (stat.onField?.length ? ' when the wearer is on field' : '')
@@ -287,7 +289,7 @@ export class EmbedRenderer {
             + functionAction
             + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
             + (stat?.amount?.length ? ` of **${stat.amount[level]}**` : '')
-            + (stat?.count ? ` (**${stat.count[level]}** time(s))` : '')
+            + (stat?.count ? ` (**${stat.count[level]}** ${plural_wrap(+stat.count[level], 'time')})` : '')
             + ` on **${f.affectTarget}**`
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
             + (stat.onField?.length ? ' when the wearer is on field' : '')

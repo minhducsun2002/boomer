@@ -1,4 +1,4 @@
-export { plural } from './plural';
+export { plural, plural_wrap } from './plural';
 export { componentLog } from './log';
 export { pad } from './pad';
 export { chunk } from './chunk';
