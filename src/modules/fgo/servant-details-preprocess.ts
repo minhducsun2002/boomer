@@ -64,6 +64,7 @@ export = class extends FgoModule {
         let queue = new Queue(cpus().length * 2);
 
         for (let { id } of _) {
+            if (id)
             queue.add(
                 async () => {
                     try {
