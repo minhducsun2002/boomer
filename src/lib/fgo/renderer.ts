@@ -10,7 +10,6 @@ import type { mstSvt } from '@pepper/db/fgo/master/mstSvt';
 import type { mstSvtLimit } from '@pepper/db/fgo/master/mstSvtLimit';
 import type { mstSvtCard } from '@pepper/db/fgo/master/mstSvtCard';
 import type { mstTreasureDeviceLv } from '@pepper/db/fgo/master/mstTreasureDeviceLv';
-import type { mstTreasureDevice } from '@pepper/db/fgo/master/mstTreasureDevice';
 import type { mstSkill } from '@pepper/db/fgo/master/mstSkill';
 import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import type { mstCombineLimit } from '@pepper/db/fgo/master/mstCombineLimit';
