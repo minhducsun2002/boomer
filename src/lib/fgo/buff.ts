@@ -85,11 +85,16 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_GRANT_INSTANTDEATH:
         case Buff.UP_FUNC_HP_REDUCE:
         case Buff.UP_ATK:           case Buff.DOWN_ATK:
+        case Buff.UP_TOLERANCE_SUBSTATE:
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
         case Buff.GUTS_RATIO:
             count(false);
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
+            break;
+        case Buff.GUTS:
+            count(false);
+            _.amount = val.get(ValsKey[vType.Value]);
             break;
         case Buff.AVOID_INSTANTDEATH:
             count();
@@ -100,12 +105,15 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.ADD_MAXHP:        case Buff.SUB_MAXHP:
         case Buff.OVERWRITE_CLASSRELATIO_ATK:
         case Buff.REGAIN_HP:
+        case Buff.SUB_SELFDAMAGE:
             _.amount = val.get(ValsKey[vType.Value]);
             break;
         case Buff.COMMANDATTACK_FUNCTION:
         case Buff.DEAD_FUNCTION:    
-        case Buff.DELAY_FUNCTION:            
-            let skills = val.get(ValsKey[vType.Value]).map(async (skillId, i) => {
+        case Buff.DELAY_FUNCTION:
+        case Buff.NPATTACK_PREV_BUFF:
+            let skills = val.get("SkillID") || val.get(ValsKey[vType.Value]);
+            let skillText = skills.map(async (skillId, i) => {
                 // if there's Value2, that indicates levels
                 let levels = val.get(ValsKey[vType.Value2]);
                 let level = (levels || [])[i] || '1';
@@ -114,7 +122,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                 })
                 return `__` + effect.value + `__`;
             });
-            let value = await Promise.all(skills);
+            let value = await Promise.all(skillText);
             value[0] = '\n' + value[0];
             out.push({
                 name: `Trigger skill on ${
@@ -122,6 +130,9 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                 }`,
                 value
             });
+            break;
+        case Buff.INVINCIBLE:
+            count(false);
             break;
         case Buff.AVOID_STATE:
         case Buff.DONOT_SKILL:

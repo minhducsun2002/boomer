@@ -348,6 +348,7 @@ export const BuffTypes = {
     [bType.INVINCIBLE]: 'Invincible',
     [bType.MULTIATTACK]: 'Multiple hits',
     [bType.NONE]: 'None',
+    [bType.NPATTACK_PREV_BUFF]: 'Bonus effect on NPs',
     [bType.OVERWRITE_BATTLECLASS]: 'Overwrite Class in Battle',
     [bType.OVERWRITE_CLASS_RELATION]: 'Overwrite Class Relationship',
     [bType.OVERWRITE_CLASSRELATIO_ATK]: 'Overwrite Class Relationship for Attack',
