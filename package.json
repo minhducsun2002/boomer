@@ -33,7 +33,7 @@
     "escape-string-regexp": "^2.0.0",
     "fuse.js": "^6.4.1",
     "is-promise": "^4.0.0",
-    "mongoose": "^5.7.11",
+    "mongoose": "5.10.15",
     "mongoose-cache": "^0.1.5",
     "nconf": "^0.10.0",
     "ojsama": "^1.2.5",
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@types/cheerio": "^0.22.16",
     "@types/csprng": "^0.1.1",
-    "@types/mongoose": "^5.5.34",
+    "@types/mongoose": "5.10.1",
     "@types/nconf": "^0.10.0",
     "@types/node": "^12.12.17",
     "@types/rimraf": "^3.0.0",
