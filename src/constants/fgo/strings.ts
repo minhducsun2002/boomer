@@ -64,7 +64,7 @@ export const Trait = {
     [t.buffHpRecoveryPerTurn]: 'HP Recovery per Turn',
     [t.buffIncreaseDamage]: 'Damage Up',
     [t.buffIncreaseDefence]: 'DEF Up',
-    [t.buffIncreaseDefenceAgainstIndividuality]: 'DEF Up against',
+    [t.buffIncreaseDefenceAgainstIndividuality]: 'DEF Up against trait',
     [t.buffIncreasePoisonEffectiveness]: 'Poison Effectiveness Up',
     [t.buffInvincible]: 'Invincible',
     [t.buffInvinciblePierce]: 'Ignore Invincible',
