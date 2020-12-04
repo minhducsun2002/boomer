@@ -305,12 +305,13 @@ export class EmbedRenderer {
                 limits = (<mstCombineLimit[]>combineLimits).sort((a, b) => a.svtLimit - b.svtLimit).slice(0, 4);
                 name = 'Stage';
                 shift = 1;
+                break;
             case 'skill':
                 limits = (<mstCombineSkill[]>combineLimits).sort((a, b) => a.skillLv - b.skillLv);
                 name = 'Level';
                 shift = 2;
         }
-        words = limits.map(async (limit, i) => {
+        words = (limits as (mstCombineLimit|mstCombineSkill)[]).map(async (limit, i) => {
             let { itemIds, itemNums, qp } = limit;
             let items = itemIds
                 .map(async id => await this.complementary.item.findOne({ id }).exec())
