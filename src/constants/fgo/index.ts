@@ -819,6 +819,8 @@ export const Attribute = {
 export const GenderModifier = 0;
 /** Plus mstSvt.classId to get trait */
 export const ClassModifier = 99;
+/** Plus CardType to get trait */
+export const CardModifier = 4000;
 
 export enum SkillType {
     ACTIVE = 1,

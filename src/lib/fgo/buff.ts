@@ -1,4 +1,4 @@
-import { Buff, ValsType as vType } from '@pepper/constants/fgo';
+import { Buff, CardModifier, ValsType as vType } from '@pepper/constants/fgo';
 import { ValsType, Trait, ValsKey } from '@pepper/constants/fgo/strings';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
 import type { EmbedRenderer } from './renderer';
@@ -133,6 +133,12 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
             break;
         case Buff.INVINCIBLE:
             count(false);
+            break;
+        case Buff.CHANGE_COMMAND_CARD_TYPE:
+            out.push({
+                name: 'Change all Command Cards of the target to',
+                value: val.get(ValsKey[vType.Value])?.map(card => Trait[+ card + CardModifier as keyof typeof Trait])
+            });
             break;
         case Buff.AVOID_STATE:
         case Buff.DONOT_SKILL:
