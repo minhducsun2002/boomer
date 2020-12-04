@@ -383,6 +383,7 @@ export class EmbedRenderer {
 
     skillEmbed = async (collectionNo : number) => {
         let svt = await this.JP.mstSvt.findOne({ collectionNo }).exec();
+        svt.name = (await this.complementary.svtObject.findOne({ id: svt.id }).exec())?.name ?? svt.name;
         let records = await this.JP.mstSvtSkill.find({ svtId: svt.id }).exec();
 
         // sort into positions
