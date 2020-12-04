@@ -20,7 +20,7 @@ export function renderTurn(s : string[]) : BuffEntry {
     // only handle turns > 0
     if (s.some(_ => +_ > 0)) return {
         name: ValsType[vType.Turn],
-        value: s.map(_ => `${(+_ / 10)}`)
+        value: s
     };
 }
 
@@ -86,6 +86,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_FUNC_HP_REDUCE:
         case Buff.UP_ATK:           case Buff.DOWN_ATK:
         case Buff.UP_TOLERANCE_SUBSTATE:
+            count(false);
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
         case Buff.GUTS_RATIO:

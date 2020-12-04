@@ -252,15 +252,19 @@ export class EmbedRenderer {
                 + ' chance to'
                 + (stat.chance?.length > 3 ? '\n' : ' ')
             : '';
+        let limits = [
+            stat?.count ? [stat.count, stat.count.length === 1 ? plural_wrap(+stat.count[0], 'time') : 'times'] : '',
+            stat?.turn ? [stat.turn, stat.turn.length === 1 ? plural_wrap(+stat.turn[0], 'turn') : 'turns'] : '',
+        ]
+            .filter(Boolean)
+            .map(([count, type]) => `**${count}** ${type}`).join(', ');
         return (
             team
             + (showChance ? chance : '')
             + functionAction
             + ` on ${f.affectTarget}`
             + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
-            + (stat?.count ? ` (**${stat.count}** ${
-                stat.count.length === 1 ? plural_wrap(+stat.count[0], 'time') : 'times'
-            })` : '')
+            + (limits ? ` (${limits})` : '')
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
             + amount
             + (stat.onField?.length ? ' when the wearer is on field' : '')
@@ -282,13 +286,19 @@ export class EmbedRenderer {
             // chance might be zipped
             _chance = (_chance ? `**${_chance}** chance to\n` : '');
         let functionAction = `**${f.action}${targets ? ' ' + targets : ''}**`;
+        let limits = [
+            stat?.count ? [stat.count, stat.count.length === 1 ? plural_wrap(+stat.count[0], 'time') : 'times'] : '',
+            stat?.turn ? [stat.turn, stat.turn.length === 1 ? plural_wrap(+stat.turn[0], 'turn') : 'turns'] : '',
+        ]
+            .filter(Boolean)
+            .map(([count, type]) => `**${count}** ${type}`).join(', ');
         return (
             team
             + (chance ? _chance : '')
             + functionAction
             + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
             + (stat?.amount?.length ? ` of **${stat.amount[level]}**` : '')
-            + (stat?.count ? ` (**${stat.count[level]}** ${plural_wrap(+stat.count[level], 'time')})` : '')
+            + (limits ? ` (${limits})` : '')
             + ` on **${f.affectTarget}**`
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
             + (stat.onField?.length ? ' when the wearer is on field' : '')
