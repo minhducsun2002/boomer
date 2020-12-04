@@ -81,7 +81,7 @@ export = class extends FgoModule {
                         }`);
                         this.push(collectionNo, e.toJSON());
                     } catch (e) {
-                        this.log.error(`Error processing CE ${collectionNo}.\n${e.stack}`)
+                        this.log.error(`Error processing skills of servant ${collectionNo}.\n${e.stack}`)
                     };
                 }  
             )

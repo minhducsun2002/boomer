@@ -327,7 +327,7 @@ export class EmbedRenderer {
     } 
 
     servantDashboardEmbed = async (dataset : Servant) : Promise<MessageEmbed[]> => {
-        const { name, id, activeSkill } = dataset;
+        const { name, id } = dataset;
         let { NA, JP } = this;
     
         const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
@@ -355,19 +355,6 @@ export class EmbedRenderer {
                 .setFooter(`Basic details`),
             base()
                 .addFields([this.traits(svt)]).setFooter('Traits'),
-            base()
-            .addField(
-                'Active skill',
-                activeSkill.map(a => {
-                    const upgrades = a.length, { name, rank, detail, condition } = a.pop();
-                    return (
-                        `**${name}** __[${rank}]__` + (upgrades > 1 ? ` (${upgrades} upgrades)` : '')
-                        + `\n${detail}`
-                        + `\n_${condition}_`
-                    )
-                }).join('\n\n')
-            )
-            .setFooter(`Active skills`),
             base().addFields(passives).setFooter(`Passive skills`),
             // cover case where no ascension material
             (ascItems.length
