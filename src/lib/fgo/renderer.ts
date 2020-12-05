@@ -162,21 +162,18 @@ export class EmbedRenderer {
         for (let f of functionIds) 
             functionCache.set(f, await db.mstFunc.findOne({ id: f }).exec())
         
-        // for each function
-        let _inv = functionIds.map(async fid => {
-            // parse datavals for current function
-            let vals = skillLevels
-                .sort((a, b) => a.lv - b.lv)
-                .map(level => level.svals[level.funcId.findIndex(_ => _ === fid)]);
+        let invocations = skillLevels[0].funcId
+            .map(async (functionId, index) => {
+                let vals = skillLevels
+                    .sort((a, b) => a.lv - b.lv)
+                    .map(level => level.svals[index]);
 
-            let resolvedVals = await Promise.all(vals.map(v => parseVals(v, functionCache.get(fid).funcType)));
+                let resolvedVals = await Promise.all(vals.map(v => parseVals(v, functionCache.get(functionId).funcType)));
 
-            // process the current function into human-friendly format
-            let func = await renderInvocation(functionCache.get(fid), db);
-            return { func, vals: zipMap(resolvedVals) };
-        })
-    
-        return await Promise.all(_inv);
+                let func = await renderInvocation(functionCache.get(functionId), db);
+                return { func, vals: zipMap(resolvedVals) };
+            })
+        return await Promise.all(invocations);
     }
 
     /**
