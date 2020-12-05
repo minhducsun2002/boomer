@@ -388,7 +388,9 @@ export class EmbedRenderer {
         for (let rec of records)
             if (numMap.has(rec.num)) numMap.get(rec.num).push(rec);
             else numMap.set(rec.num, [rec]);
-        let skills = [...numMap].map(rec => rec[1].sort((a, b) => a.priority - b.priority));
+        let skills = [...numMap]
+            .sort((a, b) => a[0] - b[0])
+            .map(rec => rec[1].sort((a, b) => a.priority - b.priority));
 
         let output : SetOptional<EmbedFieldData, 'inline'>[][] = [];
         for (let position of skills) {
