@@ -114,6 +114,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.DEAD_FUNCTION:    
         case Buff.DELAY_FUNCTION:
         case Buff.ENTRY_FUNCTION:
+        case Buff.GUTS_FUNCTION:
         case Buff.NPATTACK_PREV_BUFF:
         case Buff.SELFTURNEND_FUNCTION:
             let skills = val.get("SkillID") || val.get(ValsKey[vType.Value]);

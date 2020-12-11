@@ -732,6 +732,7 @@ export enum Trait {
     giant = 2666,
     childServant = 2667,
     nobu = 2721,
+    fieldImaginarySpace = 2730,
     normalAttack0 = 3000,
     normalAttack1 = 3001,
     normalAttack2 = 3002,
