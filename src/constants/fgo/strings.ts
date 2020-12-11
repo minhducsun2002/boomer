@@ -359,7 +359,7 @@ export const BuffTypes = {
     [bType.REGAIN_HP]: 'HP gain per turn',
     [bType.REGAIN_NP]: 'NP gain per turn',
     [bType.REGAIN_STAR]: 'Stars gain per turn',
-    [bType.SELFTURNEND_FUNCTION]: 'Trigger Skill every Turn',
+    [bType.SELFTURNEND_FUNCTION]: 'Trigger skill when turn ends',
     [bType.SKILL_RANK_UP]: 'Skill Rank Up',
     [bType.SPECIAL_INVINCIBLE]: 'Special Invincible',
     [bType.SUB_MAXHP]: 'Max HP Down',

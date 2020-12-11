@@ -94,6 +94,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
         case Buff.GUTS:
+        case Buff.UP_CHAGETD:
             count(false);
             _.amount = val.get(ValsKey[vType.Value]);
             break;
@@ -112,7 +113,9 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.COMMANDATTACK_FUNCTION:
         case Buff.DEAD_FUNCTION:    
         case Buff.DELAY_FUNCTION:
+        case Buff.ENTRY_FUNCTION:
         case Buff.NPATTACK_PREV_BUFF:
+        case Buff.SELFTURNEND_FUNCTION:
             let skills = val.get("SkillID") || val.get(ValsKey[vType.Value]);
             let skillText = skills.map(async (skillId, i) => {
                 // if there's Value2, that indicates levels
@@ -132,6 +135,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                 value
             });
             break;
+        case Buff.AVOIDANCE:
         case Buff.INVINCIBLE:
             count(false);
             break;
