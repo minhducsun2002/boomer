@@ -2,6 +2,7 @@ import {
     CardType as Card,
     GenderModifier as genMod,
     ClassModifier as claMod,
+    CardModifier as cardMod,
     Attribute,
     ApplyTarget
 } from '@pepper/constants/fgo';
@@ -209,6 +210,7 @@ export class EmbedRenderer {
 
             return (
                 ('level' in opt && Number.isSafeInteger(opt.level))
+                    // serialize this function as if it belongs to a single/active skill.
                     ? this.serializeSingleSkillRepresentation(stat, f, <SetRequired<typeof opt, 'level'>>opt)
                     : this.serializeActiveSkillRepresentation(stat, f, opt)
             ) 
@@ -302,6 +304,85 @@ export class EmbedRenderer {
             + (f.fieldTraits.length ? ` if on ${f.fieldTraits.map(a => `__[${a}]__`).join(' & ')} field` : '')
             + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value[level]}`).join('\n') || '')).trimRight()
         )
+    }
+
+    private async renderTreasureDevice (treasureDeviceId : number) {
+        let db = this.JP;
+        let treasureDevice = await db.mstTreasureDevice.findOne({ id: treasureDeviceId }).exec();
+        let levels = await db.mstTreasureDeviceLv.find({ treaureDeviceId: treasureDevice.id }).sort({ lv: 1 }).exec();
+        let invocations = levels[0].funcId.map(async (funcId, entryIndex) => {
+            // the assumption here is that a value would never differ in both overcharge and level
+            // a value should only change when EITHER overcharge OR level changes
+
+            let outputValue = new Map<string, string[]>();
+            let overchargeKey : string[] = [], levelKey : string[] = [], staticKey : string[] = [];
+
+            let _function = await db.mstFunc.findOne({ id: funcId }).exec();
+
+            {
+                let level = levels[0];
+                let svals = [level.svals, level.svals2, level.svals3, level.svals4, level.svals5];
+                let _level = levels.map(level => parseVals(level.svals[entryIndex], _function.funcType));
+                
+                [
+                    // check for level changes at overcharge 1
+                    [overchargeKey, svals.map(overcharge => parseVals(overcharge[entryIndex], _function.funcType))],
+                    // check for overcharge changes at level 1
+                    [levelKey, _level]
+                ]
+                .forEach(([keySetToPush, values]) => {
+                    let vals = zipMap(values as Exclude<typeof values, string[]>);
+                    for (let [key, value] of vals) 
+                        if (deduplicate(value).length !== 1) {
+                            (<string[]>keySetToPush).push(key);
+                            outputValue.set(key, deduplicate(value));
+                        }
+                })
+
+                for (let [key, value] of zipMap(_level))
+                    // collect the rest of the key 
+                    if (!overchargeKey.includes(key) && !levelKey.includes(key)) {
+                        staticKey.push(key);
+                        outputValue.set(key, deduplicate(value));
+                    }
+            }
+            
+            
+            let func = await renderInvocation(_function, db);
+            let stat = func.rawBuffs.length
+                ? await renderBuffStatistics(func.rawBuffs[0], outputValue, this)
+                : renderFunctionStatistics(func.rawType, outputValue);
+
+            return {
+                overcharge: overchargeKey,
+                level: levelKey,
+                static: staticKey,
+                stat,
+                func,
+            }
+        });
+        let oc : string[] = [], level : string[] = [], both: string[] = [], none: string[] = [];
+        for (let { stat, func, level: _level, overcharge } of await Promise.all(invocations)) {
+            let serializedText = this.serializeActiveSkillRepresentation(
+                stat, func,
+                { chance: true, side: false, newline: true, cooldown: true }
+            );
+            if (_level.length && overcharge.length) both.push(serializedText);
+                else (overcharge.length ? oc : (_level.length ? level : none)).push(serializedText)
+        }
+        
+        let fields : SetOptional<EmbedFieldData, 'inline'>[] = [];
+        fields.push({ name: '\u200b', value: none.join('\n') + '\n' + level.join('\n') });
+        fields.push({ name: '[Overcharge]', value: oc.join('\n') });
+        fields.push({ name: '[Overcharge] & [Level]', value: both.join('\n') });
+
+        // English name/ranks
+        let NA = await this.NA.mstTreasureDevice.findOne({ id: treasureDeviceId }).exec()
+        treasureDevice.name = NA?.name ?? treasureDevice.name;
+        treasureDevice.rank = NA?.rank ?? treasureDevice.rank;
+        treasureDevice.typeText = NA?.typeText ?? treasureDevice.typeText;
+
+        return { raw: treasureDevice, fields: fields.filter(field => field.value.trimRight()) };
     }
 
     renderItems = (combineLimits : mstCombineLimit[] | mstCombineSkill[], type : 'ascension' | 'skill') => {
@@ -447,5 +528,34 @@ export class EmbedRenderer {
             .setTitle(`${collectionNo}. ${englishName?.name || name} (\`${id}\`)`)
             .setDescription(`Cost : ${cost}`)
             .addFields([base, max].filter(a => a.value));
+    }
+
+    treasureDeviceEmbed = async (collectionNo : number) => {
+        let db = this.JP;
+
+        let svt = await db.mstSvt.findOne({ collectionNo }).exec();
+        let treasureDevices = await db.mstSvtTreasureDevice.find({ svtId: svt.baseSvtId }).exec()
+            .then(records => records.filter(rec => rec.priority))
+            .then(records => records.sort((a, b) => a.treasureDeviceId - b.treasureDeviceId));
+
+        svt.name = await this.complementary.svtObject.findOne({ id: svt.baseSvtId }).exec().then(obj => obj?.name ?? svt.name);
+        let data = await Promise.all(treasureDevices.map(td => this.renderTreasureDevice(td.treasureDeviceId)));
+
+        let generator = (_data : typeof data[0], index : number) => {
+            let { damage, cardId } = treasureDevices[index];
+            let { raw, fields } = _data;
+            return new MessageEmbed()
+                .setURL(`https://apps.atlasacademy.io/db/#/JP/noble-phantasm/${raw.id}`)
+                .setAuthor(`${svt.collectionNo}. ${svt.name}`)
+                .setTitle(`[${raw.typeText}] ${raw.name} [__${raw.rank}__]`)
+                .setDescription(
+                    `Card : **${Trait[cardId + cardMod as tr]}** – Hit count : **${damage.length}** (${damage.join('-')})`,
+                )
+                .addFields(fields)
+                .setThumbnail(null);
+}
+
+
+        return data.map(generator);
     }
 }

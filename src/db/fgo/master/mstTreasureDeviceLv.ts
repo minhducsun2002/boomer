@@ -4,7 +4,7 @@ import type { mstFunc } from './mstFunc';
 type tdId = mstSvtTreasureDevice['treasureDeviceId'];
 export interface mstTreasureDeviceLv {
     funcId: mstFunc['id'][];
-    svals: [string]; svals2: [string]; svals3: [string]; svals4: [string]; svals5: [string];
+    svals: string[]; svals2: string[]; svals3: string[]; svals4: string[]; svals5: string[];
     treaureDeviceId: tdId; lv: number; detailId: tdId;
     tdPoint: number, tdPointDef: number,
     tdPointQ: number, tdPointA: number, tdPointB: number, tdPointEx: number;

@@ -1,9 +1,8 @@
 import { MessageEmbed, Message } from 'discord.js';
-import { plural as p } from '@pepper/utils' ;
-import sentence from '@pepper/lib/sentence';
 import { FgoCommand } from './baseCommand';
 import search from '@pepper/modules/fgo/servant-name-search';
-import main from '@pepper/modules/fgo/servant-main-database';
+import td from '@pepper/modules/fgo/np-details-cache';
+import { paginatedEmbed } from '@pepper/utils';
 
 const commandName = 'servant-np';
 const aliases = ['servant-np', 'np', 'snp'];
@@ -37,46 +36,15 @@ export = class extends FgoCommand {
             _id = res[0].item.id;
         }
 
-        const _main = this.client.moduleHandler.findInstance(main);
-        const results = await _main.query({ id: _id })
-            .select('name noblePhantasm id dmgDistribution.np').exec();
-
-        if (!results.length) return bail();
-
-        const [{ name, id, noblePhantasm: np }] = results;
-
-        const embed = new MessageEmbed()
-            .setAuthor(`${id}. ${name}`)
-            .setTitle(`Noble Phantasm${p(np.length)}`)
-
-        np.forEach(
-            ({ name, extendedName, rank, detail, class: _class, hitcount, records,
-                overchargeDetail, overchargeRecords, condition
-            }) => {
-                embed.addField(
-                    `[${_class}] **${name}** __[${rank}]__\n_${extendedName}_`,
-                    `Hit count : ${hitcount}`
-                    + `\n${detail.split('\n').map(a => `- ${a}`).join('\n')}`
-                    + `\n__${overchargeDetail.split('\n').map(a => `- ${a}`).join('\n')}__`
-                    + `\n\n${records.map(
-                        ({ effectName, effectStrength }) => {
-                            if (effectStrength.length)
-                                return `**[${sentence(effectName)}]** : ${effectStrength.join(' / ')}`
-                            else return ''
-                        }
-                    ).filter(a=>!!a).join('\n')}`
-                    + `\n__${overchargeRecords.map(
-                        ({ effectName, effectStrength }) => {
-                            if (effectStrength.length)
-                                return `**[${sentence(effectName)}]** : ${effectStrength.join(' / ')}`
-                            else return ''
-                        }
-                    ).join('\n')}__`
-                    + (condition ? `\n\n_${condition}_` : '')
+        let embeds = (await this.client.moduleHandler.findInstance(td).get(_id)).map(data => new MessageEmbed(data));
+        if (embeds.length > 1)
+            paginatedEmbed()
+                .setChannel(m.channel)
+                .setEmbeds(
+                    embeds.map((embed, i, _) => embed.setFooter(`Page ${i + 1}/${_.length}`))
                 )
-            }
-        )
-
-        m.channel.send(embed);
+                .run({ idle: 20000, dispose: true })
+        else
+            m.channel.send(embeds[0]);
     }
 }

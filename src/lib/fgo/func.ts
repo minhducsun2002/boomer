@@ -97,6 +97,8 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 100)}%`)
         if ([FuncType.GAIN_HP, FuncType.GAIN_STAR].includes(f))
             out.amount = val.get(vKey[vType.Value])
+        if ([FuncType.DAMAGE_NP].includes(f))
+            out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`)
     }
     return out;
 }
