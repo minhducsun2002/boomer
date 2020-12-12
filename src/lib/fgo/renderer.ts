@@ -4,7 +4,8 @@ import {
     ClassModifier as claMod,
     CardModifier as cardMod,
     Attribute,
-    ApplyTarget
+    ApplyTarget,
+    FuncType
 } from '@pepper/constants/fgo';
 import { ApplyTarget as aTgt, Trait } from '@pepper/constants/fgo/strings';
 import type { mstSvt } from '@pepper/db/fgo/master/mstSvt';
@@ -232,15 +233,17 @@ export class EmbedRenderer {
         let { side, chance: showChance } = opt;
         let targets = f.targets.map(a => `**[${a.trim()}]**`).join(', ');
         let team = side ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
-        let functionAction = `${targets ? f.action : '**' + f.action + '**'}${targets ? ' ' + targets : ''}`;
         
         // Active skills are only possessed by servants.
         // We usually don't care how a servant acts on the enemy side, I guess.
         if (f.onTeam === aTgt[ApplyTarget.ENEMY]) return '';
         // By default, everything is 100%.
         // We omit if that's the case to reduce clutter.
-        if (stat.chance?.length === 1 && stat.chance[0] === '100%') stat.chance = [];
-
+        if (stat.chance?.length === 1 && stat.chance[0] === '100%') showChance = false;
+        // We also don't care about NOPs.
+        // I mean, they have no effect, in most aspects I can think of.
+        if (f.rawType === FuncType.NONE) return '';
+        
         let amount = stat.amount?.length 
             ? (stat.amount?.length > 3 ? '\n ' : ' ') + 'of '
                 + stat.amount.map(a => `**${a}**`).join(' / ')
@@ -257,11 +260,14 @@ export class EmbedRenderer {
         ]
             .filter(Boolean)
             .map(([count, type]) => `**${count}** ${type}`).join(', ');
+        
+        f.action = (showChance ? f.action.substr(0, 1).toLowerCase() + f.action.substr(1) : f.action);
+        let functionAction = `${targets ? f.action : '**' + f.action + '**'}${targets ? ' ' + targets : ''}`;
         return (
             team
             + (showChance ? chance : '')
             + functionAction
-            + ` on ${f.affectTarget}`
+            + ` to ${f.affectTarget}`
             + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
             + (limits ? ` (${limits})` : '')
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
@@ -298,7 +304,7 @@ export class EmbedRenderer {
             + (f.traitToAffect?.length ? ` with ${f.traitToAffect.map(a => `[${a}]`).join(', ')}` : '')
             + (stat?.amount?.length ? ` of **${stat.amount[level]}**` : '')
             + (limits ? ` (${limits})` : '')
-            + ` on **${f.affectTarget}**`
+            + ` to **${f.affectTarget}**`
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
             + (stat.onField?.length ? ' when the wearer is on field' : '')
             + (f.fieldTraits.length ? ` if on ${f.fieldTraits.map(a => `__[${a}]__`).join(' & ')} field` : '')
@@ -366,13 +372,14 @@ export class EmbedRenderer {
             let serializedText = this.serializeActiveSkillRepresentation(
                 stat, func,
                 { chance: true, side: false, newline: true, cooldown: true }
-            );
+            )
+            if (serializedText)
             if (_level.length && overcharge.length) both.push(serializedText);
                 else (overcharge.length ? oc : (_level.length ? level : none)).push(serializedText)
         }
         
         let fields : SetOptional<EmbedFieldData, 'inline'>[] = [];
-        fields.push({ name: '\u200b', value: none.join('\n') + '\n' + level.join('\n') });
+        fields.push({ name: '\u200b', value: none.concat(level).join('\n') });
         fields.push({ name: '[Overcharge]', value: oc.join('\n') });
         fields.push({ name: '[Overcharge] & [Level]', value: both.join('\n') });
 
@@ -553,7 +560,7 @@ export class EmbedRenderer {
                 )
                 .addFields(fields)
                 .setThumbnail(null);
-}
+        }
 
 
         return data.map(generator);
