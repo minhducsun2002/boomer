@@ -2,7 +2,7 @@ import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
 import { getBuffById } from './buff';
 import { ValsType as vType } from '@pepper/constants/fgo';
-import { ValsKey as vKey } from '@pepper/constants/fgo/strings';
+import { ValsKey as vKey, Trait } from '@pepper/constants/fgo/strings';
 import { Statistics, renderChance, renderCount } from './buff';
 
 import {
@@ -95,10 +95,23 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
     if (val.has(vKey[vType.Value])) {
         if ([FuncType.GAIN_NP, FuncType.LOSS_NP].includes(f))
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 100)}%`)
-        if ([FuncType.GAIN_HP, FuncType.GAIN_STAR].includes(f))
+        if ([FuncType.GAIN_HP, FuncType.GAIN_STAR, FuncType.SHORTEN_SKILL].includes(f))
             out.amount = val.get(vKey[vType.Value])
-        if ([FuncType.DAMAGE_NP].includes(f))
+        if (f === FuncType.DAMAGE_NP)
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`)
+        if ([FuncType.DAMAGE_NP_INDIVIDUAL, FuncType.DAMAGE_NP_STATE_INDIVIDUAL_FIX].includes(f)) {
+            out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
+            out.other = out.other ?? [];
+            let specialDamageValue = val.get(vKey[vType.Correction]).map(_ => `**${(+_ / 10)}%**`);
+            out.other.push(
+                {
+                    // assumption that a target trait doesn't change ever, so we don't need to dedupe
+                    name: `Special damage for ${Trait[+val.get(vKey[vType.Target])[0] as keyof typeof Trait]} targets`,
+                    value: specialDamageValue,
+                    serializeValue: () => specialDamageValue.join(' / ')
+                }
+            );
+        }
     }
     return out;
 }

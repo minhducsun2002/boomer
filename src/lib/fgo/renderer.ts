@@ -268,7 +268,7 @@ export class EmbedRenderer {
             + amount
             + (stat.onField?.length ? ' when the wearer is on field' : '')
             + (f.fieldTraits.length ? ` if on ${f.fieldTraits.map(a => `__[${a}]__`).join(' & ')} field` : '')
-            + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value}`).join('\n') || '')).trimRight()
+            + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_?.serializeValue?.() ?? _.value}`).join('\n') || '')).trimRight()
         ).trimRight();
     }
 

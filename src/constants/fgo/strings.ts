@@ -96,9 +96,9 @@ export const Trait = {
     // Abigail Williams?
     [t.buffTerrorStunChanceAfterTurn]: 'Terror',
     [t.canBeInBattle]: 'Can be in battle',
-    [t.cardArts]: 'Arts Cards',
-    [t.cardBuster]: 'Buster Cards',
-    [t.cardExtra]: 'Extra Cards',
+    [t.cardArts]: 'Arts',
+    [t.cardBuster]: 'Buster',
+    [t.cardExtra]: 'Extra',
     [t.cardNP]: 'NP Cards',
     [t.cardQuick]: 'Quick Cards',
     [t.centaur]: 'Centaur',
@@ -209,7 +209,7 @@ export const FuncTypes = {
     [fType.DAMAGE_NP_SAFE]: '',
     [fType.DAMAGE_NP_STATE_INDIVIDUAL]: '',
     // deal Special Attack for those with a certain state
-    [fType.DAMAGE_NP_STATE_INDIVIDUAL_FIX]: 'Deal NP damage & Special Attack NP damage to enemies with certain state',
+    [fType.DAMAGE_NP_STATE_INDIVIDUAL_FIX]: 'Deal NP damage & Special Attack NP damage',
     // deal a static value of damage?
     [fType.DAMAGE_VALUE]: 'Deal damage',
     [fType.DELAY_NPTURN]: 'Drain enemy charge',
@@ -263,6 +263,7 @@ export const FuncTypes = {
     [fType.REVIVAL]: 'Revive',
     [fType.SEND_SUPPORT_FRIEND_POINT]: '',
     [fType.SERVANT_FRIENDSHIP_UP]: 'Increase Bond points gained',
+    [fType.SHORTEN_SKILL]: 'Decrease skill cooldown',
     [fType.SUB_STATE]: 'Remove effects',
     [fType.TRANSFORM_SERVANT]: 'Swap servant',
     // https://apps.atlasacademy.io/db/#/JP/skill/962854

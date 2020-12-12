@@ -14,8 +14,8 @@ export async function getBuffById(id: number, db : DBInstance) {
     return _;
 }
 
-
-export type BuffEntry = { name: string, value: string[] };
+// serializeValue is for cases when we want to provide a "recommended" method of serializing .value values into a string.
+export type BuffEntry = { name: string, value: string[], serializeValue?: () => string };
 export function renderTurn(s : string[]) : BuffEntry {
     // only handle turns > 0
     if (s.some(_ => +_ > 0)) return {
@@ -86,13 +86,12 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.UP_FUNC_HP_REDUCE:
         case Buff.UP_ATK:           case Buff.DOWN_ATK:
         case Buff.UP_TOLERANCE_SUBSTATE:
-            count(false);
-            _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
-            break;
         case Buff.GUTS_RATIO:
+        case Buff.DOWN_DEFENCECOMMANDALL:
             count(false);
             _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             break;
+        case Buff.REDUCE_HP:        case Buff.REGAIN_HP:
         case Buff.GUTS:
         case Buff.UP_CHAGETD:
             count(false);
@@ -101,12 +100,14 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
         case Buff.AVOID_INSTANTDEATH:
             count();
             break;
+        case Buff.REGAIN_NP:
+            _.amount = val.get(ValsKey[vType.Value]).map(_ => `${(+_ / 100)}%`);
+            break;
         case Buff.ADD_DAMAGE:       case Buff.DOWN_DAMAGE:
         case Buff.REGAIN_STAR:
         case Buff.UP_DAMAGE_INDIVIDUALITY_ACTIVEONLY:
         case Buff.ADD_MAXHP:        case Buff.SUB_MAXHP:
         case Buff.OVERWRITE_CLASSRELATIO_ATK:
-        case Buff.REGAIN_HP:
         case Buff.SUB_SELFDAMAGE:
             _.amount = val.get(ValsKey[vType.Value]);
             break;
