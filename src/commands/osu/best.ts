@@ -36,7 +36,7 @@ export = class extends OsuCommand {
         })
     }
 
-    async exec(m : Message, { user, mode, limit } = { user: '', mode: '', limit: 20 }) {
+    async exec(m : Message, { user, mode, limit } = { user: '', mode: '', limit: 50 }) {
         user = user.trim();
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
@@ -47,7 +47,7 @@ export = class extends OsuCommand {
             // we got the ID, now we start fetching things
 
             if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
-                limit = 20;
+                limit = 50;
             let recents = await fetchBest(id, mode, limit, MAX_SINGLE);
             
             if (recents.length) 
