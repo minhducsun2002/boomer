@@ -1,9 +1,26 @@
 import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
 import f from 'fuse.js';
+import { Schema, Document, createConnection, Model } from 'mongoose';
 import db, { Servant } from './servant-main-database';
 
 type fuzzySearchOpt = Parameters<f<Servant>['search']>[1];
+
+
+interface AliasEntry extends Document {
+    /** Servant collectionNo. */
+    collectionNo: number;
+    /** Alias of this servant. */
+    alias: string;
+    /** When this entry was added. `new Date.toJSON()`. */
+    addedAt: string;
+    /** ID of user who added. */
+    creator: string;
+}
+const nameSchema = new Schema<AliasEntry>({
+    collectionNo: Number, alias: { type: String, unique: true }, addedAt: String, creator: String
+});
+
 
 export = class extends FgoModule {
     constructor() {
@@ -16,14 +33,16 @@ export = class extends FgoModule {
 
     private _records : Servant[];
     public get records() { return this._records };
+
+    private aliasModel:  Model<AliasEntry>;
     
     /**
      * Search a servant by name
      * @param s Search query
      */
-    async search(s : string, opt? : fuzzySearchOpt) {
+    search(s : string, opt? : fuzzySearchOpt) {
         let t = this.tokenSearch(s);
-        let res = await this.fuzzySearch(s, opt);
+        let res = this.fuse.search(s, Object.assign({}, { shouldSort: true }, opt));
         if (t?.size) {
             // instead of removing, prioritise
             let match = [] as typeof res, mis = [] as typeof res;
@@ -65,15 +84,6 @@ export = class extends FgoModule {
         return new Map(occurences.map(({ id, count }) => [id, count]));
     }
 
-    /**
-     * Fuzzy search a servant by name
-     * @param s Search query
-     */
-    async fuzzySearch(s : string, opt? : fuzzySearchOpt) {
-        if (!this.fuse || !this.initialized) await this.initialize();
-        return this.fuse.search(s, Object.assign({}, { shouldSort: true }, opt));
-    }
-
     private async verifyDupes(s : Servant[]) {
         let _ = s.map(s => [s.name, ...s.alias]).flat();
         let _1 = new Set(_).size;
@@ -84,10 +94,19 @@ export = class extends FgoModule {
             )
     }
 
+    async getAlias(query: string) {
+        return await this.aliasModel.findOne({ alias: query.toLowerCase() }).exec();
+    }
+
+    async pushAlias(collectionNo: number, alias: string, creator: string) {
+        return await this.aliasModel.create({ collectionNo, alias, creator, addedAt: new Date().toJSON() })
+    }
+
     require = [new db().id];
 
-    initialized = false;
     async initialize() {
+        await this.initializeAlias();
+
         let c = this.handler.findInstance(db);
         let records = await c.query({}).select('name alias id class rarity').exec();
         this._records = records;
@@ -127,6 +146,12 @@ export = class extends FgoModule {
             index
         );
         this.log.success(`Servant aliases indexing complete.`)
-        this.initialized = true;
+    }
+
+    private async initializeAlias() {
+        let { servant_aliases } = this.client.config.database.fgo as { [k: string]: string };
+        this.aliasModel = createConnection(servant_aliases)
+            .on('open', () => this.log.success(`Connected to servant alias database.`))
+            .model('Servant', nameSchema);
     }
 }

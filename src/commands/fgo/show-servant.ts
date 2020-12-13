@@ -29,19 +29,15 @@ export = class extends FgoCommand {
         { query }: { query?: string }
     ) {
         const err = new MessageEmbed().setColor(ERROR_COLOR);
+        let bail = (s? : string) => m.channel.send(
+            err.setDescription(s || ':disappointed: Sorry, I could not find anything.')
+        )
 
-        if (!query)
-            return m.channel.send(
-                err.setDescription(':frowning: Where is your query?')
-            )
+        if (!query) return bail(':frowning: Where is your query?');
 
         let search_instance = this.client.moduleHandler.findInstance(search);
         let cache_details = this.client.moduleHandler.findInstance(cache);
         let master = this.client.moduleHandler.findInstance(mst);
-
-        let bail = (s? : string) => m.channel.send(
-            err.setDescription(s || ':disappointed: Sorry, I could not find anything.')
-        )
 
         let _id : number, det = false;
         if (Number.isInteger(+query)) {
@@ -49,9 +45,14 @@ export = class extends FgoCommand {
             det = true;
         }
         else {
-            let res = await search_instance.search(query);
-            if (!res.length) return bail();
-            _id = res[0].item.id;
+            let alias = await search_instance.getAlias(query);
+            if (alias)
+                _id = alias.collectionNo;
+            else {
+                let res = search_instance.search(query);
+                if (!res.length) return bail();
+                _id = res[0].item.id;
+            }
         }
 
         let e : MessageEmbed[] = [], cached: any[] = [], found = true;

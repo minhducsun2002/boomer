@@ -30,10 +30,15 @@ export = class extends FgoCommand {
 
         let _id = +query;
         if (isNaN(_id)) {
-            let res = await this.client.moduleHandler.findInstance(search)
-                .search(query);
-            if (!res.length) return bail();
-            _id = res[0].item.id;
+            let search_instance = this.client.moduleHandler.findInstance(search);
+            let alias = await search_instance.getAlias(query);
+            if (alias)
+                _id = alias.collectionNo;
+            else {
+                let res = search_instance.search(query);
+                if (!res.length) return bail();
+                _id = res[0].item.id;
+            }
         }
 
         let embeds = (await this.client.moduleHandler.findInstance(td).get(_id)).map(data => new MessageEmbed(data));
