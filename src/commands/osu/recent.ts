@@ -54,7 +54,7 @@ export = class extends OsuCommand {
             let { user: { id, username } } = await fetchUser(user, mode);
             let mode_int = modes.indexOf(mode) as keyof typeof accuracy;
             if (failed) {
-                let _ = await fetchRecentApi(OSU_API_KEY, user, mode_int, 10);
+                let _ = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));
                 embeds = await embedScoresetApi(mode_int, _, 5)
                 for (let e of embeds) 
                     e
@@ -70,15 +70,17 @@ export = class extends OsuCommand {
                 embeds = embedScoreset(recents, username, id, mode)
                     .map(a => a.setTitle(`Recent plays of **${username}**`))
             }
-            if (embeds.length) 
+            if (embeds.length > 1)
                 paginatedEmbed()
                     .setChannel(m.channel)
                     .setEmbeds(embeds)
                     .run({ idle: 20000, dispose: true })
             else
                 m.channel.send(
-                    new MessageEmbed()
-                        .setDescription(`No recent play found for user [**${username}**](https://osu.ppy.sh/users/${id}).`)
+                    embeds[0] 
+                    || new MessageEmbed().setDescription(
+                        `No recent play found for user [**${username}**](https://osu.ppy.sh/users/${id}).`
+                    )
                 )
         }
         catch (e) {
