@@ -1,11 +1,12 @@
 import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
 import axios from 'axios';
-import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors';
-import { accuracy as acc, modToString as mm } from '../../lib/osu/utils';
+import { SUCCESS_COLOR, ERROR_COLOR } from '@pepper/constants/colors';
+import { accuracy as acc} from '@pepper/lib/osu/utils';
 import { pad, chunk, paginatedEmbed } from '@pepper/utils';
 import { modes } from '@pepper/constants/osu';
 import { fetchMapset, fetchScore, checkURL as check, checkScoreURL as checkScore } from '@pepper/lib/osu';
+import { modbits } from 'ojsama';
 
 const commandName = 'score', aliases : string[] = [commandName, 'scores', 'sc'];
 
@@ -38,7 +39,7 @@ export = class extends OsuCommand {
     }
 
     async exec(m : Message, { beatmap, username, mode: gameMode } = { beatmap: '', username: '', mode: '' }) {
-        const MAX_SCORES = 3;
+        const MAX_SCORES = 5;
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, an error occurred.`);
 
@@ -107,7 +108,7 @@ export = class extends OsuCommand {
             if (!results)
                 results = set.converts.find(a => a.id === _ && a.mode_int === gameModeInt);
             let {
-                difficulty_rating, mode_int, version, convert,
+                difficulty_rating, mode_int, version, bpm,
                 max_combo, ar, accuracy, cs, drain, total_length, id
             } = results
 
@@ -115,34 +116,33 @@ export = class extends OsuCommand {
 
             const createEmbed = (__ : typeof scores) => new MessageEmbed()
                 .setColor(SUCCESS_COLOR).setTimestamp()
-                .setURL(`https://osu.ppy.sh/beatmaps/${_}`)
+                .setURL(`https://osu.ppy.sh/beatmaps/${id}`)
                 .setTitle(`Scores by \`${scores[0].username}\`\non **${set.artist}** - **${set.title}** [**${version}**]`)
                 .setDescription(
                     `\n${difficulty_rating} :star:${max_combo ? ` | **${max_combo}**x` : ''} | `
-                    + `${pad(2)(Math.floor(total_length / 60))}:${pad(2)(total_length % 60)} | `
-                    + `[Link](https://osu.ppy.sh/beatmaps/${id})`
+                    + `${pad(2)(Math.floor(total_length / 60))}:${pad(2)(total_length % 60)} | **${bpm}** BPM`
                     + `\n\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${accuracy}** \`HP\`**${drain}**\n`
-                )
-                .addFields(
-                    __.map(a => {
+                    + '\n'
+                    + __.map(a => {
                         let {
                             rank, pp, enabled_mods, maxcombo: combo, perfect, score_id,
                             count100: c3, count300: c6, count50: c1, countmiss: c0, countkatu: c3k, countgeki: c6k,
                             date
                         } = a;
-                        let mods = mm(+enabled_mods);
-                        return {
-                            name : `${new Date(date).toUTCString()}`,
-                            value : `[**${rank}**] **${pp}**pp (**${combo}**x${+perfect ? '' : (convert ? '' : `/**${max_combo}**x`)} | `
+                        let mods = modbits.string(+enabled_mods);
+                        return (
+                            `[**${rank}**] **${pp}**pp (**${combo}**x | `
                             + `**${(acc[mode_int as keyof typeof acc]({
                                 count50: +c1, count100: +c3,
                                 count300: +c6, countMiss: +c0,
                                 count100k: +c3k, count300k: +c6k
-                            }) * 100).toFixed(3)}**%) ${+perfect ? '(FC)' : ''}\n`
-                            + (mods.length ? `Mods : ${mods.join(', ')}\n` : '')
-                            + `[Score link](https://osu.ppy.sh/scores/${modes[mode_int]}/${score_id})`
-                        }
-                    })
+                            }) * 100).toFixed(3)}**%) ${+perfect ? '(FC)' : ''}`
+                            + (mods ? ` +**${mods}**` : '')
+                            + `\n[**${c6}**/**${c3}**/**${c1}**/**${c0}**]`
+                            + ` @ **${new Date(date).toLocaleString('vi-VN', { timeZone: 'UTC' })}**`
+                            +`\n[**Score link**](https://osu.ppy.sh/scores/${modes[mode_int]}/${score_id})`
+                        )
+                    }).join('\n\n')
                 )
 
             if (__.length < 2) return m.channel.send(createEmbed(__[0]));
