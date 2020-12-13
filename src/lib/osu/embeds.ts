@@ -186,7 +186,7 @@ export async function embedScoresetApi(
                         + `\n${b.difficulty_rating} :star: `
                         + `- \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}** `
                         + `- **${b.bpm}** BPM`
-                        + `\n[**Beatmap**](https://osu.ppy.sh/beatmaps/${id})`
+                        + `\n[[**Beatmap**]](https://osu.ppy.sh/beatmaps/${id})`
                     }
                 }))
             )
