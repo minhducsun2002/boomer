@@ -99,7 +99,7 @@ export = class extends FgoModule {
     }
 
     async pushAlias(collectionNo: number, alias: string, creator: string) {
-        return await this.aliasModel.create({ collectionNo, alias, creator, addedAt: new Date().toJSON() })
+        return await this.aliasModel.create({ collectionNo, alias: alias.toLowerCase(), creator, addedAt: new Date().toJSON() })
     }
 
     async listAlias(collectionNo: number) {
