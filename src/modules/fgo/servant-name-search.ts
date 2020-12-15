@@ -102,6 +102,10 @@ export = class extends FgoModule {
         return await this.aliasModel.create({ collectionNo, alias, creator, addedAt: new Date().toJSON() })
     }
 
+    async listAlias(collectionNo: number) {
+        return await this.aliasModel.find({ collectionNo }).exec();
+    }
+
     require = [new db().id];
 
     async initialize() {
@@ -152,6 +156,6 @@ export = class extends FgoModule {
         let { servant_aliases } = this.client.config.database.fgo as { [k: string]: string };
         this.aliasModel = createConnection(servant_aliases)
             .on('open', () => this.log.success(`Connected to servant alias database.`))
-            .model('Servant', nameSchema);
+            .model('names', nameSchema);
     }
 }
