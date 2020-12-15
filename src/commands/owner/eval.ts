@@ -32,7 +32,7 @@ export = class extends OwnerCommand {
         }
         let end = performance.now();
         if (typeof result !== 'string') 
-            result = inspect(result, { depth: 3 });
+            result = inspect(result, { depth: 2 });
 		
         let embed = new MessageEmbed()
             .setDescription('```' + code + '```')
