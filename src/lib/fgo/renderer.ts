@@ -23,7 +23,6 @@ import { parseVals } from './datavals';
 import { renderBuffStatistics } from './buff';
 import type { PromiseValue, SetOptional, SetRequired } from 'type-fest';
 import type { DBInstance } from '@pepper/db/fgo';
-import type { Servant } from '@pepper/db/fgo/main';
 import { ComplementaryDataModel } from '@pepper/modules/fgo/complementary-data';
 import { EmbedFieldData } from 'discord.js';
 
@@ -421,8 +420,7 @@ export class EmbedRenderer {
         return Promise.all(words);
     } 
 
-    servantDashboardEmbed = async (dataset : Servant) : Promise<MessageEmbed[]> => {
-        const { name, id } = dataset;
+    servantDashboardEmbed = async (name : string, id : number) : Promise<MessageEmbed[]> => {
         let { NA, JP } = this;
     
         const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
