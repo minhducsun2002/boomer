@@ -133,6 +133,17 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
                 serializeValue: () => maxTraitCount.join(' / ')
             })
         }
+
+        if (f === FuncType.DAMAGE_NP_RARE) {
+            out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
+            let rarities = val.get('TargetRarityList')[0].split('/');
+            let specialDamageValue = val.get(vKey[vType.Correction]).map(_ => `**${(+_ / 10)}%**`);
+            out.other.push({
+                name: `Special damage for ${rarities.join('/')} rarity targets`,
+                value: specialDamageValue,
+                serializeValue: () => specialDamageValue.join(' / ')
+            });
+        }
     }
     return out;
 }

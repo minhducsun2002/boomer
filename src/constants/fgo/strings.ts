@@ -205,7 +205,7 @@ export const FuncTypes = {
     [fType.DAMAGE_NP_INDIVIDUAL]: 'Deal Special Attack NP damage',
     [fType.DAMAGE_NP_INDIVIDUAL_SUM]: 'Deal Special Attack NP damage (bonus per trait)',
     [fType.DAMAGE_NP_PIERCE]: 'Deal DEF-ignoring NP damage',
-    [fType.DAMAGE_NP_RARE]: '',
+    [fType.DAMAGE_NP_RARE]: 'Deal Special Attack NP damage (bonus from rarity)',
     [fType.DAMAGE_NP_SAFE]: '',
     [fType.DAMAGE_NP_STATE_INDIVIDUAL]: '',
     // deal Special Attack for those with a certain state
