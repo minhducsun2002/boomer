@@ -88,7 +88,7 @@ function isSimpleEffect(_ : mstBuff | { name: string, simple: number }) : _ is {
 
 export function renderFunctionStatistics (f: FuncType, val : Map<string, string[]>) {
     let out = {} as Statistics;
-
+    out.other = [];
     if (val.has('AddCount')) out.amount = val.get('AddCount');
     if (val.has(vKey[vType.Rate])) out.chance = renderChance(val.get(vKey[vType.Rate]))?.value;
     if (val.has(vKey[vType.Count])) out.amount = renderCount(val.get(vKey[vType.Count]))?.value;
@@ -101,7 +101,6 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`)
         if ([FuncType.DAMAGE_NP_INDIVIDUAL, FuncType.DAMAGE_NP_STATE_INDIVIDUAL_FIX].includes(f)) {
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
-            out.other = out.other ?? [];
             let specialDamageValue = val.get(vKey[vType.Correction]).map(_ => `**${(+_ / 10)}%**`);
             out.other.push(
                 {
@@ -111,6 +110,28 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
                     serializeValue: () => specialDamageValue.join(' / ')
                 }
             );
+        }
+        if (f === FuncType.DAMAGE_NP_INDIVIDUAL_SUM) {
+            out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
+            let traits = val.get('TargetList')[0].split('/').map(t => Trait[+t as keyof typeof Trait]),
+                specialDamageValue = val.get(vKey[vType.Value2]).map(_ => `**${(+_ / 10)}%**`),
+                traitBasedSpecialDamageValue = val.get(vKey[vType.Correction]).map(_ => `**${(+_ / 10)}%**`),
+                maxTraitCount = val.get('ParamAddMaxCount').map(_ => `**${_}**`);
+            out.other.push({
+                name: `Special damage for ${traits.join(' / ')} targets`,
+                value: specialDamageValue,
+                serializeValue: () => specialDamageValue.join(' / ')
+            });
+            out.other.push({
+                name: `Added special damage per [${traits.join(' / ')}] trait`,
+                value: traitBasedSpecialDamageValue,
+                serializeValue: () => traitBasedSpecialDamageValue.join(' / ')
+            })
+            out.other.push({
+                name: `Maximum amount of counted [${traits.join(' / ')}] traits`,
+                value: maxTraitCount,
+                serializeValue: () => maxTraitCount.join(' / ')
+            })
         }
     }
     return out;

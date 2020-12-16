@@ -203,7 +203,7 @@ export const FuncTypes = {
     [fType.DAMAGE_NP_HPRATIO_HIGH]: '',
     [fType.DAMAGE_NP_HPRATIO_LOW]: 'Deal NP damage based on HP level',
     [fType.DAMAGE_NP_INDIVIDUAL]: 'Deal Special Attack NP damage',
-    [fType.DAMAGE_NP_INDIVIDUAL_SUM]: '',
+    [fType.DAMAGE_NP_INDIVIDUAL_SUM]: 'Deal Special Attack NP damage (bonus per trait)',
     [fType.DAMAGE_NP_PIERCE]: 'Deal DEF-ignoring NP damage',
     [fType.DAMAGE_NP_RARE]: '',
     [fType.DAMAGE_NP_SAFE]: '',
