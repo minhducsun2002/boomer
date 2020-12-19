@@ -247,7 +247,7 @@ export const FuncTypes = {
     [fType.LOSS_HP]: 'Reduce HP',
     [fType.LOSS_HP_PER]: '',
     [fType.LOSS_HP_PER_SAFE]: '',
-    [fType.LOSS_HP_SAFE]: 'Reduce HP to 1',
+    [fType.LOSS_HP_SAFE]: 'Reduce HP without killing',
     [fType.LOSS_NP]: 'Decrease NP',
     [fType.LOSS_STAR]: 'Decrease Critical Stars',
     // https://youtu.be/lrHzvSckdSY?t=87
