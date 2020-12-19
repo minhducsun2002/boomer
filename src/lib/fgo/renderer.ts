@@ -35,8 +35,6 @@ interface SkillRenderOptions {
     side: boolean;
     /** Show/hide the probability of a skill triggerring. */
     chance: boolean;
-    /** Whether to separate skill functions with an empty line. */
-    newline: boolean;
     /** Whether to show skill cooldown */
     cooldown: boolean;
 }
@@ -221,7 +219,7 @@ export class EmbedRenderer {
 
         return {
             name: (NAskillName ?? skill.name) + (turns.length ? ` (${turns.join('-')})` : ''),
-            value: (await Promise.all(values)).filter(Boolean).join(opt.newline ? '\n\n' : '\n') 
+            value: (await Promise.all(values)).filter(Boolean)
         };
     }
 
@@ -370,7 +368,7 @@ export class EmbedRenderer {
         for (let { stat, func, level: _level, overcharge } of await Promise.all(invocations)) {
             let serializedText = this.serializeActiveSkillRepresentation(
                 stat, func,
-                { chance: true, side: false, newline: true, cooldown: true }
+                { chance: true, side: false, cooldown: true }
             )
             if (serializedText)
             if (_level.length && overcharge.length) both.push(serializedText);
@@ -439,7 +437,7 @@ export class EmbedRenderer {
         svt.name = name;
         let base = () => this.servantBase(svt, __class.name, Math.max(...limits.map(_ => _.rarity)));
 
-        let passives = await Promise.all(classPassive.map(_ => this.renderSkill(_, { level: 0, side: true, newline: true })));
+        let passives = await Promise.all(classPassive.map(_ => this.renderSkill(_, { level: 0, side: true })));
         let ascItems = await this.renderItems(await this.JP.mstCombineLimit.find({ id: baseSvtId }).limit(5).exec(), 'ascension');
         let skillItems = await this.renderItems(await this.JP.mstCombineSkill.find({ id: baseSvtId }).limit(9).exec(), 'skill');
         return [
@@ -448,7 +446,7 @@ export class EmbedRenderer {
                 .setFooter(`Basic details`),
             base()
                 .addFields([this.traits(svt)]).setFooter('Traits'),
-            base().addFields(passives).setFooter(`Passive skills`),
+            base().addFields(passives.map(_ => ({ name: _.name, value: _.value.join('\n') }))).setFooter(`Passive skills`),
             // cover case where no ascension material
             (ascItems.length
             ? base().addFields(ascItems).setFooter(`Ascension materials`)
@@ -479,9 +477,8 @@ export class EmbedRenderer {
         for (let position of skills) {
             let out : typeof output[0] = [];
             for (let record of position) {
-                out.push(
-                    await this.renderSkill(record.skillId, { chance: true, side: false, newline: true, cooldown: true })
-                )
+                let { name, value } = await this.renderSkill(record.skillId, { chance: true, side: false, cooldown: true });
+                out.push({ name, value: value.join('\n\n') })
             }
             output.push([...out, { name: '\u200b', value: '\u200b' }]);
         }

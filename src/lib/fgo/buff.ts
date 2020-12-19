@@ -3,6 +3,7 @@ import { ValsType, Trait, ValsKey } from '@pepper/constants/fgo/strings';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
 import type { EmbedRenderer } from './renderer';
 import type { DBInstance } from '@pepper/db/fgo';
+import { deduplicate } from '@pepper/utils';
 
 /**
  * Fetch a `mstBuff` by its ID.
@@ -124,17 +125,21 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                 let levels = val.get(ValsKey[vType.Value2]);
                 let level = (levels || [])[i] || '1';
                 let effect = await renderer.renderSkill(+skillId, {
-                    side: true, chance: false, newline: false, level: (levels?.length > 1 ? undefined : (+level) - 1)
+                    side: true, chance: false, level: (levels?.length > 1 ? undefined : (+level) - 1)
                 })
-                return `__` + effect.value + `__`;
+                return effect.value;
             });
-            let value = await Promise.all(skillText);
+            let value = (await Promise.all(skillText))
+                // skills might have similar effects
+                .map(({}, effectIndex, arr) => deduplicate(arr.map(effectList => effectList[effectIndex])).join('\n'))
+                .filter(Boolean);
             value[0] = '\n' + value[0];
             out.push({
                 name: `Trigger skill on ${
                     (conditions.length ? conditions : ['all cases']).join('/')
                 }`,
-                value
+                value,
+                serializeValue: () => value.join('\n')
             });
             break;
         case Buff.AVOIDANCE:
