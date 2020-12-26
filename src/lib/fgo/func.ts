@@ -97,7 +97,7 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 100)}%`)
         if ([FuncType.GAIN_HP, FuncType.LOSS_HP, FuncType.LOSS_HP_SAFE, FuncType.GAIN_STAR, FuncType.SHORTEN_SKILL].includes(f))
             out.amount = val.get(vKey[vType.Value])
-        if (f === FuncType.DAMAGE_NP)
+        if ([FuncType.DAMAGE_NP, FuncType.DAMAGE_NP_PIERCE].includes(f))
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`)
         if ([FuncType.DAMAGE_NP_INDIVIDUAL, FuncType.DAMAGE_NP_STATE_INDIVIDUAL_FIX].includes(f)) {
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
