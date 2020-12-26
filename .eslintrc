@@ -4,7 +4,8 @@
         "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars-experimental": ["error"],
         "max-nested-callbacks": ["error", 3],
-        "max-depth": ["warn", 4]
+        "max-depth": ["warn", 4],
+        "no-trailing-spaces": ["error", { "ignoreComments": true }]
     },
     "parserOptions": {
         "sourceType": "module",
