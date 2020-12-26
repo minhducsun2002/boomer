@@ -15,7 +15,7 @@ export class InhibitorHandler extends i {
     constructor(...args : ConstructorParameters<typeof i>) {
         super(...args);
         this.on(
-            'load', 
+            'load',
             m => {
                 let { id, categoryID,  filepath, handler: { directory } } = m;
                 this.clientLog.success(

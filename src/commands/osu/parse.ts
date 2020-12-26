@@ -33,7 +33,7 @@ export = class extends OsuCommand {
         let _ = m.attachments.array().filter(a => a.name.endsWith('.osr'));
         if (!_.length)
             return m.channel.send(err.setDescription('Please attach at least one `.osr` file.'));
-        
+
         let replay;
         try {
             let __ = await axios.get(`${_[0].url}`, { validateStatus: () => true, responseType: 'arraybuffer' })
@@ -69,7 +69,7 @@ export = class extends OsuCommand {
                     _.runCommand(m, _.findCommand(`beatmap`), { beatmap: __.data[0].beatmap_id });
                     if (pp) {
                         _.runCommand(
-                            m, 
+                            m,
                             _.findCommand(`pp`),
                             {
                                 beatmap: __.data[0].beatmap_id,
@@ -83,6 +83,6 @@ export = class extends OsuCommand {
             } catch {}
         }
 
-        
+
     }
 }

@@ -76,7 +76,7 @@ export = class extends FgoCommand {
             );
 
         cached.forEach(s => e.push(new MessageEmbed(s)));
-            
+
         let notice = det ? '' : (
             `Search may not bring up the expected result.`
             + `\nPlease use \`${

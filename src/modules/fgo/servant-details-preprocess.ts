@@ -83,7 +83,7 @@ export = class extends FgoModule {
                     } catch (e) {
                         this.log.error(`Error processing servant ${collectionNo}.\n${e.stack}`)
                     };
-                }  
+                }
             )
         };
     }

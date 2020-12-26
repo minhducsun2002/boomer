@@ -39,7 +39,7 @@ export const ModNames = {
 
 export function modToString(m : number) {
     let out = [];
-    for (let key in Mods) 
+    for (let key in Mods)
         if (m & (+Mods[key])) out.push(ModNames[+Mods[key] as keyof typeof ModNames]);
     return out;
 }

@@ -31,9 +31,9 @@ export = class extends OwnerCommand {
             result = `${e}`; error = true;
         }
         let end = performance.now();
-        if (typeof result !== 'string') 
+        if (typeof result !== 'string')
             result = inspect(result, { depth: 2 });
-		
+
         let embed = new MessageEmbed()
             .setDescription('```' + code + '```')
             .addField(`Execution time`, `${((end - start) / 1000).toFixed(6)}s`);

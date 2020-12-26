@@ -51,7 +51,7 @@ export = class extends GeneralCommand {
             else if (handler.findCommand(q)) {
                 const cmd = handler.findCommand(q);
                 let _p = cmd.prefix ?? prefix;
-                const mainCall = `${_p}${cmd.aliases[0]}`, args = ((cmd.args || []) as ArgumentOptions[]) 
+                const mainCall = `${_p}${cmd.aliases[0]}`, args = ((cmd.args || []) as ArgumentOptions[])
                 out = out
                     .setTitle(`\`${mainCall}\`${
                         (cmd.aliases.length > 1)
@@ -87,7 +87,7 @@ export = class extends GeneralCommand {
         }
         else {
             let [main] = aliases;
-        
+
             out = out
                 .setDescription(
                     `${this.client.user} is ready to serve you.`
@@ -99,7 +99,7 @@ export = class extends GeneralCommand {
                     'Syntax description',
                     `A command's arguments are shown in the form of \`[name:type]\`.`
                     + `\nThe following types are supported :\n`
-                    + 
+                    +
                     [
                         [`phrase`, `matches by the order of the phrases inputted, ignoring flags/options.`],
                         [`flag`, `matches specified phrases, evaluated to \`true\` if present, \`false\` otherwise.`],
@@ -109,7 +109,7 @@ export = class extends GeneralCommand {
                 )
         }
 
-        if (out instanceof MessageEmbed) 
+        if (out instanceof MessageEmbed)
             out = out.setFooter(`Call ${prefix}${new i().aliases[0]} for info about me.`)
                 .setTimestamp()
 

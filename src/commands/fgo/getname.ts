@@ -28,7 +28,7 @@ export = class extends FgoCommand {
 
         let servantId = +query;
         if (isNaN(servantId)) servantId = (await search_instance.getAlias(query))?.collectionNo;
-        
+
         if (!Number.isSafeInteger(servantId))
             return bail(`Please specify a valid servant ID or alias.`)
 

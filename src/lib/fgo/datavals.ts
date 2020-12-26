@@ -43,7 +43,7 @@ function nestedSplitting (s : string) : string[] {
 export function parseVals (s : string, f : FuncType) {
     let raw = nestedSplitting(s.replace('[', '').replace(new RegExp(']$'), ''));
     let out = new Map<string, string>();
-    
+
     let raw_clean = raw.filter(a => !isNaN(+a));
 
     // let populate = (s : string[]) => s.forEach((k, i) => out.set(k, raw_clean[i]));
@@ -84,15 +84,15 @@ export function parseVals (s : string, f : FuncType) {
     let match = mappings.find(a => a.condition.includes(f));
     if (match) populate(match.values);
     else populate(["Rate", "Value", "Target"])
-    if (EVENT_FUNCTIONS.has(f) || FRIEND_FUNCTIONS.add(FuncType.CLASS_DROP_UP).has(f)) 
+    if (EVENT_FUNCTIONS.has(f) || FRIEND_FUNCTIONS.add(FuncType.CLASS_DROP_UP).has(f))
         out.set(+out.get("Type1") === 1 ? "AddCount" : "RateCount", out.get("Exp1"));
 
     // delete intermediary values
     out.delete("Type1"); out.delete("Exp1");
-    
+
     // keyed check
     for (let val of raw.filter(a => isNaN(+a)))
         out.set(...keyedArguments(val));
-        
+
     return out;
 }

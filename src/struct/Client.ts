@@ -12,7 +12,7 @@ import { plural as p } from '@pepper/utils';
 import c from 'chalk';
 import * as utils from './util';
 
-type cfg = (ConstructorParameters<typeof AkairoClient>[0]); 
+type cfg = (ConstructorParameters<typeof AkairoClient>[0]);
 
 type databaseMapping = { [key: string]: string | databaseMapping };
 
@@ -104,7 +104,7 @@ export class PepperClient extends AkairoClient {
             Object.assign(
                 {},
                 { prefix: Object.keys(pre).map(a => pre[a]).flat() },
-                cfg.commandHandlerOptions   
+                cfg.commandHandlerOptions
             )
         );
         this.inhibitorHandler = new InhibitorHandler(this, cfg.inhibitorHandlerOptions);

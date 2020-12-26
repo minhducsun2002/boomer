@@ -73,7 +73,7 @@ export default class extends OsuCommand {
                     )
                 )
             }
-            
+
         } catch (e) {
             m.channel.send(err.setDescription(`Sorry, an error occurred.`));
         }

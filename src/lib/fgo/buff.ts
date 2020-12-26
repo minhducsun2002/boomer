@@ -113,7 +113,7 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
             _.amount = val.get(ValsKey[vType.Value]);
             break;
         case Buff.COMMANDATTACK_FUNCTION:
-        case Buff.DEAD_FUNCTION:    
+        case Buff.DEAD_FUNCTION:
         case Buff.DELAY_FUNCTION:
         case Buff.ENTRY_FUNCTION:
         case Buff.GUTS_FUNCTION:

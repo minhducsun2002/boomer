@@ -53,7 +53,7 @@ export async function renderInvocation({
             else {
                 return `${bTp[a.type as keyof typeof bTp]}${
                     // buff elligibility for self
-                    a.ckSelfIndv.length 
+                    a.ckSelfIndv.length
                         ? ` for ${a.ckSelfIndv.map(t => tr[t as keyof typeof tr] || t).join(', ')}`
                         : ``
                 }${

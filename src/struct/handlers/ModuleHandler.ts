@@ -16,7 +16,7 @@ export class ModuleHandler extends a {
     constructor(...args : ConstructorParameters<typeof a>) {
         super(args[0], Object.assign(args[1], args[1], { classToHandle: PepperModule }));
         this.on(
-            'load', 
+            'load',
             (m : PepperModule) => {
                 let { id, categoryID,  filepath, handler: { directory } } = m;
                 this.clientLog.success(
@@ -69,7 +69,7 @@ export class ModuleHandler extends a {
             return false;
         }
 
-        for (let i of ordered) 
+        for (let i of ordered)
             await this.modules.get(i.name).initialize();
         return true;
     }

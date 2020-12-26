@@ -41,7 +41,7 @@ export = class extends FgoCommand {
             };
         };
         if (s.length) pages.push(s);
-        
+
         if (pages.length == 1)
             m.channel.send(new MessageEmbed().setTitle(`Known traits`).setDescription(pages[0]));
         else

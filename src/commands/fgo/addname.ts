@@ -42,7 +42,7 @@ export = class extends FgoCommand {
                 { type: SvtType.ENEMY_COLLECTION_DETAIL, collectionNo }
             ]
         }).exec();
-        
+
         if (!(Number.isSafeInteger(collectionNo) && (await verify())))
             return bail(`Please specify a valid servant ID.`)
 

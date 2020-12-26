@@ -37,9 +37,9 @@ export = class extends FgoCommand {
     async exec(m: Message, { query, trait } : { query: string, trait: string[] }) {
         query = query ?? '';
         let qTrait = (trait || []).map(a => +a).filter(_ => availableTraits.has(_));
-        if (!qTrait.length && !query) 
+        if (!qTrait.length && !query)
             return m.channel.send(`Please specify a query :frowning:`);
-        
+
         let _db = this.client.moduleHandler.findInstance(db);
         let _traits = this.client.moduleHandler.findInstance(traits);
         let results = query ? (await _db.search(query)) : _db.records.map(a => ({ item: a }));
@@ -53,21 +53,21 @@ export = class extends FgoCommand {
 
         if (!results.length)
             return m.channel.send(`I found no matching results. :frowning:`);
-        
+
         let r = chunk(results.map(a => a.item), this.MAX_RESULTS);
 
         let render = (_ : typeof r[0]) => new MessageEmbed()
             .setTitle(`Search results` + (query ? ` for \`${query}\`` : ''))
             .setDescription(_.map(s => `[${s.rarity}★] ${s.id}. **${s.name}**`))
             .addFields(
-                qTrait.length 
+                qTrait.length
                 ? [{
                     name: `Queried traits`,
                     value: qTrait.map(t => `[${ts[t as keyof typeof ts] || t}]`).join(`, `)
                 }] : []
             )
 
-        if (r.length === 1) 
+        if (r.length === 1)
             return m.channel.send(render(r[0]));
         else
             paginatedEmbed()

@@ -41,7 +41,7 @@ export = class extends FgoCommand {
             .setTitle(`Search results` + (q ? ` for \`${q}\`` : ''))
             .setDescription(_.map(s => `${s.collectionNo}. **${s.name}**`))
 
-        if (r.length === 1) 
+        if (r.length === 1)
             return m.channel.send(render(r[0]));
         else
             paginatedEmbed()

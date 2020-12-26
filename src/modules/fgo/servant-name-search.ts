@@ -35,7 +35,7 @@ export = class extends FgoModule {
     public get records() { return this._records };
 
     private aliasModel:  Model<AliasEntry>;
-    
+
     /**
      * Search a servant by name
      * @param s Search query
@@ -46,7 +46,7 @@ export = class extends FgoModule {
         if (t?.size) {
             // instead of removing, prioritise
             let match = [] as typeof res, mis = [] as typeof res;
-            for (let r of res) 
+            for (let r of res)
                 (t.has(r.item.id) ? match : mis).push(r);
             res = [...match.sort((a, b) => {
                 // compare by bucket count first

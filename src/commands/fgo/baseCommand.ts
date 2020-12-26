@@ -7,5 +7,5 @@ export const FgoCommand = class extends extendCommand({
 }) {
     constructor(...args: ConstructorParameters<typeof PepperCommand>) {
         super(`fgo-${args[0]}`, args[1]);
-    }   
+    }
 }

@@ -29,7 +29,7 @@ export = class extends GeneralCommand {
             repo: repo.replace('.git', ''), owner, per_page: max
         })
 
-      
+
         const out = new MessageEmbed()
             .setTitle(`Latest ${data.length} commit(s) from \`${owner}/${repo}\``)
             .setURL(`https://github.com/${owner}/${repo}`)
@@ -42,7 +42,7 @@ export = class extends GeneralCommand {
                     )
                 }).join('\n')
             )
-        
+
 
         m.channel.send(out)
     }

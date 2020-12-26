@@ -5,7 +5,7 @@ export interface mstSkillLv {
     funcId: mstFunc['id'][];
     svals: string[];
     skillId: mstSkill['id'];
-    lv: number; chargeTurn: number;  
+    lv: number; chargeTurn: number;
 }
 
 export interface mstSkillLvDocument extends Document, mstSkillLv {}

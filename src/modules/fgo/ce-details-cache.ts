@@ -85,7 +85,7 @@ export = class extends FgoModule {
                     } catch (e) {
                         this.log.error(`Error processing CE ${id}.\n${e.stack}`)
                     };
-                }  
+                }
             )
         };
     }

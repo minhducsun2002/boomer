@@ -43,7 +43,7 @@ export default class extends OsuCommand {
                     pp, rank, play_count, play_time,
                     ranked_score, total_score, maximum_combo, hit_accuracy,
                     grade_counts: { ss, ssh, s, sh, a }
-                } 
+                }
             } = userdata.user;
             let [score] = userdata.extra.scoresBest;
             let [_w, _d, _h, _m, _s] = [
@@ -70,7 +70,7 @@ export default class extends OsuCommand {
                 .addField('Scores', `${ranked_score} ranked\n${total_score} total`, true)
                 .addField('Ranks', `**${ssh}** XH | **${ss}** X\n**${sh}** SH | **${s}** S\n**${a}** A`, true)
                 .addField(`Play time`,`${play_count} times | ${_w}w ${_d}d ${_h}h ${_m}m ${_s}s`)
-            
+
             if (score) {
                 let { beatmapset, beatmap, perfect, mods } = score,
                     { ar, drain, difficulty_rating, accuracy, cs } = beatmap;

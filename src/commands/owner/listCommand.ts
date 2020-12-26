@@ -28,7 +28,7 @@ export = class extends OwnerCommand {
                     .addFields(
                         a.map(p => ({
                             name: p.id,
-                            value: 
+                            value:
                                 `Path: \`${rel(h.directory, p.filepath)}\``
                                 + `\nCategory: ${p.categoryID || 'N/A'}`
                                 + `\nAliases : ${p.aliases.map(a => `\`${a}\``).join(', ')}`

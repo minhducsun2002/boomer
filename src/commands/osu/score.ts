@@ -14,7 +14,7 @@ export = class extends OsuCommand {
     constructor() {
         super(commandName, {
             aliases,
-            typing: true, 
+            typing: true,
             description: 'View score(s) on a map of a certain player.',
             args: [{
                 id: 'beatmap',
@@ -99,7 +99,7 @@ export = class extends OsuCommand {
                 perfect: string, enabled_mods: string, user_id: string,
                 date: string, rank: string, pp: string
             }[];
-            
+
             if (scores.length === 0)
                 return m.channel.send(err.setDescription(`Sorry, no scores found on that beatmap.`))
 
@@ -182,7 +182,7 @@ export = class extends OsuCommand {
                     + `[Beatmap link](https://osu.ppy.sh/beatmaps/${id})`
                     + `\n\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${od}** \`HP\`**${drain}**\n`
                     + '\n'
-                    + `[**${rank}**] **${pp}**pp ` 
+                    + `[**${rank}**] **${pp}**pp `
                     + `[${count_300}/${count_100}/${count_50}/${count_miss}]`
                     + ` (**${combo}**x${+perfect ? '' : `/**${max_combo}**x`} | `
                     + `**${(accuracy * 100).toFixed(3)}**%) ${perfect ? '(FC)' : ''}\n`

@@ -30,7 +30,7 @@ export = class extends FgoModule {
             // instead of removing, prioritise
             let match = [] as typeof res, mis = [] as typeof res;
             // res = res.filter(_ => t.has(_.item.id))
-            for (let r of res) 
+            for (let r of res)
                 (t.has(r.item.id) ? match : mis).push(r);
             res = [...match.sort((a, b) => a.score - b.score), ...mis];
         }

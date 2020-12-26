@@ -2,7 +2,7 @@ import { componentLog } from '@pepper/utils';
 import { FgoModule } from './base';
 import { createConnection, Schema, Document, Model } from 'mongoose';
 
-interface DataObject extends Document { name: string; id: number; } 
+interface DataObject extends Document { name: string; id: number; }
 const object = new Schema<DataObject>({ name: String, id: Number });
 const item = new Schema<DataObject>({ name: String, id: Number });
 export { object, item };

@@ -9,7 +9,7 @@ export interface mstSvtLimit {
     // stats
     power: number; defense: number; agility: number;
     magic: number; luck: number; treasureDevice: number;
-    
+
     hpBase: number; hpMax: number;
     atkBase: number; atkMax: number;
 }

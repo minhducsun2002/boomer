@@ -17,7 +17,7 @@ export const Embeds = {
     COMMAND_ERROR: (err : string, c : PepperCommand) => {
         let errorLines = err.split('\n');
         let error = '';
-        for (let line of errorLines) 
+        for (let line of errorLines)
             if (error.length > 1500) break;
             else error += line + '\n';
         return new MessageEmbed({

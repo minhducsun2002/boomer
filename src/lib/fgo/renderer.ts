@@ -98,7 +98,7 @@ export class EmbedRenderer {
      * @param tdLv `treasureDeviceLv` object
      */
     servantDashboard = (
-        svt: mstSvt, limits: mstSvtLimit[], cards: mstSvtCard[], 
+        svt: mstSvt, limits: mstSvtLimit[], cards: mstSvtCard[],
         tdLv: mstTreasureDeviceLv
     ) => {
         let { hpBase, hpMax, atkBase, atkMax } = limits[0],
@@ -107,7 +107,7 @@ export class EmbedRenderer {
             ccount = (_ : Card) => cardIds.reduce((b, a) => a === _ ? b + 1 : b, 0),
             dmg = cards.sort((a, b) => a.cardId - b.cardId)
                     .map(a => a.normalDamage);
-    
+
         let b = ccount(Card.BUSTER), a = ccount(Card.ARTS), q = ccount(Card.QUICK), e = 1,
             bc = dmg[Card.BUSTER - 1], ac = dmg[Card.ARTS - 1], qc = dmg[Card.QUICK - 1],
             ec = dmg[Card.EXTRA - 1];
@@ -127,7 +127,7 @@ export class EmbedRenderer {
                 + `\nGeneration : **${(starRate / 10).toFixed(1)}**%`,
             inline
         }, {
-            name: 'Gender / Attribute', 
+            name: 'Gender / Attribute',
             value: `${Trait[(genderType + genMod) as tr]} / ${Trait[
                 individuality.find(a => attribs.includes(a)) as tr
             ]}`,
@@ -152,15 +152,15 @@ export class EmbedRenderer {
     _prepareSkill = async (s: mstSkill) => {
         let db = this.JP;
         let skillLevels = await db.mstSkillLv.find({ skillId: s.id }).exec();
-        
+
         // make a cache for function queries
         let functionCache = new Map<number, mstFunc>(),
             // list all function IDs that ever appeared in any skill
             functionIds = [...new Set(skillLevels.map(l => l.funcId).flat())];
         // pre-fetch all functions
-        for (let f of functionIds) 
+        for (let f of functionIds)
             functionCache.set(f, await db.mstFunc.findOne({ id: f }).exec())
-        
+
         let invocations = skillLevels[0].funcId
             .map(async (functionId, index) => {
                 let vals = skillLevels
@@ -184,34 +184,34 @@ export class EmbedRenderer {
         let db = this.JP;
         let skill = await db.mstSkill.findOne({ id: skillId }).exec();
         let turns = (
-            opt.cooldown 
+            opt.cooldown
             ? await db.mstSkillLv.find({ skillId }).select('chargeTurn').exec()
             .then(levels => new Set(levels.map(lv => lv.chargeTurn)))
             .then(set => [...set].sort((a, b) => b - a))
             : []
         );
         let invocations = await this._prepareSkill(skill);
-    
+
         // function lookup table
         let funcs = new Map<number, typeof invocations[0]['func']>();
         for (let { func } of invocations) funcs.set(func.id, func);
-    
+
         let values = invocations.map(async _ => {
             let { func: f, vals } = _;
-    
+
             // dedupe the values
             vals.forEach((values, key) => vals.set(key, deduplicate(values)));
             let stat = f.rawBuffs.length
                 ? await renderBuffStatistics(f.rawBuffs[0], vals, this)
                 : renderFunctionStatistics(f.rawType, vals);
-            
+
 
             return (
                 ('level' in opt && Number.isSafeInteger(opt.level))
                     // serialize this function as if it belongs to a single/active skill.
                     ? this.serializeSingleSkillRepresentation(stat, f, <SetRequired<typeof opt, 'level'>>opt)
                     : this.serializeActiveSkillRepresentation(stat, f, opt)
-            ) 
+            )
         })
 
         // try to get skill name in NA
@@ -230,7 +230,7 @@ export class EmbedRenderer {
         let { side, chance: showChance } = opt;
         let targets = f.targets.map(a => `**[${a.trim()}]**`).join(', ');
         let team = side ? (f.onTeam ? `[${f.onTeam.substr(0, 1).toUpperCase() + f.onTeam.slice(1)}] ` : '') : '';
-        
+
         // Active skills are only possessed by servants.
         // We usually don't care how a servant acts on the enemy side, I guess.
         if (f.onTeam === aTgt[ApplyTarget.ENEMY]) return '';
@@ -240,14 +240,14 @@ export class EmbedRenderer {
         // We also don't care about NOPs.
         // I mean, they have no effect, in most aspects I can think of.
         if (f.rawType === FuncType.NONE) return '';
-        
-        let amount = stat.amount?.length 
+
+        let amount = stat.amount?.length
             ? (stat.amount?.length > 3 ? '\n ' : ' ') + 'of '
                 + stat.amount.map(a => `**${a}**`).join(' / ')
                 + (stat.amount?.length > 3 ? '\n' : '')
             : '';
         let chance = stat.chance?.length
-            ? stat.chance.map(a => `**${a}**`).join(' / ') 
+            ? stat.chance.map(a => `**${a}**`).join(' / ')
                 + ' chance to'
                 + (stat.chance?.length > 3 ? '\n' : ' ')
             : '';
@@ -257,7 +257,7 @@ export class EmbedRenderer {
         ]
             .filter(Boolean)
             .map(([count, type]) => `**${count}** ${type}`).join(', ');
-        
+
         f.action = (showChance ? f.action.substr(0, 1).toLowerCase() + f.action.substr(1) : f.action);
         let functionAction = `${targets ? f.action : '**' + f.action + '**'}${targets ? ' ' + targets : ''}`;
         return (
@@ -326,7 +326,7 @@ export class EmbedRenderer {
                 let level = levels[0];
                 let svals = [level.svals, level.svals2, level.svals3, level.svals4, level.svals5];
                 let _level = levels.map(level => parseVals(level.svals[entryIndex], _function.funcType));
-                
+
                 [
                     // check for level changes at overcharge 1
                     [overchargeKey, svals.map(overcharge => parseVals(overcharge[entryIndex], _function.funcType))],
@@ -335,7 +335,7 @@ export class EmbedRenderer {
                 ]
                 .forEach(([keySetToPush, values]) => {
                     let vals = zipMap(values as Exclude<typeof values, string[]>);
-                    for (let [key, value] of vals) 
+                    for (let [key, value] of vals)
                         if (deduplicate(value).length !== 1) {
                             (<string[]>keySetToPush).push(key);
                             outputValue.set(key, deduplicate(value));
@@ -349,8 +349,8 @@ export class EmbedRenderer {
                         outputValue.set(key, deduplicate(value));
                     }
             }
-            
-            
+
+
             let func = await renderInvocation(_function, db);
             let stat = func.rawBuffs.length
                 ? await renderBuffStatistics(func.rawBuffs[0], outputValue, this)
@@ -374,7 +374,7 @@ export class EmbedRenderer {
             if (_level.length && overcharge.length) both.push(serializedText);
                 else (overcharge.length ? oc : (_level.length ? level : none)).push(serializedText)
         }
-        
+
         let fields : SetOptional<EmbedFieldData, 'inline'>[] = [];
         fields.push({ name: '\u200b', value: none.concat(level).join('\n') });
         fields.push({ name: '[Overcharge]', value: oc.join('\n') });
@@ -416,11 +416,11 @@ export class EmbedRenderer {
             }
         })
         return Promise.all(words);
-    } 
+    }
 
     servantDashboardEmbed = async (name : string, id : number) : Promise<MessageEmbed[]> => {
         let { NA, JP } = this;
-    
+
         const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
         let { baseSvtId, classId, classPassive } = svt;
         const [limits, cards, __class] = await Promise.all([
@@ -432,7 +432,7 @@ export class EmbedRenderer {
         const svtTdMapping = await JP.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
         let [{ treasureDeviceId: tdId }] = svtTdMapping;
         const td_npGain = await JP.mstTreasureDeviceLv.findOne({ treaureDeviceId: tdId }).exec();
-    
+
         // overwrite name
         svt.name = name;
         let base = () => this.servantBase(svt, __class.name, Math.max(...limits.map(_ => _.rarity)));
@@ -507,7 +507,7 @@ export class EmbedRenderer {
         // sort for MLB
         let baseSkills = skillRecords.filter(a => a.condLimitCount === limitBase),
             maxSkills  = skillRecords.filter(a => (a.condLimitCount === limitMax) && (a.condLimitCount !== limitBase));
-        
+
         let [baseEffects, maxEffects] = [baseSkills, maxSkills]
             .map(async (skills, idx) => {
                 let isBaseEffects = idx === 0;

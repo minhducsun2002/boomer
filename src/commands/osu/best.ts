@@ -49,8 +49,8 @@ export = class extends OsuCommand {
             if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
                 limit = 50;
             let recents = await fetchBest(id, mode, limit, MAX_SINGLE);
-            
-            if (recents.length) 
+
+            if (recents.length)
                 paginatedEmbed()
                     .setChannel(m.channel)
                     .setEmbeds(

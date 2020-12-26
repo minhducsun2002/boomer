@@ -13,7 +13,7 @@ const aliases = [commandName, 'ce']
 export = class extends FgoCommand {
     constructor() {
         super(commandName, {
-            aliases, 
+            aliases,
             args: [{
                 id: 'q',
                 match: 'rest'

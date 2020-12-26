@@ -55,11 +55,11 @@ export = class extends OsuCommand {
 
         if (isNaN(_))
             return m.channel.send(err.setDescription('You passed an invalid beatmap ID!'));
-        
+
         if (!((accuracy <= 100) || (accuracy >= 0))) accuracy = 100;
         if (!combo || isNaN(combo)) combo = undefined;
         if (!mods) mods = '';
-        
+
         try {
             let _ = await axios.get(`https://osu.ppy.sh/osu/${mapId}`, { validateStatus: () => true });
             if (_.status === 404) return m.channel.send(`Sorry, could not find your beatmap.`);

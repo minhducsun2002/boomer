@@ -17,7 +17,7 @@ export class CommandHandler extends c {
     constructor(...args : ConstructorParameters<typeof c>) {
         super(...args);
         this.on(
-            'load', 
+            'load',
             m => {
                 let { id, categoryID, filepath, handler: { directory } } = m;
                 this.clientLog.success(

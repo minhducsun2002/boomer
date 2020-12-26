@@ -56,11 +56,11 @@ export = class extends OsuCommand {
             if (failed) {
                 let _ = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));
                 embeds = await embedScoresetApi(mode_int, _, 5)
-                for (let e of embeds) 
+                for (let e of embeds)
                     e
                     .setTitle(`Recent plays of **${username}**`)
                     .setURL(`https://osu.ppy.sh/users/${id}`)
-                
+
             } else {
                 // sanitize the number
                 if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
@@ -77,7 +77,7 @@ export = class extends OsuCommand {
                     .run({ idle: 20000, dispose: true })
             else
                 m.channel.send(
-                    embeds[0] 
+                    embeds[0]
                     || new MessageEmbed().setDescription(
                         `No recent play found for user [**${username}**](https://osu.ppy.sh/users/${id}).`
                     )

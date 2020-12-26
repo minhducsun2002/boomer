@@ -24,7 +24,7 @@ const log = {
 
     log : (log: str, prefix : str) => {
         if (process.env.NODE_ENV === environmentMode.testing) return;
-        let _ = `${log}`.split('\n'), d = `${new Date().toJSON()}`; 
+        let _ = `${log}`.split('\n'), d = `${new Date().toJSON()}`;
         c.log(`${chalk.magentaBright(d)}| ${prefix} ${_[0]}`);
         _.slice(1).forEach(a => c.log(`${' '.repeat(d.length)}| ${
             ' '.repeat(ss(prefix).length)
