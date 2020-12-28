@@ -31,7 +31,7 @@ export default class extends OsuCommand {
     }
 
     async exec(m : Message, { user, mode, pp } = { user: '', mode: '', pp: 0 }) {
-        user = user.trim();
+        user = user?.trim();
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
         if (!(pp > 0)) pp = 0;

@@ -27,7 +27,7 @@ export default class extends OsuCommand {
     }
 
     async exec(m : Message, { user, mode } = { user: '', mode: '' }) {
-        user = user.trim();
+        user = user?.trim();
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
         const err = new MessageEmbed().setColor(ERROR_COLOR)
