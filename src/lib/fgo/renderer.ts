@@ -5,9 +5,10 @@ import {
     CardModifier as cardMod,
     Attribute,
     ApplyTarget,
-    FuncType
+    FuncType,
+    TargetType
 } from '@pepper/constants/fgo';
-import { ApplyTarget as aTgt, Trait } from '@pepper/constants/fgo/strings';
+import { ApplyTarget as aTgt, TargetType as tgt, Trait } from '@pepper/constants/fgo/strings';
 import type { mstSvt } from '@pepper/db/fgo/master/mstSvt';
 import type { mstSvtLimit } from '@pepper/db/fgo/master/mstSvtLimit';
 import type { mstSvtCard } from '@pepper/db/fgo/master/mstSvtCard';
@@ -233,7 +234,45 @@ export class EmbedRenderer {
 
         // Active skills are only possessed by servants.
         // We usually don't care how a servant acts on the enemy side, I guess.
-        if (f.onTeam === aTgt[ApplyTarget.ENEMY]) return '';
+
+        var targetEnemies = 
+        [
+            TargetType.ENEMY,
+            TargetType.ENEMY_ANOTHER,
+            TargetType.ENEMY_ALL,
+            TargetType.ENEMY_FULL,
+            TargetType.ENEMY_OTHER,
+            TargetType.ENEMY_RANDOM,
+            TargetType.ENEMY_OTHER_FULL,
+            TargetType.ENEMY_ONE_ANOTHER_RANDOM
+        ].map(ttype => tgt[ttype]).includes(f.affectTarget) == (
+            f.onTeam === aTgt[ApplyTarget.ENEMY] || f.onTeam === aTgt[ApplyTarget.PLAYER_AND_ENEMY]
+        );
+        var targetPlayers = [
+            TargetType.SELF,
+            TargetType.PT_ONE,
+            TargetType.PT_ANOTHER,
+            TargetType.PT_ALL,
+            TargetType.PT_FULL,
+            TargetType.PT_OTHER,
+            TargetType.PT_ONE_OTHER,
+            TargetType.PT_RANDOM,
+            TargetType.PT_OTHER_FULL,
+            TargetType.PTSELECT_ONE_SUB,
+            TargetType.PTSELECT_SUB,
+            TargetType.PT_ONE_ANOTHER_RANDOM,
+            TargetType.PT_SELF_ANOTHER_RANDOM,
+            TargetType.PT_SELF_ANOTHER_FIRST,
+            TargetType.PT_SELF_BEFORE,
+            TargetType.PT_SELF_AFTER,
+            TargetType.PT_SELF_ANOTHER_LAST,
+            TargetType.COMMAND_TYPE_SELF_TREASURE_DEVICE,
+        ].map(ttype => tgt[ttype]).includes(f.affectTarget) == (
+            f.onTeam === aTgt[ApplyTarget.PLAYER] || f.onTeam === aTgt[ApplyTarget.PLAYER_AND_ENEMY]
+        );
+
+        if (!(targetPlayers || targetEnemies)) return '';
+
         // By default, everything is 100%.
         // We omit if that's the case to reduce clutter.
         if (stat.chance?.length === 1 && stat.chance[0] === '100%') showChance = false;
