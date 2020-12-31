@@ -86,7 +86,7 @@ export class EmbedRenderer {
 
     /**
      * Make a servant dashboard.
-     * 
+     *
      * Includes :
      * - Base & maximum HP/ATK
      * - NP generation rate
@@ -235,7 +235,7 @@ export class EmbedRenderer {
         // Active skills are only possessed by servants.
         // We usually don't care how a servant acts on the enemy side, I guess.
 
-        var targetEnemies = 
+        var targetEnemies =
         [
             TargetType.ENEMY,
             TargetType.ENEMY_ANOTHER,
@@ -382,7 +382,7 @@ export class EmbedRenderer {
                 })
 
                 for (let [key, value] of zipMap(_level))
-                    // collect the rest of the key 
+                    // collect the rest of the key
                     if (!overchargeKey.includes(key) && !levelKey.includes(key)) {
                         staticKey.push(key);
                         outputValue.set(key, deduplicate(value));
@@ -557,7 +557,7 @@ export class EmbedRenderer {
                 let results = await Promise.all(
                     skillIds.map(id => this.renderSkill(id, { level: 0 }))
                 )
-                // merge 
+                // merge
                 return {
                     name: isBaseEffects ? 'Base' : 'Maximum limit break',
                     value: results.map(a => a.value).join('\n')
