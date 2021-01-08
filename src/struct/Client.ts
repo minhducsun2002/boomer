@@ -80,21 +80,31 @@ export class PepperClient extends AkairoClient {
                     ))
             })
 
-        this.once('ready', () => {
+        this.once('ready', async () => {
             let g = this.guilds.cache;
+
+            let guildList : string[] = [];
+
+            // cache all owners before displaying
+            for (let [{}, guild] of g) {
+                let ownerUser = guild.owner?.user;
+                if (!ownerUser) ownerUser = await this.users.fetch(guild.ownerID);
+                guildList.push(
+                    ` * ${c.bgCyanBright.black(guild.id)} `
+                    + c.green(`=>`)
+                    + ` ${c.bgYellowBright.black(guild.name)}`
+                    + `\n    ${c.magenta('@')} ${c.bgRedBright.black(ownerUser.tag)}`
+                    + ` (${guild.ownerID})`
+                );
+            }
+
             this.clientLog.success(
                 `I am now logged in as ${c.bgBlue.yellowBright(this.user.tag)} (${
                     this.user.id
                 }).`
                 + `\nI will be serving in ${g.size} guild${p(g.size)} :`
                 + `\n`
-                + g.array().map(
-                    a => ` * ${c.bgCyanBright.black(a.id)} `
-                        + c.green(`=>`)
-                        + ` ${c.bgYellowBright.black(a.name)}`
-                        + `\n    ${c.magenta('@')} ${c.bgRedBright.black(a.owner.user.tag)}`
-                        + ` (${a.owner.id})`
-                ).join('\n')
+                + guildList.join('\n')
             )
         })
 
