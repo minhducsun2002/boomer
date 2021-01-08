@@ -10,7 +10,8 @@
   "scripts": {
     "transpile": "ttsc --project tsconfig.build.json",
     "start": "node dist/index.js",
-    "build": "rimraf dist/ && npm run transpile",
+    "build": "npm run transpile",
+    "build:clean" : "rimraf dist/ && rimraf .tsbuildinfo && npm run transpile",
     "build:test": "tsc --noEmit",
     "dev": "ts-node-dev --compiler ttypescript --respawn --no-notify --prefer-ts src/index.ts",
     "lint": "eslint src/**/* --ext .ts",
