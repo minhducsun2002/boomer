@@ -99,6 +99,47 @@ export function embedBeatmapset(
     }).flat();
 }
 
+export async function embedSingleScore(
+    mode_int: keyof typeof accuracy,
+    score : PromiseValue<ReturnType<typeof fetchRecentApi>>[0]
+) {
+    let {
+        beatmap_id, enabled_mods, rank, perfect, date, maxcombo,
+        count50, count100, count300, countkatu, countgeki, countmiss
+    } = score;
+
+    let mapset = await fetchMapset(+beatmap_id);
+    let map = [...mapset.beatmaps, ...mapset.converts].find(map => map.id === +beatmap_id);
+    let mods = modbits.string(+enabled_mods);
+
+    return new MessageEmbed()
+        .setURL(`https://osu.ppy.sh/users/${score.user_id}`)
+        .addField(
+            `${mapset.artist} - ${mapset.title} [${map.version}]` + (mods.length ? `+${mods}` : ''),
+            `[**${rank}**] **${
+                (accuracy[mode_int]({
+                    countMiss: +countmiss,
+                    count50: +count50,
+                    count100: +count100,
+                    count100k: +countkatu,
+                    count300: +count300,
+                    count300k: +countgeki
+                }) * 100).toFixed(3)
+            }**% `
+            + `(${count300}/${count100}/${count50}/${countmiss}) `
+            + `- **${maxcombo}**x${+perfect ? '' : `/**${map.max_combo}**x`}`
+            + (+perfect ? ' (FC)' : '')
+            + `\n@ **${
+                new Date(date)
+                    .toLocaleString('vi-VN', { timeZone: 'UTC' })
+            }**`
+            + `\n${map.difficulty_rating} :star: `
+            + `- \`AR\`**${map.ar}** \`CS\`**${map.cs}** \`OD\`**${map.accuracy}** \`HP\`**${map.drain}** `
+            + `- **${map.bpm}** BPM`
+            + `\n[[**Beatmap**]](https://osu.ppy.sh/beatmaps/${map.id})`
+        );
+}
+
 export function embedScoreset(
     recents: osuUserExtra['scoresBest'],
     u : string, id: number, mode: string, MAX_VIEW = 5
@@ -154,6 +195,7 @@ export async function embedScoresetApi(
     await Promise.all(__);
     let _ = chunk(scoreset, MAX_DIFF_PER_PAGE).map(
         async (a, i, c) => new MessageEmbed()
+            .setURL(`https://osu.ppy.sh/users/${scoreset[0].user_id}`)
             .setFooter(`Page ${i + 1}/${c.length} | All times are UTC`)
             .addFields(
                 await Promise.all(a.map(async ({

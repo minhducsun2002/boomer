@@ -4,9 +4,12 @@ import { modes } from '@pepper/constants/osu'
 import { fetchUser, fetchRecent, embedScoreset, fetchRecentApi, embedScoresetApi } from '@pepper/lib/osu';
 import { paginatedEmbed } from '@pepper/utils';
 import { accuracy } from '@pepper/lib/osu';
+import type { CommandUtil } from 'discord-akairo';
+import { embedSingleScore } from '@pepper/lib/osu/embeds';
 
+const singleModeAlias = 'rs';
 const commandName = 'recent';
-const aliases = [commandName, 'recentplay', 'rp'];
+const aliases = [commandName, 'recentplay', 'rp', singleModeAlias];
 
 const MAX_RESULTS = 100, MAX_SINGLE = 50;
 const { OSU_API_KEY } = process.env;
@@ -42,34 +45,49 @@ export = class extends OsuCommand {
         })
     }
 
-    async exec(m : Message, { user, mode, failed, limit } = { user: '', mode: '', failed: false, limit: 20 }) {
+    async exec(m : Message & { util: CommandUtil }, { user, mode, failed, limit } = { user: '', mode: '', failed: false, limit: 20 }) {
         user = user?.trim();
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
         if (!user) return m.channel.send(
             this.client.extras.Embeds.ERROR().setDescription('Who to check for recent scores?')
         );
+
+        // special alias handling
+        let singleMode = m.util.parsed.alias === singleModeAlias;
+
         try {
             let embeds : MessageEmbed[] = [];
             let { user: { id, username } } = await fetchUser(user, mode);
             let mode_int = modes.indexOf(mode) as keyof typeof accuracy;
-            if (failed) {
-                let _ = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));
-                embeds = await embedScoresetApi(mode_int, _, 5)
-                for (let e of embeds)
-                    e
-                    .setTitle(`Recent plays of **${username}**`)
-                    .setURL(`https://osu.ppy.sh/users/${id}`)
+
+            if (singleMode) {
+                let [score] = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));
+                if (score) embeds = [
+                    await embedSingleScore(mode_int, score)
+                        .then(embed => embed.setTitle(`Most recent play of user **${username}**`))
+                ];
 
             } else {
-                // sanitize the number
-                if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
-                    limit = 20;
-                // we got the ID, now we start fetching things
-                let recents = await fetchRecent(id, mode, limit, MAX_SINGLE);
-                embeds = embedScoreset(recents, username, id, mode)
-                    .map(a => a.setTitle(`Recent plays of **${username}**`))
+                if (failed) {
+                    let _ = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));
+                    embeds = await embedScoresetApi(mode_int, _, 5)
+                    for (let e of embeds)
+                        e
+                        .setTitle(`Recent plays of **${username}**`)
+                        .setURL(`https://osu.ppy.sh/users/${id}`)
+
+                } else {
+                    // sanitize the number
+                    if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
+                        limit = 20;
+                    // we got the ID, now we start fetching things
+                    let recents = await fetchRecent(id, mode, limit, MAX_SINGLE);
+                    embeds = embedScoreset(recents, username, id, mode)
+                        .map(a => a.setTitle(`Recent plays of **${username}**`))
+                }
             }
+
             if (embeds.length > 1)
                 paginatedEmbed()
                     .setChannel(m.channel)

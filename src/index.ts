@@ -6,7 +6,8 @@ const client = new PepperClient({
     commandHandlerOptions: {
         blockBots: false,
         allowMention: true,
-        directory: join(__dirname, 'commands')
+        directory: join(__dirname, 'commands'),
+        commandUtil: true
     },
     inhibitorHandlerOptions: {
         directory: join(__dirname, 'inhibitors')
