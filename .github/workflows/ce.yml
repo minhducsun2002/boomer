@@ -30,7 +30,7 @@ jobs:
     - name: Checkout database synchronizer
       uses: actions/checkout@v2
       with:
-        repository: minhducsun2002/atlasacademy-mongo
+        repository: minhducsun2002/fgo-master-sync
         path: 'database'
 
     - name: Checkout JP dataset
