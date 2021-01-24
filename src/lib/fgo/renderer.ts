@@ -560,7 +560,7 @@ export class EmbedRenderer {
                 // merge
                 return {
                     name: isBaseEffects ? 'Base' : 'Maximum limit break',
-                    value: results.map(a => a.value).join('\n')
+                    value: results.map(a => a.value.join('\n')).join('\n')
                 };
             })
         let [base, max] = [await baseEffects, await maxEffects];
