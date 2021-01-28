@@ -50,6 +50,9 @@ export = class extends OsuCommand {
                 limit = 50;
             let recents = await fetchBest(id, mode, limit, MAX_SINGLE);
 
+            // sort by descending pp
+            recents = recents.sort((score1, score2) => score2.pp - score1.pp);
+
             if (recents.length)
                 paginatedEmbed()
                     .setChannel(m.channel)
