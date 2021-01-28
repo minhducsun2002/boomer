@@ -4,6 +4,7 @@ import { ERROR_COLOR } from '../../constants/colors';
 import { modes } from '@pepper/constants/osu'
 import { fetchUser, fetchBest, embedScoreset } from '@pepper/lib/osu';
 import { paginatedEmbed } from '@pepper/utils';
+import { modbits } from 'ojsama';
 
 const commandName = 'best';
 const aliases = [commandName, 'top'];
@@ -30,14 +31,24 @@ export = class extends OsuCommand {
                 description: `Limit the number of plays to retrieve. Must not be greater than ${MAX_RESULTS}.`,
                 flag: ['/limit=', '/limit:'],
                 type: 'number'
+            }, {
+                id: 'mod',
+                match: 'option',
+                description: `Filter plays with certain mods. Applied after retrieving plays.`,
+                flag: ['/mod=', '/mod:'],
+                type: 'string'
             }],
             cooldown: 3 * 1000
             // 3s
         })
     }
 
-    async exec(m : Message, { user, mode, limit } = { user: '', mode: '', limit: 50 }) {
+    async exec(m : Message, { user, mode, mod, limit } = { user: '', mode: '', mod: '', limit: 50 }) {
         user = user?.trim();
+
+        // interpret modstrings into modbits
+        let modFilter = modbits.from_string(mod?.trim() ?? '');
+
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
         const err = new MessageEmbed().setColor(ERROR_COLOR)
@@ -48,23 +59,36 @@ export = class extends OsuCommand {
 
             if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
                 limit = 50;
-            let recents = await fetchBest(id, mode, limit, MAX_SINGLE);
+            let best = await fetchBest(id, mode, limit, MAX_SINGLE);
 
             // sort by descending pp
-            recents = recents.sort((score1, score2) => score2.pp - score1.pp);
+            best = best
+                .sort((score1, score2) => score2.pp - score1.pp)
+                .filter(score => {
+                    // without a filter, modFilter will always be 0, effectively filtering out
+                    // every play when AND'd
+                    if (!modFilter) return true;
 
-            if (recents.length)
+                    let scoreMods = modbits.from_string(score.mods.join(''));
+                    return (scoreMods & modFilter) === modFilter;
+                });
+
+            let modSuffix = modFilter ? ` with ${modbits.string(modFilter)}` : '';
+
+            if (best.length)
                 paginatedEmbed()
                     .setChannel(m.channel)
                     .setEmbeds(
-                        embedScoreset(recents, username, id, mode)
-                            .map(a => a.setTitle(`Top plays of **${username}**`))
+                        embedScoreset(best, username, id, mode)
+                            .map(a => a.setTitle(`Top plays of **${username}**${modSuffix}`))
                     )
                     .run({ idle: 20000, dispose: true })
             else
                 m.channel.send(
                     new MessageEmbed()
-                        .setDescription(`No top play found for user [**${username}**](https://osu.ppy.sh/users/${id}).`)
+                        .setDescription(
+                            `No top play found for user [**${username}**](https://osu.ppy.sh/users/${id})${modSuffix}.`
+                        )
                 )
         }
         catch (e) {
