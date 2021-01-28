@@ -43,11 +43,18 @@ export = class extends OsuCommand {
         })
     }
 
+    private modStringToBit(mods : string)
+    {
+        let ret = modbits.from_string(mods.trim());
+        if ((ret & modbits.nc) == modbits.nc) ret = ret | modbits.dt;
+        return ret;
+    }
+
     async exec(m : Message, { user, mode, mod, limit } = { user: '', mode: '', mod: '', limit: 50 }) {
         user = user?.trim();
 
         // interpret modstrings into modbits
-        let modFilter = modbits.from_string(mod?.trim() ?? '');
+        let modFilter = this.modStringToBit(mod?.trim() ?? '');
 
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
@@ -69,7 +76,7 @@ export = class extends OsuCommand {
                     // every play when AND'd
                     if (!modFilter) return true;
 
-                    let scoreMods = modbits.from_string(score.mods.join(''));
+                    let scoreMods = this.modStringToBit(score.mods.join(''));
                     return (scoreMods & modFilter) === modFilter;
                 });
 
