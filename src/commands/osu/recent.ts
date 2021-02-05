@@ -5,7 +5,7 @@ import { fetchUser, fetchRecent, embedScoreset, fetchRecentApi, embedScoresetApi
 import { paginatedEmbed } from '@pepper/utils';
 import { accuracy } from '@pepper/lib/osu';
 import type { CommandUtil } from 'discord-akairo';
-import { embedSingleScore } from '@pepper/lib/osu/embeds';
+import { embedSingleScore, embedSingleScoreApi } from '@pepper/lib/osu/embeds';
 
 const singleModeAlias = 'rs';
 const commandName = 'recent';
@@ -45,6 +45,25 @@ export = class extends OsuCommand {
         })
     }
 
+    private async handleSingleMode(
+        { user, user_id } : { user: string, user_id: number },
+        mode_int : number,
+        failed : boolean
+    ) : Promise<MessageEmbed[]> {
+        let out : MessageEmbed[] = [];
+        if (failed) {
+            let [score] = await fetchRecentApi(OSU_API_KEY, user, mode_int, 1);
+            out = score ? [await embedSingleScoreApi(mode_int, score)] : [];
+        }
+        else {
+            let [recent] = await fetchRecent(user_id, modes[mode_int], 1, 1);
+            out = recent ? [await embedSingleScore(modes[mode_int], recent, user)] : [];
+        }
+
+        if (out.length) out[0] = out[0].setTitle(`Most recent play of user **${user}**`);
+        return out;
+    }
+
     async exec(m : Message & { util: CommandUtil }, { user, mode, failed, limit } = { user: '', mode: '', failed: false, limit: 20 }) {
         user = user?.trim();
         if (!modes.includes(mode)) mode = modes[0];
@@ -61,14 +80,8 @@ export = class extends OsuCommand {
             let { user: { id, username } } = await fetchUser(user, mode);
             let mode_int = modes.indexOf(mode) as keyof typeof accuracy;
 
-            if (singleMode) {
-                let [score] = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));
-                if (score) embeds = [
-                    await embedSingleScore(mode_int, score)
-                        .then(embed => embed.setTitle(`Most recent play of user **${username}**`))
-                ];
-
-            } else {
+            if (singleMode) embeds = await this.handleSingleMode({ user: username, user_id: id }, mode_int, failed);
+            else {
                 if (failed) {
                     let _ = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));
                     embeds = await embedScoresetApi(mode_int, _, 5)

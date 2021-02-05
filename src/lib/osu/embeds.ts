@@ -99,7 +99,7 @@ export function embedBeatmapset(
     }).flat();
 }
 
-export async function embedSingleScore(
+export async function embedSingleScoreApi(
     mode_int: keyof typeof accuracy,
     score : PromiseValue<ReturnType<typeof fetchRecentApi>>[0]
 ) {
@@ -137,6 +137,43 @@ export async function embedSingleScore(
             + `- \`AR\`**${map.ar}** \`CS\`**${map.cs}** \`OD\`**${map.accuracy}** \`HP\`**${map.drain}** `
             + `- **${map.bpm}** BPM`
             + `\n[[**Beatmap**]](https://osu.ppy.sh/beatmaps/${map.id})`
+        );
+}
+
+export async function embedSingleScore(
+    mode_path : string,
+    score : osuUserExtra['scoresBest'][0],
+    username : string
+) {
+    let {
+        user_id,
+        accuracy, mods, perfect, rank, max_combo,
+        beatmap: b, beatmapset: s, pp, created_at, id,
+        statistics: { count_miss, count_50, count_100, count_300 }
+    } = score
+    return new MessageEmbed()
+        .setTitle(`Recent plays of **${username}**`)
+        .setURL(`https://osu.ppy.sh/users/${user_id}`)
+        .addField(
+            `${s.artist} - ${s.title} [${b.version}]`
+            + (mods.length ? `+${mods.join('')}` : ''),
+            `[**${rank}**] ${
+                // multiple formatting
+                pp
+                ? `**${pp}**pp (**${(accuracy * 100).toFixed(3)}**% | **${max_combo}**x)`
+                : `**${(accuracy * 100).toFixed(3)}**% - **${max_combo}**x`
+            }`
+            + (perfect ? ` (FC)` : '')
+            + `\n${b.difficulty_rating} :star: `
+            + `- \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}** `
+            + `- **${b.bpm}** BPM`
+            + `\n[**${count_300}**/**${count_100}**/**${count_50}**/**${count_miss}**]`
+            + ` @ **${
+                new Date(created_at)
+                    .toLocaleString('vi-VN', { timeZone: 'UTC' })
+            }**`
+            + `\n[[**Beatmap**]](https://osu.ppy.sh/b/${b.id}) `
+            + ` [[**Score**]](https://osu.ppy.sh/scores/${mode_path}/${id})`
         );
 }
 
