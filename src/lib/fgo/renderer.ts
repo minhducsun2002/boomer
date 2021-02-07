@@ -493,10 +493,15 @@ export class EmbedRenderer {
 
         const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
         let { baseSvtId, classId, classPassive } = svt;
-        const [limits, cards, __class] = await Promise.all([
+        const [limits, cards, svtClass, bondCESkill] = await Promise.all([
+            // ascensions
             await JP.mstSvtLimit.find({ svtId: baseSvtId }).limit(5).exec(),
+            // card set
             await JP.mstSvtCard.find({ svtId: baseSvtId }).limit(4).exec(),
-            await NA.mstClass.findOne({ id: classId }).exec()
+            // servant class
+            await NA.mstClass.findOne({ id: classId }).exec(),
+            // getting skills of bond CE
+            await JP.mstSkill.findOne({ actIndividuality: baseSvtId }).exec()
         ]);
         // render NP gain
         const svtTdMapping = await JP.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
@@ -505,8 +510,29 @@ export class EmbedRenderer {
 
         // overwrite name
         svt.name = name;
-        let base = () => this.servantBase(svt, __class.name, Math.max(...limits.map(_ => _.rarity)));
+        let base = () => this.servantBase(svt, svtClass.name, Math.max(...limits.map(_ => _.rarity)));
 
+        let bondCE = async () => {
+            if (!bondCESkill) return;
+            let { id } = bondCESkill;
+            let skillMapping = await JP.mstSvtSkill.findOne({ skillId: id }).exec();
+            if (!skillMapping) return;
+            let { svtId } = skillMapping;
+            let mstSvt = await JP.mstSvt.findOne({ id: svtId }).exec();
+            if (mstSvt) {
+                let { name, cost, collectionNo, id } = mstSvt;
+                let englishName = await this.complementary.svtObject.findOne({ id }).exec();
+                return {
+                    title: `[**${collectionNo}**. **${englishName?.name || name}**]`
+                        + `(https://apps.atlasacademy.io/db/#/JP/craft-essence/${id})`
+                        + ` - Cost : **${cost}**`,
+                    svt: mstSvt,
+                    effects: (await this.craftEssenceFields(mstSvt)).filter(field => field.value),
+                }
+            }
+        }
+
+        let bondCEInfo = await bondCE();
         let passives = await Promise.all(classPassive.map(_ => this.renderSkill(_, { level: 0, side: true })));
         let ascItems = await this.renderItems(await this.JP.mstCombineLimit.find({ id: baseSvtId }).limit(5).exec(), 'ascension');
         let skillItems = await this.renderItems(await this.JP.mstCombineSkill.find({ id: baseSvtId }).limit(9).exec(), 'skill');
@@ -517,6 +543,8 @@ export class EmbedRenderer {
             base()
                 .addFields([this.traits(svt)]).setFooter('Traits'),
             base().addFields(passives.map(_ => ({ name: _.name, value: _.value.join('\n') }))).setFooter(`Passive skills`),
+            (bondCEInfo
+                && base().addFields(bondCEInfo.effects).setFooter(`Bond CE`).setDescription(bondCEInfo.title)),
             // cover case where no ascension material
             (ascItems.length
             ? base().addFields(ascItems).setFooter(`Ascension materials`)
@@ -524,6 +552,7 @@ export class EmbedRenderer {
             base()
                 .addFields(skillItems).setFooter(`Skill materials`)
         ]
+        .filter(Boolean)
         .map((a, i, _) => a.setFooter(`${
             a.footer?.text ? `${a.footer.text} • ` : ''
         }Page ${++i}/${_.length}`));

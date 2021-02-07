@@ -1,7 +1,8 @@
 import { Schema, Document } from 'mongoose';
-import { SkillType } from '@pepper/constants/fgo';
+import { SkillType, Trait } from '@pepper/constants/fgo';
 export interface mstSkill {
     id: number;
+    actIndividuality: Trait[];
     name: string, ruby: string;
     maxLv: number;
     type: SkillType;
@@ -10,5 +11,5 @@ export interface mstSkill {
 export interface mstSkillDocument extends Document, mstSkill { id: number }
 
 export const mstSkillSchema : Schema<mstSkill> = new Schema({
-    id: Number, name: String, ruby: String, maxLv: Number, type: Number
+    id: Number, actIndividuality: [Number], name: String, ruby: String, maxLv: Number, type: Number
 })
