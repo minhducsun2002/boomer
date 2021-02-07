@@ -4,7 +4,7 @@
 
 Currently, the bot provides data for two games: __Fate/Grand Order__ and __osu!__, through a number of commands.
 
-This README will not cover how to use those commands, they can be obtained by calling the `help` command.
+This README will not cover how to use them - call the `help` command.
 
 ### Prerequisites
 - Node.js v14.8.0. I don't test with anything after 14.8.0 yet, feel free to try.
@@ -49,14 +49,24 @@ The "main" database follows the schema defined in [`src/db/fgo/main.ts`](src/db/
 
 The `masterData` (either `NA` or `JP`) databases are more complicated.
 
-You need to get a snapshot of master data (can be found at [Atlas Academy Discord](https://discord.gg/TKJmuCR), possibly refer to me when you ask). You will get a number of JSON files for each locale, containing (possibly empty) arrays.
+You need to get a snapshot of master data, which should be a number of JSON files for each locale, containing (possibly empty) arrays.
 
-For each locale, you need to deploy all the files into a database. The collection name for each file is determined by the base file name (removing the `.json` extension).
+For each locale, you need to deploy all the files into a MongoDB database. The collection name for each file is determined by the base file name (removing the `.json` extension).
 
-### Credits
-- GamePress for the main database
-- Atlas Academy for the master data
-- bloodcat.com for the beatmap search feature
+### License
+Copyright (C) 2019 minhducsun2002
 
-### License 
-Creative Commons Attribution 4.0 International. See [here](./LICENSE).
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+> Changes in commits up to and including `967e9d32766aa9c2c94d4f1a9e3da13481d13f77` are also licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/). (I used CC-BY 4.0 previously, but that license is not really recommended for software.)

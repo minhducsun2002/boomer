@@ -18,7 +18,7 @@
     "prepare:ce": "ts-node --compiler ttypescript scripts/prepareCE.ts"
   },
   "author": "Minh Duc Vo <minhducsun2002@gmail.com>",
-  "license": "CC-BY-4.0",
+  "license": "GPL-3.0-only",
   "dependencies": {
     "@minhducsun2002/node-osr-parser": "0.0.1-1",
     "@minhducsun2002/paged-embeds": "0.1.1",
