@@ -428,6 +428,37 @@ export class EmbedRenderer {
         return { raw: treasureDevice, fields: fields.filter(field => field.value.trimRight()) };
     }
 
+    private craftEssenceFields = async (mstSvt : mstSvt) => {
+        let { id } = mstSvt;
+        // get all skills
+        let skillRecords = await this.JP.mstSvtSkill.find({ svtId: id }).exec();
+        // determining MLB skills
+        let condLimitCounts = skillRecords.map(a => a.condLimitCount);
+        let limitBase = Math.min(...condLimitCounts),
+            limitMax  = Math.max(...condLimitCounts);
+        // sort for MLB
+        let baseSkills = skillRecords.filter(a => a.condLimitCount === limitBase),
+            maxSkills  = skillRecords.filter(a => (a.condLimitCount === limitMax) && (a.condLimitCount !== limitBase));
+
+        let [baseEffects, maxEffects] = [baseSkills, maxSkills]
+            .map(async (skills, idx) => {
+                let isBaseEffects = idx === 0;
+                let skillIds = skills.map(a => a.skillId);
+
+                // sort skillIds for deterministicness
+                skillIds = skillIds.sort((a, b)=> a - b)
+                let results = await Promise.all(
+                    skillIds.map(id => this.renderSkill(id, { level: 0 }))
+                )
+                // merge
+                return {
+                    name: isBaseEffects ? 'Base' : 'Maximum limit break',
+                    value: results.map(a => a.value.join('\n')).join('\n')
+                };
+            })
+        return [await baseEffects, await maxEffects];
+    }
+
     renderItems = (combineLimits : mstCombineLimit[] | mstCombineSkill[], type : 'ascension' | 'skill') => {
         let limits : typeof combineLimits, words : Promise<SetOptional<EmbedField, 'inline'>>[];
         let name = '', shift = 0;
@@ -537,38 +568,12 @@ export class EmbedRenderer {
         let mstSvt = await this.JP.mstSvt.findOne({ id }).exec();
         let { name, cost, collectionNo } = mstSvt;
         let englishName = await this.complementary.svtObject.findOne({ id }).exec();
-        // get all skills
-        let skillRecords = await this.JP.mstSvtSkill.find({ svtId: id }).exec();
-        // determining MLB skills
-        let condLimitCounts = skillRecords.map(a => a.condLimitCount);
-        let limitBase = Math.min(...condLimitCounts),
-            limitMax  = Math.max(...condLimitCounts);
-        // sort for MLB
-        let baseSkills = skillRecords.filter(a => a.condLimitCount === limitBase),
-            maxSkills  = skillRecords.filter(a => (a.condLimitCount === limitMax) && (a.condLimitCount !== limitBase));
-
-        let [baseEffects, maxEffects] = [baseSkills, maxSkills]
-            .map(async (skills, idx) => {
-                let isBaseEffects = idx === 0;
-                let skillIds = skills.map(a => a.skillId);
-
-                // sort skillIds for deterministicness
-                skillIds = skillIds.sort((a, b)=> a - b)
-                let results = await Promise.all(
-                    skillIds.map(id => this.renderSkill(id, { level: 0 }))
-                )
-                // merge
-                return {
-                    name: isBaseEffects ? 'Base' : 'Maximum limit break',
-                    value: results.map(a => a.value.join('\n')).join('\n')
-                };
-            })
-        let [base, max] = [await baseEffects, await maxEffects];
+        let fields = await this.craftEssenceFields(mstSvt);
         return new MessageEmbed()
             .setURL(`https://apps.atlasacademy.io/db/#/JP/craft-essence/${id}`)
             .setTitle(`${collectionNo}. ${englishName?.name || name} (\`${id}\`)`)
             .setDescription(`Cost : ${cost}`)
-            .addFields([base, max].filter(a => a.value));
+            .addFields(fields.filter(a => a.value));
     }
 
     treasureDeviceEmbed = async (collectionNo : number) => {
