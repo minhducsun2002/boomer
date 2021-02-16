@@ -92,6 +92,5 @@ export async function fetchScore(id : number, mode : string) {
     });
     if (response.status === 404) throw new Error(`Score not found`)
     if (response.status !== 200) throw new Error(`Expected status 200, got status ${response.status}`);
-    const dom = cheerio.load(response.data);
-    return JSON.parse(dom('#json-show').contents().first().text()) as Score;
+    return <Score>response.data;
 }

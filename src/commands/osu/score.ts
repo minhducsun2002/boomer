@@ -177,17 +177,16 @@ export = class extends OsuCommand {
                 .setURL(beatmap)
                 .setTitle(`Score by \`${score.user.username}\`\non **${set.artist}** - **${set.title}** [**${version}**]`)
                 .setDescription(
-                    `\n${difficulty_rating} :star:${max_combo ? ` | **${max_combo}**x` : ''} | `
-                    + `${pad(2)(Math.floor(total_length / 60))}:${pad(2)(total_length % 60)} | `
-                    + `[Beatmap link](https://osu.ppy.sh/beatmaps/${id})`
-                    + `\n\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${od}** \`HP\`**${drain}**\n`
-                    + '\n'
+                    `\n**${difficulty_rating}** :star:${max_combo ? ` | **${max_combo}**x` : ''} | `
+                    + `**${pad(2)(Math.floor(total_length / 60))}**:**${pad(2)(total_length % 60)}** | `
+                    + `\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${od}** \`HP\`**${drain}**\n`
                     + `[**${rank}**] **${pp}**pp `
-                    + `[${count_300}/${count_100}/${count_50}/${count_miss}]`
+                    + `[**${count_300}**/**${count_100}**/**${count_50}**/**${count_miss}**]`
                     + ` (**${combo}**x${+perfect ? '' : `/**${max_combo}**x`} | `
                     + `**${(accuracy * 100).toFixed(3)}**%) ${perfect ? '(FC)' : ''}\n`
                     + (mods.length ? `Mods : ${mods.join(', ')}\n` : '')
-                    + `[Score link](https://osu.ppy.sh/scores/${modes[mode_int]}/${score_id})`
+                    + `[[**Score**]](https://osu.ppy.sh/scores/${modes[mode_int]}/${score_id})`
+                    + ` [[**Beatmap**]](https://osu.ppy.sh/beatmaps/${id})`
                 );
             m.channel.send(out);
         }
