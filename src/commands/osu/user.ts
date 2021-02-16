@@ -64,7 +64,7 @@ export default class extends OsuCommand {
                         ? ` (#**${rank.global}** globally | #**${rank.country}** in :flag_${cc.toLowerCase()}:)`
                         : ``
                     }.`
-                    + `\n Total accuracy : **${(+hit_accuracy).toFixed(3)}%** | Max combo : **${maximum_combo}**x`
+                    + `\nTotal accuracy : **${(+hit_accuracy).toFixed(3)}%** | Max combo : **${maximum_combo}**x`
                     + `\nJoined ${new Date(join_date).toLocaleString('en-US')}.`
                 )
                 .addField('Scores', `${ranked_score} ranked\n${total_score} total`, true)
