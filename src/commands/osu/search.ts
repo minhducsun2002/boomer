@@ -1,26 +1,15 @@
 import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
 import axios from 'axios';
-import { modes, mode_friendly, status } from '../../constants/osu';
+import { modes, mode_friendly } from '../../constants/osu';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../..//constants/colors';
 import { chunk, paginatedEmbed } from '@pepper/utils';
+import tokenProvider from '@pepper/modules/osu/api-oauth2-bearer-token';
+import { Beatmapset } from '@pepper/lib/osu';
 
 const commandName = 'search';
 const aliases = [commandName];
-
-interface bloodcatBeatmap {
-    id: string;
-    ar: string, hp: string, cs: string, od: string;
-    bpm: string; mode: string; name: string; star: string;
-    length: string; hash_md5: string;
-}
-
-interface bloodcatBeatmapSet {
-    artist: string; artistU : string | null;
-    beatmaps: bloodcatBeatmap[]; creator: string; creatorId: string;
-    id: string; rankedAt: string; status: string; tags: string;
-    title: string; titleU: string | null;
-}
+const osuIconUrl = `https://github.com/ppy/osu/raw/23419a0ec3f15d821d33e041f536236951adebd3/assets/lazer.png`;
 
 export = class extends OsuCommand {
     constructor() {
@@ -35,63 +24,62 @@ export = class extends OsuCommand {
                 id: 'mode',
                 match: 'option',
                 description: `Gamemode to search. Can be ${modes.map(a => '`' + a + '`').join('/')}.`,
-                flag: ['/'],
-                multipleFlags: true
+                flag: ['/']
             }]
         })
     }
 
-    async exec(m : Message, { query, mode: _m } : { query: string, mode: string[] }) {
-        const max_page = 3, max_diff = 10;
-        const err = new MessageEmbed().setColor(ERROR_COLOR)
-            .setDescription(`Sorry, an error occurred.`);
+    async exec(m : Message, { query, mode: _m } : { query: string, mode: string }) {
+        const max_per_page = 3, max_diff_per_set = 10;
+        const bail = (s : string) => m.channel.send(
+            new MessageEmbed().setColor(ERROR_COLOR)
+                .setDescription(s || `Sorry, an error occurred.`)
+        );
 
-        _m = _m.filter(a => modes.includes(a));
-        if (!query)
-            return m.channel.send(err.setDescription(`Please provide a search term.`));
+        if (!query) return bail(`Please provide a search term.`);
+
+        let { token } = this.client.moduleHandler.findInstance(tokenProvider);
+        if (!token) return bail(`There seems to be no osu!api access token. Contact my owner on this matter.`);
+
         try {
-            let url = `https://bloodcat.com/osu/?mod=json&q=${
-                encodeURIComponent(query)
-            }&c=b&s=1,2,3,4&m=${
-                _m.map(a => modes.indexOf(a)).join(',')
-            }&p=1`;
-            const _ = await axios.get(url, { validateStatus: () => true });
-            if (_.status !== 200) throw new Error(
-                `Error getting beatmap : Expected status 200, got status ${_.status}`
-            );
-            let resp = _.data as bloodcatBeatmapSet[];
-            let out = chunk(resp, max_page).map((o, i, _) => new MessageEmbed()
-                .setTimestamp().setColor(SUCCESS_COLOR)
-                .setAuthor(`bloodcat.com/osu`, null, `https://bloodcat.com/osu`)
+            let url = `https://osu.ppy.sh/api/v2/beatmapsets/search?q=${encodeURIComponent(query)}${
+                modes.includes(_m) ? `&m=${modes.indexOf(_m)}` : ''
+            }`;
+            let rawResponse = await axios.get(url, {
+                validateStatus: () => true,
+                headers: {
+                    'Authorization' : `Bearer ${token}`
+                }
+            });
+            let data = rawResponse.data.beatmapsets as Beatmapset[];
+
+            let out = chunk(data, max_per_page).map((_chunk, index, _) => new MessageEmbed()
+                .setColor(SUCCESS_COLOR)
+                .setAuthor(`Beatmap search`, osuIconUrl, `https://osu.ppy.sh/beatmapsets`)
                 .setTitle(`Search results for \`${query}\``)
                 .setDescription(
-                    (_m.length ? `Game mode : ${
-                        _m.map(a => mode_friendly[modes.indexOf(a)]).join(' | ')
-                    }\n` : '\n')
-                    + `Status : ranked / approved / qualified / loved`
+                    (modes.includes(_m) ? `Game mode : ${mode_friendly[modes.indexOf(_m)]}\n` : '')
+                    + `Status : has leaderboard`
                 )
                 .addFields(
-                    o.map(a => ({
-                        name: `[${status[+a.status]}] ${a.artistU || a.artist} - ${a.titleU || a.title}`,
-                        value: a.beatmaps.slice(0, max_diff)
-                            .sort((a, b) => (+a.star - +b.star))
-                            // .map(({ id, ar, hp, cs, od, star, name, mode, length }) =>
-                            .map(({ id, star, name, mode }) =>
-                                // `mapped by [${a.creator}](https://osu.ppy.sh/users/${a.creatorId})`
-                                `[${mode_friendly[+mode]}] `
-                                + `[__**${name}**__](https://osu.ppy.sh/beatmaps/${id})`
-                                + ` (**${(+star).toFixed(2)}**:star:)`
-                                // + `| ${pad(2)(Math.floor(+length / 60))}:${pad(2)(+length % 60)} `
-                                // + `|\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${od}** \`HP\`**${hp}**`
+                    _chunk.map(set => ({
+                        name: `[${set.status.charAt(0).toUpperCase() + set.status.substr(1)}] `
+                            + `${set.artist_unicode || set.artist} - ${set.title_unicode || set.title}`,
+                        value: set.beatmaps.slice(0, max_diff_per_set)
+                            .sort((a, b) => (+a.difficulty_rating - +b.difficulty_rating))
+                            .map(({ id, difficulty_rating, version, mode_int }) =>
+                                `[${mode_friendly[mode_int]}] `
+                                + `[__**${version}**__](https://osu.ppy.sh/beatmaps/${id})`
+                                + ` (**${difficulty_rating.toFixed(2)}**:star:)`
                             )
                             .join('\n')
                     }))
                 )
-                .setFooter(_.length > 1 ? `Page ${i + 1}/${_.length}` : ''));
+                .setFooter(_.length > 1 ? `Page ${index + 1}/${_.length}` : '')
+            );
+
             if (out.length === 0)
-                return m.channel.send(
-                    err.setDescription('Sorry, I found nothing that matched your query.')
-                )
+                return bail('Sorry, I found nothing that matched your query.');
             if (out.length === 1)
                 return m.channel.send(out[0]);
             if (out.length >= 2)
@@ -100,10 +88,7 @@ export = class extends OsuCommand {
                 .setChannel(m.channel)
                 .run({ idle: 20000, dispose: true })
         } catch (e) {
-            m.channel.send(err.setDescription(
-                `Sorry, an error occurred trying to load data.\n`
-                + '```' + e + '```'
-            ))
+            bail(`Sorry, an error occurred trying to load data.\n` + '```' + e + '```')
         }
     }
 }
