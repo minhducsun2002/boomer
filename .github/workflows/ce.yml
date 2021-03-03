@@ -3,12 +3,12 @@ on:
   push:
     paths:
     - '.github/workflows/ce.yml'
-    - 'src/**'
+    - 'src/**/fgo/**'
     - 'scripts/prepareCE.ts'
 jobs:
   build:
     name: Prepare CE data
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
