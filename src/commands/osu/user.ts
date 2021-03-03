@@ -40,7 +40,7 @@ export default class extends OsuCommand {
                 username, country: { code: cc }, avatar_url, join_date, id,
                 statistics: {
                     level: { current: level },
-                    pp, rank, play_count, play_time,
+                    pp, rank, global_rank, play_count, play_time,
                     ranked_score, total_score, maximum_combo, hit_accuracy,
                     grade_counts: { ss, ssh, s, sh, a }
                 }
@@ -60,8 +60,8 @@ export default class extends OsuCommand {
                 .setURL(`https://osu.ppy.sh/users/${id}`)
                 .setDescription(
                     `**${pp}**pp${
-                        rank.global
-                        ? ` (#**${rank.global}** globally | #**${rank.country}** in :flag_${cc.toLowerCase()}:)`
+                        global_rank
+                        ? ` (#**${global_rank}** globally | #**${rank.country}** in :flag_${cc.toLowerCase()}:)`
                         : ``
                     }.`
                     + `\nTotal accuracy : **${(+hit_accuracy).toFixed(3)}%** | Max combo : **${maximum_combo}**x`
