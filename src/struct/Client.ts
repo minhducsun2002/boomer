@@ -67,17 +67,21 @@ export class PepperClient extends AkairoClient {
                         }
                         return o;
                     })
-                    .then(_ => this.clientLog.success(
-                        `Successfully fetched application profile.`
-                        + `\nLooks like I belong to ${_.length > 1 ? 'a team' : 'an user'}.`
-                        + `\nI recognize the following user${p(_.length)} as my owner${p(_.length)} :`
-                        + `\n`
-                        + _.map(
-                            a => ` * ${c.bgGreenBright.red(a.id)} `
-                                + c.green(`=>`)
-                                + ` ${c.bgMagentaBright.black(a.tag)}`
-                        ).join('\n')
-                    ))
+                    .then(_ => {
+                        this.clientLog.success(
+                            `Successfully fetched application profile.`
+                            + `\nLooks like I belong to ${_.length > 1 ? 'a team' : 'an user'}.`
+                            + `\nI recognize the following user${p(_.length)} as my owner${p(_.length)} :`
+                            + `\n`
+                            + _.map(
+                                a => ` * ${c.bgGreenBright.red(a.id)} `
+                                    + c.green(`=>`)
+                                    + ` ${c.bgMagentaBright.black(a.tag)}`
+                            ).join('\n')
+                        );
+
+                        this.commandHandler.ignoreCooldown = _.map(a => a.id);
+                    })
             })
 
         this.once('ready', async () => {
