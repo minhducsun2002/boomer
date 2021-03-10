@@ -4,7 +4,8 @@ import traits from '@pepper/modules/fgo/servant-trait-search';
 import { FgoCommand } from './baseCommand';
 import { findSetIntersection, chunk, paginatedEmbed } from '@pepper/utils';
 import { Trait } from '@pepper/constants/fgo';
-import { Trait as ts } from '@pepper/constants/fgo/strings';
+import { Trait as traitString } from '@pepper/constants/fgo/strings';
+import f from 'fuse.js';
 
 let availableTraits = new Set(Object.values(Trait));
 
@@ -32,17 +33,32 @@ export = class extends FgoCommand {
         })
     }
 
+    private fuse = new f(
+        Object.values(Trait).filter(a => isNaN(+a))
+            .map((traitName : keyof typeof traitString) => ({
+                trait: +Trait[traitName] as Trait,
+                traitName: traitString[+Trait[traitName] as keyof typeof traitString] || `\`${traitName}\``
+            })),
+        { keys: ['traitName'], shouldSort: true, includeScore: true, minMatchCharLength: 1, ignoreLocation: true }
+    )
+
     MAX_RESULTS = 15;
+    private resolveTrait(trait : string) {
+        return this.fuse.search(trait).map(res => res.item)[0];
+    }
 
     async exec(m: Message, { query, trait } : { query: string, trait: string[] }) {
         query = query ?? '';
-        let qTrait = (trait || []).map(a => +a).filter(_ => availableTraits.has(_));
+        let qTrait = (trait || []).map(a => isNaN(+a) ? this.resolveTrait(a).trait : +a)
+            .filter(Boolean)
+            .filter(_ => availableTraits.has(_));
+
         if (!qTrait.length && !query)
             return m.channel.send(`Please specify a query :frowning:`);
 
         let _db = this.client.moduleHandler.findInstance(db);
         let _traits = this.client.moduleHandler.findInstance(traits);
-        let results = query ? (await _db.search(query)) : _db.records.map(a => ({ item: a }));
+        let results = query ? _db.search(query) : _db.records.map(a => ({ item: a }));
         if (qTrait.length) {
             // build a list of servants matching the queries
             let matchings = qTrait.map(t => new Set(_traits.trait(t)));
@@ -63,7 +79,7 @@ export = class extends FgoCommand {
                 qTrait.length
                 ? [{
                     name: `Queried traits`,
-                    value: qTrait.map(t => `[${ts[t as keyof typeof ts] || t}]`).join(`, `)
+                    value: qTrait.map(t => `[${traitString[t as keyof typeof traitString] || t}]`).join(`, `)
                 }] : []
             )
 
