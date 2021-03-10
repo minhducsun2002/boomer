@@ -32,11 +32,9 @@ export default class extends OsuCommand {
         // check mode
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
-        if (!user) {
-            let record = await this.resolveUserFromAuthor(m.author.id);
-            if (!record) return m.channel.send(err.setDescription(`Who do you want to search for?`));
-            user = record.osuUsername;
-        }
+        user = await this.resolveUserFromAuthor(user, m.author.id);
+        if (!user)
+            return m.channel.send(err.setDescription(`Who do you want to search for?`));
 
         try {
             let userdata = await fetchUser(user, mode);

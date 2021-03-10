@@ -10,7 +10,15 @@ export const OsuCommand = class extends extendCommand({
         super(`osu-${args[0]}`, args[1]);
     }
 
-    async resolveUserFromAuthor(userId : string) {
-        return await client.moduleHandler.findInstance(User).getUser(userId);
+    async resolveUserFromAuthor(user : string, author : string) {
+        let target = author;
+        if (user) {
+            if (user.match(/^<@!?(\d+)>$/)) {
+                // mention. resolve as user id
+                let { id } = await this.client.users.fetch(user.match(/^<@!?(\d+)>$/)[1], false);
+                target = id;
+            } else return user;
+        }
+        return (await client.moduleHandler.findInstance(User).getUser(target)).osuUsername;
     }
 }

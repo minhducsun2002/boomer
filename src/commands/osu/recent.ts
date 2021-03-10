@@ -65,17 +65,14 @@ export = class extends OsuCommand {
     }
 
     async exec(m : Message & { util: CommandUtil }, { user, mode, failed, limit } = { user: '', mode: '', failed: false, limit: 20 }) {
-        user = user?.trim();
+        user = await this.resolveUserFromAuthor(user?.trim(), m.author.id);
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
-        if (!user) {
-            let record = await this.resolveUserFromAuthor(m.author.id);
-            if (!record)
-                return m.channel.send(
-                    this.client.extras.Embeds.ERROR().setDescription('Who to check for recent scores?')
-                )
-                user = record.osuUsername;
-        }
+        if (!user)
+            return m.channel.send(
+                this.client.extras.Embeds.ERROR().setDescription('Who to check for recent scores?')
+            )
+
 
         // special alias handling
         let singleMode = m.util.parsed.alias === singleModeAlias;

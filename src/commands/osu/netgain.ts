@@ -31,19 +31,15 @@ export default class extends OsuCommand {
     }
 
     async exec(m : Message, { user, mode, pp } = { user: '', mode: '', pp: 0 }) {
-        user = user?.trim();
+        user = await this.resolveUserFromAuthor(user?.trim(), m.author.id);
+
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
         if (!(pp > 0)) pp = 0;
         // check valid pp count
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
-        if (!user) {
-            let record = await this.resolveUserFromAuthor(m.author.id);
-            if (!record)
-                return m.channel.send(err.setDescription(`Who do you want to search for?`))
-            user = record.osuUsername;
-        }
+        if (!user)  return m.channel.send(err.setDescription(`Who do you want to search for?`));
         let { user: { username, id, statistics: { pp: _pp } } } = await fetchUser(user, mode);
         let scoresBest = await fetchBest(id, mode, 100, 50);
         let basePP = scoresBest.map(score => score.pp).sort((a, b) => b - a);

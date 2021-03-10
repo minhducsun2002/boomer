@@ -51,17 +51,12 @@ export = class extends OsuCommand {
     }
 
     async exec(m : Message, { user, mode, mod, limit } = { user: '', mode: '', mod: '', limit: 50 }) {
-        user = user?.trim();
+        user = await this.resolveUserFromAuthor(user?.trim(), m.author.id);
 
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
 
-        if (!user) {
-            let record = await this.resolveUserFromAuthor(m.author.id);
-            if (!record)
-                return m.channel.send(err.setDescription(`Who to check for top scores?`))
-            user = record.osuUsername;
-        }
+        if (!user) return m.channel.send(err.setDescription(`Who to check for top scores?`));
 
         // interpret modstrings into modbits
         let modFilter = this.modStringToBit(mod?.trim() ?? '');
