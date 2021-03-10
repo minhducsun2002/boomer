@@ -135,7 +135,7 @@ export const Trait = {
     [t.door]: 'Door',
     [t.dragon]: 'Dragon',
     [t.dragonSlayer]: 'Dragon Slayer',
-    [t.dragonType]: 'Dragon',
+    [t.dragonType]: 'Dragon-type',
     [t.fieldBurning]: 'Burning',
     [t.fieldCity]: 'City',
     [t.fieldForest]: 'Forest',

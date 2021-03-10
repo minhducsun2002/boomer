@@ -22,7 +22,8 @@
             "@pepper/lib/*": ["src/lib/*"],
             "@pepper/constants/*": ["src/constants/*"],
             "@pepper/db/*": ["src/db/*"],
-            "@pepper/modules/*": ["src/modules/*"]
+            "@pepper/modules/*": ["src/modules/*"],
+            "@pepper/inhibitors/*": ["src/inhibitors/*"]
         },
         "plugins": [
             {
