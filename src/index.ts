@@ -42,12 +42,12 @@ client.commandHandler
         m.reply(client.extras.Embeds.COMMAND_ERROR(`${e}`, c as any));
     })
     .loadAll();
-client.inhibitorHandler.loadAll();
-// initialize all modules
-client.moduleHandler.loadAll()
-    .initializeAll()
+
+Promise.all([client.inhibitorHandler, client.moduleHandler].map(_ => _.loadAll().initializeAll()))
     .then(succeeded => {
-        if (succeeded) client.login(process.env.DISCORD_TOKEN);
-        else process.exit(1);
+        if (succeeded.every(a => a))
+            client.login(process.env.DISCORD_TOKEN)
+        else process.exit(1)
     })
+
 export { client };

@@ -2,7 +2,7 @@ import { environmentMode } from '@pepper/constants/configurations';
 import { PepperInhibitor } from '@pepper/struct';
 export = class extends PepperInhibitor {
     constructor() {
-        super('development-filter-owner', {
+        super('development-filter', {
             reason: 'I am in development mode! Only my owners can invoke commands.',
             type: 'pre',
             category: 'Development'
