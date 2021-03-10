@@ -18,9 +18,9 @@ export = class extends FgoModule {
      */
     trait(t : number, region : 'NA' | 'JP' = 'JP') {
         switch (region) {
-            case 'NA': return [...this.NA.get(t)];
+            case 'NA': return [...(this.NA.get(t) || new Set())];
             default:
-            case 'JP': return [...this.JP.get(t)];
+            case 'JP': return [...(this.JP.get(t) || new Set())];
         }
     }
 
