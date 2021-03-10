@@ -38,8 +38,12 @@ export default class extends OsuCommand {
         // check valid pp count
         const err = new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find anyone with username \`${user}\`.`)
-        if (!user)
-            return m.channel.send(err.setDescription(`Who do you want to search for?`));
+        if (!user) {
+            let record = await this.resolveUserFromAuthor(m.author.id);
+            if (!record)
+                return m.channel.send(err.setDescription(`Who do you want to search for?`))
+            user = record.osuUsername;
+        }
         let { user: { username, id, statistics: { pp: _pp } } } = await fetchUser(user, mode);
         let scoresBest = await fetchBest(id, mode, 100, 50);
         let basePP = scoresBest.map(score => score.pp).sort((a, b) => b - a);

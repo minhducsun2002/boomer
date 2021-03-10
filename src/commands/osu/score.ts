@@ -57,8 +57,13 @@ export = class extends OsuCommand {
             return m.channel.send(err.setDescription(`You didn't pass a beatmap URL/ID/score URL!`));
 
         let listingMode = async () => {
-            if (!username)
-                return m.channel.send(err.setDescription(`Who to check for scores?`))
+            if (!username) {
+                let record = await this.resolveUserFromAuthor(m.author.id);
+                if (!record)
+                    return m.channel.send(err.setDescription(`Who to check for scores?`))
+                username = record.osuUsername;
+            }
+
 
             if (!process.env.OSU_API_KEY) {
                 let { users, ownerID } = this.client;

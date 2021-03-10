@@ -68,9 +68,14 @@ export = class extends OsuCommand {
         user = user?.trim();
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
-        if (!user) return m.channel.send(
-            this.client.extras.Embeds.ERROR().setDescription('Who to check for recent scores?')
-        );
+        if (!user) {
+            let record = await this.resolveUserFromAuthor(m.author.id);
+            if (!record)
+                return m.channel.send(
+                    this.client.extras.Embeds.ERROR().setDescription('Who to check for recent scores?')
+                )
+                user = record.osuUsername;
+        }
 
         // special alias handling
         let singleMode = m.util.parsed.alias === singleModeAlias;
