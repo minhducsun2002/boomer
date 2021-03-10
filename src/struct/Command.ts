@@ -1,12 +1,27 @@
 import { Command as c, CommandOptions } from 'discord-akairo';
 import type { PepperClient } from './Client';
+import { CommandHandler } from './handlers/CommandHandler';
+
+export interface PepperCommandOptions extends CommandOptions
+{
+    /**
+     * Whether this command requires manual guild whitelisting to run
+     */
+    locked?: boolean;
+}
 
 export class PepperCommand extends c {
     client: PepperClient;
     args?: CommandOptions['args'];
-    constructor(...args : ConstructorParameters<typeof c>) {
-        super(...args);
-        this.args = args[1].args;
+    handler: CommandHandler;
+    /**
+     * Whether this command requires manual guild whitelisting to run
+     */
+    locked: boolean;
+    constructor(id : string, options? : PepperCommandOptions) {
+        super(id, options);
+        this.args = options.args;
+        this.locked = !!options.locked;
     }
 
 }

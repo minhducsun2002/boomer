@@ -34,7 +34,7 @@ client.commandHandler
                     `Prefix : \`${_.prefix}\`\nAlias : \`${_.alias}\``,
                     true
                 )
-                .addField('Reason', rr[r as keyof typeof rr]())
+                .addField('Reason', rr[r as keyof typeof rr]?.() || r)
         )
     })
     .on('error', (e, m, c) => {
