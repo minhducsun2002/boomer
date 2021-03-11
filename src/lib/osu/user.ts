@@ -20,7 +20,7 @@ export interface osuUser {
         play_count: number, play_time: number, total_score: number, total_hits: number, maximum_combo: number,
         is_ranked: boolean,
         grade_counts: { ss: number, ssh: number, s: number, sh: number, a: number },
-        global_rank: number,
+        global_rank: number, country_rank: number,
         rank: { country: number }
     }
 }
