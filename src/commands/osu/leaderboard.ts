@@ -31,6 +31,8 @@ export = class extends OsuCommand {
         return `earth_` + [`africa`, `americas`, `asia`][Math.round(Math.random() * 2)];
     }
 
+    private markdownWrap = (_ : string) => `\`${_}\``;
+
     async exec(m : Message, { mode } : { mode: string }) {
         let { guild } = m;
         if (!modes.includes(mode)) mode = modes[0];
@@ -55,23 +57,21 @@ export = class extends OsuCommand {
             .map(chunk => new MessageEmbed()
                 .addFields(
                     chunk.map(_user => {
+                        let ppStringMaxLength = Math.max(...chunk.map(_ => `${_.osu.user.statistics.pp.toFixed(2)}`.length)),
+                            accStringMaxLength = Math.max(...chunk.map(_ => `${(+_.osu.user.statistics.hit_accuracy).toFixed(3)}`.length));
                         let { osu: { user: { username, statistics, country } }, userId } = _user;
                         let { pp, hit_accuracy, global_rank, country_rank } = statistics;
                         return {
                             name: `${username}`,
-                            value: `**\`${
-                                pp.toFixed(2)
-                                    .padStart(
-                                        Math.max(...chunk.map(_ => `${_.osu.user.statistics.pp.toFixed(2)}`.length)),
-                                        ' '
-                                    )
-                            }\`**pp - **\`${
-                                (+hit_accuracy).toFixed(3)
-                                    .padStart(
-                                        Math.max(...chunk.map(_ => `${(+_.osu.user.statistics.hit_accuracy).toFixed(3)}`.length)),
-                                        ' '
-                                    )
-                            }\`**%`
+                            value: `**${
+                                pp.toFixed(2).length != ppStringMaxLength
+                                    ? this.markdownWrap(pp.toFixed(2).padStart(ppStringMaxLength))
+                                    : pp.toFixed(2)
+                            }**pp - **${
+                                (+hit_accuracy).toFixed(3).length != accStringMaxLength
+                                    ? this.markdownWrap((+hit_accuracy).toFixed(3).padStart(accStringMaxLength))
+                                    : (+hit_accuracy).toFixed(3)
+                            }**%`
                                 + ` - :${this.randomEarthEmoji()}: #${global_rank} - :flag_${country.code.toLowerCase()}: #${country_rank}`
                                 + `\n${members.get(userId).toString()}`
                         }
