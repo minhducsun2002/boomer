@@ -18,21 +18,21 @@ export = class extends OsuModule {
 
     async setUser(userId : string, username: string) {
         return await this.model.findOneAndUpdate(
-            { discordUserId: userId },
-            { osuUsername: username, discordUserId: userId },
+            { discordUserId: userId.trim() },
+            { osuUsername: username.trim(), disordUserId: userId.trim() },
             { upsert: true }
         );
     }
     async unsetUser(userId : string) {
-        return await this.model.findOneAndDelete({ discordUserId: userId });
+        return await this.model.findOneAndDelete({ discordUserId: userId.trim() });
     }
     async getUser(userId : string) {
-        return await this.model.findOne({ discordUserId: userId });
+        return await this.model.findOne({ discordUserId: userId.trim() });
     }
     async listUsers(...userIds : string[]) {
         if (!userIds.length)
             throw new Error('No user ID was specified!')
-        return await this.model.find({ $or: userIds.map(id => ({ discordUserId: id })) });
+        return await this.model.find({ $or: userIds.map(id => ({ discordUserId: id.trim() })) });
     }
 
     async initialize() {
