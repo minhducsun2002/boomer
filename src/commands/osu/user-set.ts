@@ -3,7 +3,7 @@ import { Message } from 'discord.js';
 import UsernameDb from '@pepper/modules/osu/username-db';
 
 const commandName = 'user-set';
-const aliases = [commandName, 'set'];
+const aliases = [commandName, 'set', 'save'];
 
 export = class extends OsuCommand {
     constructor() {
