@@ -44,8 +44,11 @@ export default class extends OsuCommand {
                 // URL overrides everything.
                 // if id is available, fetch map, else fetch mapset
                 _id = (_.id ? _.id : _.set)
-                // /set is enabled if no ID is present, and setId is present
-                set = !!_.set && !_.id
+                // /set is enabled in the following cases :
+                // - no ID is present, and setId is present
+                // - set ID is present, and /set is passed
+                set = (!!_.set && !_.id) || (set && !!_.set);
+                if (set && !!_.set) _id = _.set;
             }
             catch { return _e(); }
             if (!_id) return _e();
