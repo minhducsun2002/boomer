@@ -1,6 +1,6 @@
 import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
-import { checkURL, fetchUser, fetchMapset, Beatmapset } from '@pepper/lib/osu';
+import { checkURL, fetchUser, fetchMapset, Beatmapset, fetchScore } from '@pepper/lib/osu';
 import { modes } from '@pepper/constants/osu';
 import Users from '@pepper/modules/osu/username-db';
 import { chunk, paginatedEmbed, pad } from '@pepper/utils';
@@ -170,7 +170,7 @@ export = class extends OsuCommand {
         let scores = users.map(user =>
             client.Beatmap.score(mapId, user.osu.user.id, { mode: mode as GameMode })
                 .then(async score => {
-                    score.score = await client.Score.get(score.score.mode, score.score.id);
+                    score.score = await fetchScore(score.score.id, score.score.mode);
                     return score;
                 })
                 .catch(() => null)
