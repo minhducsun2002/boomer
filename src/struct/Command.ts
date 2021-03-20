@@ -1,5 +1,6 @@
 import { Command as c, CommandOptions } from 'discord-akairo';
 import type { PepperClient } from './Client';
+import type { PepperModule } from './Module';
 import { CommandHandler } from './handlers/CommandHandler';
 
 export interface PepperCommandOptions extends CommandOptions
@@ -24,6 +25,9 @@ export class PepperCommand extends c {
         this.locked = !!options.locked;
     }
 
+    resolveModule<Module extends typeof PepperModule>(moduleType : Module) {
+        return this.client.moduleHandler.findInstance(moduleType) as InstanceType<typeof moduleType>;
+    }
 }
 
 /**
