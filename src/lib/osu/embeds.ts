@@ -112,6 +112,9 @@ export async function embedSingleScoreApi(
     let map = [...mapset.beatmaps, ...mapset.converts].find(map => map.id === +beatmap_id);
     let mods = modbits.string(+enabled_mods);
 
+    let { count_circles, count_sliders, count_spinners } = map;
+    let completion = (+countmiss + +count50 + +count100 + +count300) / (count_circles + count_sliders + count_spinners);
+
     return new MessageEmbed()
         .setURL(`https://osu.ppy.sh/users/${score.user_id}`)
         .addField(
@@ -125,14 +128,10 @@ export async function embedSingleScoreApi(
                     count300: +count300,
                     count300k: +countgeki
                 }) * 100).toFixed(3)
-            }**% `
-            + `(${count300}/${count100}/${count50}/${countmiss}) `
-            + `- **${maxcombo}**x${+perfect ? '' : `/**${map.max_combo}**x`}`
-            + (+perfect ? ' (FC)' : '')
-            + `\n@ **${
-                new Date(date)
-                    .toLocaleString('vi-VN', { timeZone: 'UTC' })
-            }**`
+            }**% - **${maxcombo}**x${+perfect ? '' : `/**${map.max_combo}**x`} `
+            + (+perfect ? '(FC)' : (completion != 1 ? `(completed ${(completion * 100).toFixed(2)}%)` : ''))
+            + `\n[**${count300}**/**${count100}**/**${count50}**/**${countmiss}**] `
+            + `@ **${new Date(date).toLocaleString('vi-VN', { timeZone: 'UTC' })}**`
             + `\n${map.difficulty_rating} :star: `
             + `- \`AR\`**${map.ar}** \`CS\`**${map.cs}** \`OD\`**${map.accuracy}** \`HP\`**${map.drain}** `
             + `- **${map.bpm}** BPM`
