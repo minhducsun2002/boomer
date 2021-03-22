@@ -42,6 +42,7 @@ export interface osuUserExtra {
             difficulty_rating: number; bpm: number;
             cs: number, drain: number, accuracy: number, ar: number;
             count_circles: number; count_sliders: number; count_spinners: number;
+            mode: string;
         };
         beatmapset: {
             id: number;

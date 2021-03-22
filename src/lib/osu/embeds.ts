@@ -4,10 +4,10 @@ import { mode_friendly, modes } from '@pepper/constants/osu';
 import type { Beatmapset } from './beatmapset';
 import type { Beatmap } from './beatmap';
 import { osuUserExtra } from './user';
-import { fetchRecentApi, fetchMapset } from './fetch';
+import { fetchRecentApi, fetchMapset, fetchBeatmapFile } from './fetch';
 import type { PromiseValue } from 'type-fest';
 import { accuracy } from './utils';
-import { modbits } from 'ojsama';
+import { modbits, parser as beatmapParser, diff, ppv2 } from 'ojsama';
 
 export function embedBeatmap(b: Beatmap, s: Beatmapset) {
     let {
@@ -114,22 +114,35 @@ export async function embedSingleScoreApi(
 
     let { count_circles, count_sliders, count_spinners } = map;
     let completion = (+countmiss + +count50 + +count100 + +count300) / (count_circles + count_sliders + count_spinners);
+    let _accuracy = accuracy[mode_int]({
+        countMiss: +countmiss,
+        count50: +count50,
+        count100: +count100,
+        count100k: +countkatu,
+        count300: +count300,
+        count300k: +countgeki
+    }) * 100;
+
+    let map_file = await fetchBeatmapFile(+beatmap_id);
+    let parser = new beatmapParser();
+    parser.feed(map_file);
+    let pp = ppv2({
+        stars: new diff().calc({ map: parser.map, mods: +enabled_mods }),
+        acc_percent: _accuracy, nmiss: +countmiss, n50: +count50, n100: +count100, n300: +count300
+    }).total
+
+    let full_combo_pp = ppv2({
+        stars: new diff().calc({ map: parser.map, mods: +enabled_mods }),
+        acc_percent: _accuracy, nmiss: 0
+    }).total
 
     return new MessageEmbed()
         .setURL(`https://osu.ppy.sh/users/${score.user_id}`)
         .addField(
             `${mapset.artist} - ${mapset.title} [${map.version}]` + (mods.length ? `+${mods}` : ''),
-            `[**${rank}**] **${
-                (accuracy[mode_int]({
-                    countMiss: +countmiss,
-                    count50: +count50,
-                    count100: +count100,
-                    count100k: +countkatu,
-                    count300: +count300,
-                    count300k: +countgeki
-                }) * 100).toFixed(3)
-            }**% - **${maxcombo}**x${+perfect ? '' : `/**${map.max_combo}**x`} `
+            `[**${rank}**] **${pp.toFixed(4)}**pp (?) **${_accuracy.toFixed(3)}**% - **${maxcombo}**x${+perfect ? '' : `/**${map.max_combo}**x`} `
             + (+perfect ? '(FC)' : (completion != 1 ? `(completed ${(completion * 100).toFixed(2)}%)` : ''))
+            + (+perfect ? '' : ` (**${full_combo_pp.toFixed(2)}**pp (?) if FC)`)
             + `\n[**${count300}**/**${count100}**/**${count50}**/**${countmiss}**] `
             + `@ **${new Date(date).toLocaleString('vi-VN', { timeZone: 'UTC' })}**`
             + `\n${map.difficulty_rating} :star: `
@@ -149,20 +162,32 @@ export async function embedSingleScore(
         accuracy, mods, perfect, rank, max_combo,
         beatmap: b, beatmapset: s, pp, created_at, id,
         statistics: { count_miss, count_50, count_100, count_300 }
-    } = score
+    } = score;
+
+    let calculated = false, full_combo_pp = 0;
+    accuracy *= 100;
+    let parser = new beatmapParser(); parser.feed(await fetchBeatmapFile(b.id));
+    if (!pp) {
+        pp = ppv2({
+            stars: new diff().calc({ map: parser.map, mods: modbits.from_string(mods.join('')) }),
+            acc_percent: accuracy, nmiss: count_miss, n50: count_50, n100: count_100, n300: count_300
+        }).total;
+        calculated = true;
+    }
+    full_combo_pp = ppv2({
+        stars: new diff().calc({ map: parser.map, mods: modbits.from_string(mods.join('')) }),
+        acc_percent: accuracy, nmiss: 0
+    }).total;
+
     return new MessageEmbed()
-        .setTitle(`Recent plays of **${username}**`)
+        .setTitle(`Most recent play of **${username}**`)
         .setURL(`https://osu.ppy.sh/users/${user_id}`)
         .addField(
             `${s.artist} - ${s.title} [${b.version}]`
             + (mods.length ? `+${mods.join('')}` : ''),
-            `[**${rank}**] ${
-                // multiple formatting
-                pp
-                ? `**${pp}**pp (**${(accuracy * 100).toFixed(3)}**% | **${max_combo}**x)`
-                : `**${(accuracy * 100).toFixed(3)}**% - **${max_combo}**x`
-            }`
-            + (perfect ? ` (FC)` : '')
+            `[**${rank}**] **${pp.toFixed(4)}**pp${calculated ? ' (?)' : ''} `
+            + `(**${accuracy.toFixed(3)}**% | **${max_combo}**x/**${parser.map.max_combo()}**x) `
+            + (perfect ? `(FC)` : `(**${full_combo_pp.toFixed(2)}**pp (?) if FC)`)
             + `\n${b.difficulty_rating} :star: `
             + `- \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}** `
             + `- **${b.bpm}** BPM`
@@ -171,7 +196,7 @@ export async function embedSingleScore(
                 new Date(created_at)
                     .toLocaleString('vi-VN', { timeZone: 'UTC' })
             }**`
-            + `\n[[**Beatmap**]](https://osu.ppy.sh/b/${b.id}) `
+            + `\n[[**Beatmap**]](https://osu.ppy.sh/beatmapsets/${s.id}#${b.mode}/${b.id}) `
             + ` [[**Score**]](https://osu.ppy.sh/scores/${mode_path}/${id})`
         );
 }

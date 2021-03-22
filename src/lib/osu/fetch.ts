@@ -94,3 +94,10 @@ export async function fetchScore(id : number, mode : string) {
     if (response.status !== 200) throw new Error(`Expected status 200, got status ${response.status}`);
     return <Score>response.data;
 }
+
+export async function fetchBeatmapFile(id : number) {
+    const response = await axios.get(`https://osu.ppy.sh/osu/${id}`, { validateStatus: () => true , responseType: 'text'});
+    if (response.status === 404) throw new Error(`Beatmap not found`)
+    if (response.status !== 200) throw new Error(`Expected status 200, got status ${response.status}`);
+    return response.data as string;
+}
