@@ -33,10 +33,6 @@ export = class extends OsuCommand {
     MEMBER_LIMIT = 50;
     MEMBER_PER_PAGE = 10;
 
-    private randomEarthEmoji() {
-        return `earth_` + [`africa`, `americas`, `asia`][Math.round(Math.random() * 2)];
-    }
-
     private markdownWrap = (_ : string) => `\`${_}\``;
     private resolveMapId = (beatmap : string) => {
         let _id = +beatmap;
@@ -85,7 +81,8 @@ export = class extends OsuCommand {
                                     ? this.markdownWrap((+hit_accuracy).toFixed(3).padStart(accStringMaxLength))
                                     : (+hit_accuracy).toFixed(3)
                             }**%`
-                                + ` - :${this.randomEarthEmoji()}: #${global_rank} - :flag_${country.code.toLowerCase()}: #${country_rank}`
+                                + ` - :${this.resolveEarthEmoji(country.code)}: #${global_rank}`
+                                + ` - :flag_${country.code.toLowerCase()}: #${country_rank}`
                                 + `\n${members.get(userId).toString()}`
                         }
                     })
@@ -135,7 +132,7 @@ export = class extends OsuCommand {
                         : `**${(accuracy * 100).toFixed(3)}**% - **${max_combo}**x`)
                         + (perfect ? ' (FC)' : '')
                         + `\n**${new Intl.NumberFormat('en-US').format(score)}** `
-                        + `- :${this.randomEarthEmoji()}: #**${rank_global}** - :flag_${users.get(user_id)[1].toLowerCase()}: #**${rank_country}**`
+                        + `- :${this.resolveEarthEmoji(users.get(user_id)[1])}: #**${rank_global}** - :flag_${users.get(user_id)[1].toLowerCase()}: #**${rank_country}**`
                 })))
             );
         }
