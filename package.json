@@ -42,6 +42,7 @@
     "ojsama": "^2.1.0",
     "queue-ts": "^0.1.0",
     "rimraf": "^3.0.2",
+    "splashy": "^5.0.2",
     "strip-ansi": "^6.0.0",
     "timezonecomplete": "^5.11.0",
     "trailduck": "https://github.com/cipherallies/trailduck/archive/47df7a9f4a8e2c5f356bbe051b4eeacf552212c4.tar.gz"
@@ -53,6 +54,7 @@
     "@types/nconf": "^0.10.0",
     "@types/node": "^12.12.17",
     "@types/rimraf": "^3.0.0",
+    "@types/splashy": "^5.0.0",
     "@types/ws": "^7.2.1",
     "@types/yargs": "^15.0.10",
     "@typescript-eslint/eslint-plugin": "^3.5.0",

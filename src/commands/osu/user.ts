@@ -3,6 +3,8 @@ import { Message, MessageEmbed } from 'discord.js';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors'
 import { fetchUser } from '@pepper/lib/osu'
 import { modes } from '../../constants/osu';
+import dominantColors from 'splashy';
+import axios from 'axios';
 
 const commandName = 'user';
 const aliases = [commandName, 'u'];
@@ -54,11 +56,15 @@ export default class extends OsuCommand {
             Math.floor(play_time % 60)
         ]
 
+        let embedColor = await axios.get(avatar_url, { responseType: 'arraybuffer' })
+            .then(res => dominantColors(res.data)).then(colors => colors[0])
+            .catch(() => SUCCESS_COLOR)
+
         let out = new MessageEmbed()
             .setTitle(username)
             .setURL(`https://osu.ppy.sh/users/${id}`)
             .setThumbnail(avatar_url.startsWith(`https://`) ? avatar_url : null)
-            .setColor(SUCCESS_COLOR)
+            .setColor(embedColor)
             .setDescription(
                 (global_rank
                     ? `**${pp}**pp (${this.resolveEarthEmoji(cc)} #**${global_rank}** | :flag_${cc.toLowerCase()}: #**${rank.country}**)`
