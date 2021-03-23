@@ -2,7 +2,6 @@ import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
 import { SUCCESS_COLOR, ERROR_COLOR } from '../../constants/colors'
 import { fetchUser } from '@pepper/lib/osu'
-
 import { modes } from '../../constants/osu';
 
 const commandName = 'user';
@@ -41,9 +40,8 @@ export default class extends OsuCommand {
             let {
                 username, country: { code: cc }, avatar_url, join_date, id,
                 statistics: {
-                    level: { current: level },
                     pp, rank, global_rank, play_count, play_time,
-                    ranked_score, total_score, maximum_combo, hit_accuracy,
+                    maximum_combo, hit_accuracy,
                     grade_counts: { ss, ssh, s, sh, a }
                 }
             } = userdata.user;
@@ -57,21 +55,19 @@ export default class extends OsuCommand {
             ]
 
             let out = new MessageEmbed()
-                .setTimestamp().setColor(SUCCESS_COLOR)
-                .setTitle(`[${level}] ${username}`)
+                .setTitle(username)
                 .setURL(`https://osu.ppy.sh/users/${id}`)
+                .setThumbnail(avatar_url.startsWith(`https://`) ? avatar_url : null)
+                .setColor(SUCCESS_COLOR)
                 .setDescription(
-                    `**${pp}**pp${
-                        global_rank
-                        ? ` (#**${global_rank}** globally | #**${rank.country}** in :flag_${cc.toLowerCase()}:)`
-                        : ``
-                    }.`
-                    + `\nTotal accuracy : **${(+hit_accuracy).toFixed(3)}%** | Max combo : **${maximum_combo}**x`
-                    + `\nJoined ${new Date(join_date).toLocaleString('en-US')}.`
+                    (global_rank
+                        ? `**${pp}**pp (${this.resolveEarthEmoji(cc)} #**${global_rank}** | :flag_${cc.toLowerCase()}: #**${rank.country}**)`
+                        : `Unranked`)
+                    + `.\n**${(+hit_accuracy).toFixed(3)}%** accuracy - **${maximum_combo}**x max combo.`
                 )
-                .addField('Scores', `${ranked_score} ranked\n${total_score} total`, true)
-                .addField('Ranks', `**${ssh}** XH | **${ss}** X\n**${sh}** SH | **${s}** S\n**${a}** A`, true)
-                .addField(`Play time`,`${play_count} times | ${_w}w ${_d}d ${_h}h ${_m}m ${_s}s`)
+                .addField('Play ranks', `**${ssh}** XH | **${ss}** X\n**${sh}** SH | **${s}** S\n**${a}** A`, true)
+                .addField(`Play count`,`${play_count} times\n${_w}w ${_d}d ${_h}h ${_m}m ${_s}s`, true)
+                .setFooter(`Joined ${new Date(join_date).toLocaleString('vi-VN', { timeZone: 'UTC' })} UTC.`);
 
             if (score) {
                 let { beatmapset, beatmap, perfect, mods } = score,
@@ -87,7 +83,6 @@ export default class extends OsuCommand {
                 )
             }
 
-            if (avatar_url.startsWith(`https://`)) out.setThumbnail(avatar_url);
             m.channel.send(out)
         }
         catch (e) {
