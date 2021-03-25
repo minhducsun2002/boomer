@@ -208,8 +208,7 @@ export function embedScoreset(
     return chunk(recents, MAX_VIEW)
         .map((s, i, c) => {
             let out = new MessageEmbed()
-                .setTitle(`Recent plays of **${u}**`)
-                .setURL(`https://osu.ppy.sh/users/${id}`)
+                .setAuthor(u, `https://a.ppy.sh/${id}`, `https://osu.ppy.sh/users/${id}`)
                 .setFooter(`Page ${i + 1}/${c.length} | All times are UTC`)
             s.forEach(({
                 accuracy, mods, perfect, rank, max_combo,
@@ -255,9 +254,7 @@ export async function embedScoresetApi(
         })
     await Promise.all(__);
     let _ = chunk(scoreset, MAX_DIFF_PER_PAGE).map(
-        async (a, i, c) => new MessageEmbed()
-            .setURL(`https://osu.ppy.sh/users/${scoreset[0].user_id}`)
-            .setFooter(`Page ${i + 1}/${c.length} | All times are UTC`)
+        async (a) => new MessageEmbed()
             .addFields(
                 await Promise.all(a.map(async ({
                     beatmap_id: id, enabled_mods, rank, perfect, date, maxcombo,

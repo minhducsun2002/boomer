@@ -88,10 +88,8 @@ export = class extends OsuCommand {
                 if (failed) {
                     let _ = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));
                     embeds = await embedScoresetApi(mode_int, _, 5)
-                    for (let e of embeds)
-                        e
-                        .setTitle(`Recent plays of **${username}**`)
-                        .setURL(`https://osu.ppy.sh/users/${id}`)
+                    for (let e of embeds.entries())
+                        e[1].setAuthor(username, `https://a.ppy.sh/${id}`, `https://osu.ppy.sh/users/${id}`)
 
                 } else {
                     // sanitize the number
@@ -100,18 +98,18 @@ export = class extends OsuCommand {
                     // we got the ID, now we start fetching things
                     let recents = await fetchRecent(id, mode, limit, MAX_SINGLE);
                     embeds = embedScoreset(recents, username, id, mode)
-                        .map(a => a.setTitle(`Recent plays of **${username}**`))
+                        .map((a, i, c) => a.setFooter(`Recent plays - page ${i + 1}/${c.length} | All times are UTC`))
                 }
             }
 
             if (embeds.length > 1)
                 paginatedEmbed()
                     .setChannel(m.channel)
-                    .setEmbeds(embeds)
+                    .setEmbeds(embeds.map((e, i) => e.setFooter(`Recent plays - page ${i + 1}/${embeds.length} | All times are UTC`)))
                     .run({ idle: 20000, dispose: true })
             else
                 m.channel.send(
-                    embeds[0]
+                    embeds[0].setFooter(`All times are UTC`)
                     || new MessageEmbed().setDescription(
                         `No recent play found for user [**${username}**](https://osu.ppy.sh/users/${id}).`
                     )
