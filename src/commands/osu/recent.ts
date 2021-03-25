@@ -66,6 +66,7 @@ export = class extends OsuCommand {
 
     async exec(m : Message & { util: CommandUtil }, { user, mode, failed, limit } = { user: '', mode: '', failed: false, limit: 20 }) {
         user = await this.resolveUserFromAuthor(user?.trim(), m.author.id);
+        limit = limit ?? 20;
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
         if (!user)
