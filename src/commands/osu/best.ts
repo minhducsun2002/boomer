@@ -64,47 +64,39 @@ export = class extends OsuCommand {
         if (!modes.includes(mode)) mode = modes[0];
         // check mode
 
+        let { user: { id, username } } = await fetchUser(user, mode);
+        // we got the ID, now we start fetching things
 
-        try {
-            let { user: { id, username } } = await fetchUser(user, mode);
-            // we got the ID, now we start fetching things
+        if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
+            limit = 50;
+        let best = await fetchBest(id, mode, limit, MAX_SINGLE);
 
-            if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
-                limit = 50;
-            let best = await fetchBest(id, mode, limit, MAX_SINGLE);
+        // sort by descending pp
+        best = best
+            .sort((score1, score2) => score2.pp - score1.pp)
+            .filter(score => {
+                // without a filter, modFilter will always be 0, effectively filtering out
+                // every play when AND'd
+                if (!modFilter) return true;
 
-            // sort by descending pp
-            best = best
-                .sort((score1, score2) => score2.pp - score1.pp)
-                .filter(score => {
-                    // without a filter, modFilter will always be 0, effectively filtering out
-                    // every play when AND'd
-                    if (!modFilter) return true;
+                let scoreMods = this.modStringToBit(score.mods.join(''));
+                return (scoreMods & modFilter) === modFilter;
+            });
 
-                    let scoreMods = this.modStringToBit(score.mods.join(''));
-                    return (scoreMods & modFilter) === modFilter;
-                });
+        let modSuffix = modFilter ? ` with ${modbits.string(modFilter)}` : '';
+        let embeds = embedScoreset(best, username, id, mode)
+            .map((a, i, c) => a.setFooter(`Top plays${modSuffix} - page ${i + 1}/${c.length} | All times are UTC`));
 
-            let modSuffix = modFilter ? ` with ${modbits.string(modFilter)}` : '';
-
-            if (best.length)
-                paginatedEmbed()
-                    .setChannel(m.channel)
-                    .setEmbeds(
-                        embedScoreset(best, username, id, mode)
-                            .map(a => a.setTitle(`Top plays of **${username}**${modSuffix}`))
-                    )
-                    .run({ idle: 20000, dispose: true })
-            else
-                m.channel.send(
-                    new MessageEmbed()
-                        .setDescription(
-                            `No top play found for user [**${username}**](https://osu.ppy.sh/users/${id})${modSuffix}.`
-                        )
-                )
-        }
-        catch (e) {
-            m.channel.send(err.setDescription(`Sorry, an error occurred.`));
-        }
+        if (best.length > 1)
+            paginatedEmbed()
+                .setChannel(m.channel)
+                .setEmbeds(embeds)
+                .run({ idle: 20000, dispose: true })
+        else
+            m.channel.send(
+                embeds[0]?.setFooter(`All times are UTC`)
+                || new MessageEmbed()
+                    .setDescription(`No top play found for user [**${username}**](https://osu.ppy.sh/users/${id})${modSuffix}.`)
+            )
     }
 }
