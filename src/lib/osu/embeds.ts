@@ -128,7 +128,7 @@ export async function embedSingleScoreApi(
     parser.feed(map_file);
     let pp = ppv2({
         stars: new diff().calc({ map: parser.map, mods: +enabled_mods }),
-        acc_percent: _accuracy, nmiss: +countmiss, n50: +count50, n100: +count100, n300: +count300
+        acc_percent: _accuracy, nmiss: +countmiss, n50: +count50, n100: +count100, n300: +count300, combo: +maxcombo
     }).total
 
     let full_combo_pp = ppv2({
@@ -170,7 +170,7 @@ export async function embedSingleScore(
     if (!pp) {
         pp = ppv2({
             stars: new diff().calc({ map: parser.map, mods: modbits.from_string(mods.join('')) }),
-            acc_percent: accuracy, nmiss: count_miss, n50: count_50, n100: count_100, n300: count_300
+            acc_percent: accuracy, nmiss: count_miss, n50: count_50, n100: count_100, n300: count_300, combo: max_combo
         }).total;
         calculated = true;
     }
