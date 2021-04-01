@@ -5,8 +5,8 @@ import { SUCCESS_COLOR, ERROR_COLOR } from '@pepper/constants/colors';
 import { accuracy as acc} from '@pepper/lib/osu/utils';
 import { pad, chunk, paginatedEmbed } from '@pepper/utils';
 import { modes } from '@pepper/constants/osu';
-import { fetchMapset, fetchScore, checkURL as check, checkScoreURL as checkScore } from '@pepper/lib/osu';
-import { modbits } from 'ojsama';
+import { fetchMapset, fetchScore, checkURL as check, checkScoreURL as checkScore, fetchBeatmapFile } from '@pepper/lib/osu';
+import { modbits, parser as beatmapParser, ppv2, diff } from 'ojsama';
 
 const commandName = 'score', aliases : string[] = [commandName, 'scores', 'sc'];
 
@@ -173,6 +173,24 @@ export = class extends OsuCommand {
                 statistics: { count_miss, count_50, count_100, count_300 }
             } = score;
 
+            accuracy *= 100;
+            let fc_pp = 0, pp_guess = false
+            if (!perfect || !pp) {
+                let parser = new beatmapParser(); parser.feed(await fetchBeatmapFile(id));
+                if (!pp) {
+                    pp_guess = true;
+                    pp = ppv2({
+                        stars: new diff().calc({ map: parser.map, mods: modbits.from_string(mods.join('')) }),
+                        acc_percent: accuracy, nmiss: count_miss, n50: count_50, n100: count_100, n300: count_300, combo
+                    }).total;
+                }
+
+                fc_pp = ppv2({
+                    stars: new diff().calc({ map: parser.map, mods: modbits.from_string(mods.join('')) }),
+                    acc_percent: accuracy, nmiss: 0
+                }).total;
+            }
+
             const out = new MessageEmbed()
                 .setColor(SUCCESS_COLOR).setTimestamp()
                 .setURL(beatmap)
@@ -181,10 +199,10 @@ export = class extends OsuCommand {
                     `\n**${difficulty_rating}** :star:${max_combo ? ` | **${max_combo}**x` : ''} | `
                     + `**${pad(2)(Math.floor(total_length / 60))}**:**${pad(2)(total_length % 60)}** | `
                     + `\`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${od}** \`HP\`**${drain}**\n`
-                    + `[**${rank}**] **${pp}**pp `
+                    + `[**${rank}**] **${pp}**pp ${pp_guess ? '(?)' : ''}`
                     + `[**${count_300}**/**${count_100}**/**${count_50}**/**${count_miss}**]`
                     + ` (**${combo}**x${+perfect ? '' : `/**${max_combo}**x`} | `
-                    + `**${(accuracy * 100).toFixed(3)}**%) ${perfect ? '(FC)' : ''}\n`
+                    + `**${accuracy.toFixed(3)}**%) ${perfect ? '(FC)' : `(**${fc_pp.toFixed(3)}**pp if FC)`}\n`
                     + (mods.length ? `Mods : ${mods.join(', ')}\n` : '')
                     + `[[**Score**]](https://osu.ppy.sh/scores/${modes[mode_int]}/${score_id})`
                     + ` [[**Beatmap**]](https://osu.ppy.sh/beatmaps/${id})`
