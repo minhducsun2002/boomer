@@ -5,6 +5,7 @@ import { modes } from '@pepper/constants/osu'
 import { fetchUser, fetchBest, embedScoreset } from '@pepper/lib/osu';
 import { paginatedEmbed } from '@pepper/utils';
 import { modbits } from 'ojsama';
+import scoreCommand from './score';
 
 const commandName = 'best';
 const aliases = [commandName, 'top'];
@@ -25,6 +26,12 @@ export = class extends OsuCommand {
                 match: 'option',
                 description: `Gamemode to show. Can be ${modes.map(a => `\`${a}\``).join(', ')}.`,
                 flag: ['/']
+            }, {
+                id: 'pos',
+                match: 'option',
+                description: 'Position to show as single score.',
+                flag: ['#'],
+                type: 'number'
             }, {
                 id: 'limit',
                 match: 'option',
@@ -50,7 +57,7 @@ export = class extends OsuCommand {
         return ret;
     }
 
-    async exec(m : Message, { user, mode, mod, limit } = { user: '', mode: '', mod: '', limit: 50 }) {
+    async exec(m : Message, { user, mode, mod, limit, pos } = { user: '', mode: '', mod: '', limit: 50, pos: (null as number) }) {
         user = await this.resolveUserFromAuthor(user?.trim(), m.author.id);
 
         const err = new MessageEmbed().setColor(ERROR_COLOR)
@@ -70,6 +77,18 @@ export = class extends OsuCommand {
         if (!(Number.isSafeInteger(limit) && limit > 0 && limit < 51))
             limit = 50;
         let best = await fetchBest(id, mode, limit, MAX_SINGLE);
+
+        if (pos > 0 && Number.isSafeInteger(pos)) {
+            let [best] = await fetchBest(id, mode, limit, MAX_SINGLE, pos);
+            if (!best)
+                return m.channel.send(err.setDescription(
+                    `No top play found for user [**${username}**](https://osu.ppy.sh/users/${id}) at position ${pos}.`
+                ))
+
+            let scCommand = this.handler.findCommand(new scoreCommand().aliases[0]);
+            let _args = await scCommand.parse(m, `https://osu.ppy.sh/scores/${mode}/${best.id}`);
+            return await scCommand.exec(m, _args);
+        }
 
         // sort by descending pp
         best = best

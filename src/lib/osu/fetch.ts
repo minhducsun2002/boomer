@@ -43,8 +43,8 @@ export async function fetchUser(user : string, mode : string) {
     };
 }
 
-async function fetchScoreset(path : string, user: number, mode: string, max_result: number, max_single = 50) {
-    let init = 0, out : osuUserExtra['scoresBest'] = [];
+async function fetchScoreset(path : string, user: number, mode: string, max_result: number, max_single = 50, offset = 0) {
+    let init = offset, out : osuUserExtra['scoresBest'] = [];
     while (init < max_result) {
         let _ = await axios.get(
             `https://osu.ppy.sh/users/${user}/scores/${path}?mode=${mode}`
@@ -62,12 +62,12 @@ async function fetchScoreset(path : string, user: number, mode: string, max_resu
     return out;
 }
 
-export async function fetchRecent(user: number, mode: string, max_result: number, max_single = 50) {
-    return fetchScoreset('recent', user, mode, max_result, max_single);
+export async function fetchRecent(user: number, mode: string, max_result: number, max_single = 50, offset = 0) {
+    return fetchScoreset('recent', user, mode, max_result, max_single, offset);
 }
 
-export async function fetchBest(user: number, mode: string, max_result: number, max_single = 50) {
-    return fetchScoreset('best', user, mode, max_result, max_single);
+export async function fetchBest(user: number, mode: string, max_result: number, max_single = 50, offset = 0) {
+    return fetchScoreset('best', user, mode, max_result, max_single, offset);
 }
 
 export async function fetchRecentApi(key: string, user : string, mode = 0, limit = 50) {
