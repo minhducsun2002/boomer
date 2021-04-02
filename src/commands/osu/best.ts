@@ -79,6 +79,7 @@ export = class extends OsuCommand {
         let best = await fetchBest(id, mode, limit, MAX_SINGLE);
 
         if (pos > 0 && Number.isSafeInteger(pos)) {
+            pos -= 1; // off-by-one
             let [best] = await fetchBest(id, mode, limit, MAX_SINGLE, pos);
             if (!best)
                 return m.channel.send(err.setDescription(
