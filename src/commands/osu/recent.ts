@@ -76,7 +76,7 @@ export = class extends OsuCommand {
 
 
         // special alias handling
-        let singleMode = m.util.parsed.alias === singleModeAlias;
+        let singleMode = m.util.parsed.alias.toLowerCase() === singleModeAlias;
 
         let embeds : MessageEmbed[] = [];
         let { user: { id, username } } = await fetchUser(user, mode);
