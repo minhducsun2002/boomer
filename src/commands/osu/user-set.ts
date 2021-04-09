@@ -25,6 +25,8 @@ export = class extends OsuCommand {
     }
 
     async exec(m : Message, { username, unset } : { username: string, unset: boolean }) {
+        if (!username)
+            return m.channel.send(`Please specify an username to bind.`)
         let userDb = this.client.moduleHandler.findInstance(UsernameDb);
         if (unset) {
             let record = await userDb.unsetUser(m.author.id);
