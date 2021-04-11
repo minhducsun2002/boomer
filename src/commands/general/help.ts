@@ -1,6 +1,7 @@
-import type { ArgumentOptions } from 'discord-akairo';
+import type { ArgumentOptions, Category, Command } from 'discord-akairo';
 import { Message, MessageEmbed } from 'discord.js';
 import { GeneralCommand } from './baseCommand';
+import fuse from 'fuse.js';
 import i from './info';
 
 const commandName = 'help', aliases = [commandName];
@@ -19,7 +20,9 @@ export = class extends GeneralCommand {
         })
     }
 
-    async exec(m: Message, { q } : { q: string }) {
+    private fuse : fuse<Category<string, Command>>;
+
+    async exec(m: Message, { q } : { q: string }) : Promise<void> {
         const handler = this.client.commandHandler;
         // I am not supposed to do this, but yikes
         let out : MessageEmbed | string = new MessageEmbed()
@@ -48,6 +51,7 @@ export = class extends GeneralCommand {
                     );
                 })
             }
+            // check if command name
             else if (handler.findCommand(q)) {
                 const cmd = handler.findCommand(q);
                 let _p = cmd.prefix ?? prefix;
@@ -83,7 +87,26 @@ export = class extends GeneralCommand {
                 if (args.filter(a => a.multipleFlags).length)
                     out = out.setFooter(`+ means flag can be used multiple times.`)
             }
-            else out = `${m.author}, I couldn't find any category or command with the name of ${q}`
+            // fuzzy matching for category name
+            else {
+                let categories = handler.categories.array().map(_ => _);
+                if (!this.fuse)
+                    this.fuse = new fuse(
+                        categories,
+                        {
+                            keys: ['id'],
+                            includeScore: true,
+                            minMatchCharLength: 1,
+                            ignoreLocation: true,
+                            shouldSort: true
+                        },
+                        fuse.createIndex(['id'], categories)
+                    );
+                let results = this.fuse.search(q).map(_ => _.item.id);
+                // findCategory() should catch this
+                if (results.length) return this.exec(m, { q: results[0] });
+                else out = `${m.author}, I couldn't find any category or command with the name of ${q}`;
+            }
         }
         else {
             let [main] = aliases;
