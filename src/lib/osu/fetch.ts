@@ -31,7 +31,7 @@ export async function fetchMapset(id : number, set : boolean = false) {
  * @param mode Gamemode to fetch. Should be one of `osu`, `taiko`, `fruits`, `mania`
  */
 export async function fetchUser(user : string, mode : string) {
-    const _ = await axios.get(`https://osu.ppy.sh/u/${encodeURIComponent(user)}/${mode}`, {
+    const _ = await axios.get(`https://osu.ppy.sh/users/${encodeURIComponent(user)}/${mode}`, {
         validateStatus: () => true
     });
     if (_.status === 404) throw new Error(`User not found`)
