@@ -78,9 +78,9 @@ export = class extends OsuCommand {
             limit = 50;
         let best = await fetchBest(id, mode, limit, MAX_SINGLE);
 
+        // single mode ("top #25")
         if (pos > 0 && Number.isSafeInteger(pos)) {
-            pos -= 1; // off-by-one
-            let [best] = await fetchBest(id, mode, limit, MAX_SINGLE, pos);
+            let [best] = await fetchBest(id, mode, MAX_RESULTS, MAX_SINGLE, pos - 1);
             if (!best)
                 return m.channel.send(err.setDescription(
                     `No top play found for user [**${username}**](https://osu.ppy.sh/users/${id}) at position ${pos}.`
