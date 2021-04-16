@@ -169,7 +169,7 @@ export = class extends OsuCommand {
                 max_combo, ar, cs, drain, total_length, id
             } = score.beatmap
             let {
-                perfect, max_combo : combo, mods, rank, pp, id: score_id, accuracy,
+                perfect, max_combo : combo, mods, rank, pp, id: score_id, accuracy, created_at,
                 statistics: { count_miss, count_50, count_100, count_300 }
             } = score;
 
@@ -192,7 +192,7 @@ export = class extends OsuCommand {
             }
 
             const out = new MessageEmbed()
-                .setColor(SUCCESS_COLOR).setTimestamp()
+                .setColor(SUCCESS_COLOR).setTimestamp(new Date(created_at))
                 .setURL(beatmap)
                 .setTitle(`Score by \`${score.user.username}\`\non **${set.artist}** - **${set.title}** [**${version}**]`)
                 .setDescription(
