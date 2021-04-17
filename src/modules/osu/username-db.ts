@@ -1,6 +1,7 @@
 import { componentLog } from '@pepper/utils';
 import { OsuModule } from "./base";
 import { createConnection, Document, Model, Schema } from 'mongoose';
+import Cache from '@akashbabu/lfu-cache';
 
 interface UsernameRecord extends Document {
     osuUsername: string;
@@ -15,24 +16,48 @@ export = class extends OsuModule {
     }
 
     private model : Model<UsernameRecord, {}>;
+    private cache = new Cache<string>({
+        max: 100,
+        evictCount: 5
+    })
 
     async setUser(userId : string, username: string) {
         return await this.model.findOneAndUpdate(
             { discordUserId: userId.trim() },
-            { osuUsername: username.trim(), disordUserId: userId.trim() },
-            { upsert: true }
-        );
+            { osuUsername: username.trim(), discordUserId: userId.trim() },
+            { upsert: true, new: true }
+        ).exec().then(record => {
+            this.cache.set(record.discordUserId, record.osuUsername);
+            return record;
+        });
     }
     async unsetUser(userId : string) {
-        return await this.model.findOneAndDelete({ discordUserId: userId.trim() });
+        return await this.model.findOneAndDelete({ discordUserId: userId.trim() })
+            .exec().then(record => {
+                this.cache.delete(record.discordUserId);
+                return record;
+            });
     }
     async getUser(userId : string) {
-        return await this.model.findOne({ discordUserId: userId.trim() });
+        userId = userId.trim();
+        return this.cache.peek(userId)
+            ? { discordUserId: userId, osuUsername: this.cache.get(userId) }
+            : await this.model.findOne({ discordUserId: userId.trim() }).exec().then(record => {
+                this.cache.set(record.discordUserId, record.osuUsername);
+                return record;
+            })
     }
     async listUsers(...userIds : string[]) {
         if (!userIds.length)
-            throw new Error('No user ID was specified!')
-        return await this.model.find({ $or: userIds.map(id => ({ discordUserId: id.trim() })) });
+            throw new Error('No user ID was specified!');
+        let cached = userIds.map(uid => this.cache.peek(uid) ? { discordUserId: uid, osuUsername: this.cache.get(uid) } :  '').filter(Boolean);
+        let requesting = userIds.filter(uid => !this.cache.peek(uid));
+        return await this.model.find({ $or: requesting.map(id => ({ discordUserId: id.trim() })) })
+            .exec().then(records => {
+                for (let { discordUserId, osuUsername } of records)
+                    this.cache.set(discordUserId, osuUsername);
+                return [...records, ...cached] as UsernameRecord[];
+            });
     }
 
     async initialize() {
