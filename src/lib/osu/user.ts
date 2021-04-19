@@ -28,7 +28,7 @@ export interface osuUser {
 export interface osuUserExtra {
     scoresBest: {
         id: number;
-        user_id: number;
+        user_id: number; best_id: number;
         accuracy: number;
         mods: string[];
         score: number;

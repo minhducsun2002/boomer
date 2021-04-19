@@ -158,9 +158,9 @@ export async function embedSingleScore(
     username : string
 ) {
     let {
-        user_id,
+        user_id, best_id,
         accuracy, mods, perfect, rank, max_combo,
-        beatmap: b, beatmapset: s, pp, created_at, id,
+        beatmap: b, beatmapset: s, pp, created_at,
         statistics: { count_miss, count_50, count_100, count_300 }
     } = score;
 
@@ -197,7 +197,7 @@ export async function embedSingleScore(
                     .toLocaleString('vi-VN', { timeZone: 'UTC' })
             }**`
             + `\n[[**Beatmap**]](https://osu.ppy.sh/beatmapsets/${s.id}#${b.mode}/${b.id}) `
-            + ` [[**Score**]](https://osu.ppy.sh/scores/${mode_path}/${id})`
+            + (best_id ? ` [[**Score**]](https://osu.ppy.sh/scores/${mode_path}/${best_id})` : '')
         );
 }
 
@@ -211,8 +211,8 @@ export function embedScoreset(
                 .setAuthor(u, `https://a.ppy.sh/${id}`, `https://osu.ppy.sh/users/${id}`)
                 .setFooter(`Page ${i + 1}/${c.length} | All times are UTC`)
             s.forEach(({
-                accuracy, mods, perfect, rank, max_combo,
-                beatmap: b, beatmapset: s, pp, created_at, id,
+                accuracy, mods, perfect, rank, max_combo, best_id,
+                beatmap: b, beatmapset: s, pp, created_at,
                 statistics: { count_miss, count_50, count_100, count_300 }
             }) => out.addField(
                 `${s.artist} - ${s.title} [${b.version}]`
@@ -233,7 +233,7 @@ export function embedScoreset(
                         .toLocaleString('vi-VN', { timeZone: 'UTC' })
                 }**`
                 + `\n[[**Beatmap**]](https://osu.ppy.sh/b/${b.id}) `
-                + ` [[**Score**]](https://osu.ppy.sh/scores/${mode}/${id})`
+                + (best_id ? ` [[**Score**]](https://osu.ppy.sh/scores/${mode}/${best_id})` : '')
             ))
             return out;
         })
