@@ -596,11 +596,12 @@ export class EmbedRenderer {
     craftEssenceEmbed = async (id : number) => {
         let mstSvt = await this.JP.mstSvt.findOne({ id }).exec();
         let { name, cost, collectionNo } = mstSvt;
-        let englishName = await this.complementary.svtObject.findOne({ id }).exec();
+        let englishName = await this.complementary.svtObject.findOne({ id }).then(res => res.name);
+        englishName = await this.NA.mstSvt.findOne({ id }).then(res => res?.name) ?? englishName;
         let fields = await this.craftEssenceFields(mstSvt);
         return new MessageEmbed()
             .setURL(`https://apps.atlasacademy.io/db/#/JP/craft-essence/${id}`)
-            .setTitle(`${collectionNo}. ${englishName?.name || name} (\`${id}\`)`)
+            .setTitle(`${collectionNo}. ${englishName || name} (\`${id}\`)`)
             .setDescription(`Cost : ${cost}`)
             .addFields(fields.filter(a => a.value));
     }
