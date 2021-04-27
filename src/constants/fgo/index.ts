@@ -119,6 +119,7 @@ export enum FuncType {
     FORCE_ALL_BUFF_NOACT = 58,
     BREAK_GAUGE_UP = 59,
     BREAK_GAUGE_DOWN = 60,
+    MOVE_TO_LAST_SUBMEMBER = 61,
     EXP_UP = 101,
     QP_UP = 102,
     DROP_UP = 103,
@@ -141,7 +142,8 @@ export enum FuncType {
     REVIVAL = 120,
     DAMAGE_NP_INDIVIDUAL_SUM = 121,
     FRIEND_POINT_UP_DUPLICATE = 123,
-    MOVE_STATE = 124
+    MOVE_STATE = 124,
+    CHANGE_BGM_COSTUME = 125
 }
 
 export enum TargetType {
@@ -746,6 +748,7 @@ export enum Trait {
     shuten = 2734,
     genji = 2735,
     vengeance = 2759,
+    hasCostume = 2780,
     normalAttack0 = 3000,
     normalAttack1 = 3001,
     normalAttack2 = 3002,

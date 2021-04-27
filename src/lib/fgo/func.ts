@@ -95,7 +95,7 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
     if (val.has(vKey[vType.Value])) {
         if ([FuncType.GAIN_NP, FuncType.LOSS_NP].includes(f))
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 100)}%`)
-        if ([FuncType.GAIN_HP, FuncType.LOSS_HP, FuncType.LOSS_HP_SAFE, FuncType.GAIN_STAR, FuncType.SHORTEN_SKILL].includes(f))
+        if ([FuncType.GAIN_HP, FuncType.LOSS_HP, FuncType.LOSS_HP_SAFE, FuncType.SHORTEN_SKILL].includes(f))
             out.amount = val.get(vKey[vType.Value])
         if ([FuncType.DAMAGE_NP, FuncType.DAMAGE_NP_PIERCE].includes(f))
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`)
@@ -111,6 +111,13 @@ export function renderFunctionStatistics (f: FuncType, val : Map<string, string[
                 }
             );
         }
+
+        if (f === FuncType.GAIN_STAR) {
+            out.amount = val.get(vKey[vType.Value]);
+            if (val.get('MultipleGainStar'))
+                out.other.push({ name: `Star is gained per targets with matching traits`, value: [] })
+        }
+
         if (f === FuncType.DAMAGE_NP_INDIVIDUAL_SUM) {
             out.amount = val.get(vKey[vType.Value]).map(_ => `${(+_ / 10)}%`);
             let traits = val.get('TargetList')[0].split('/').map(t => Trait[+t as keyof typeof Trait]),

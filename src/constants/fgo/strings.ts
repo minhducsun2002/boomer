@@ -153,6 +153,7 @@ export const Trait = {
     [t.golem]: 'Golem',
     [t.hand]: 'Hand',
     [t.handOrDoor]: 'Hand/Door',
+    [t.hasCostume]: 'Has Costume',
     [t.homunculus]: 'Homunculus',
     [t.human]: 'Human',
     [t.humanoid]: 'Humanoid',
@@ -251,6 +252,7 @@ export const FuncTypes = {
     [fType.LOSS_STAR]: 'Decrease Critical Stars',
     // https://youtu.be/lrHzvSckdSY?t=87
     [fType.MOVE_POSITION]: 'Move position of Zeus',
+    [fType.MOVE_TO_LAST_SUBMEMBER]: 'Move to last position in backline',
     [fType.NONE]: 'No effect',
     [fType.OVERWRITE_DEAD_TYPE]: '',
     [fType.PT_SHUFFLE]: 'Shuffle party',
