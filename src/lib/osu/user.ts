@@ -1,3 +1,5 @@
+import { Beatmap } from "./beatmap";
+
 export interface osuUser {
     id: number;
     username: string;
@@ -37,13 +39,7 @@ export interface osuUserExtra {
         rank: string;
         created_at: ReturnType<Date['toJSON']>;
         max_combo: number;
-        beatmap: {
-            version: string; id: number; beatmapset_id: number;
-            difficulty_rating: number; bpm: number;
-            cs: number, drain: number, accuracy: number, ar: number;
-            count_circles: number; count_sliders: number; count_spinners: number;
-            mode: string;
-        };
+        beatmap: Beatmap;
         beatmapset: {
             id: number;
             title: string, artist: string, source: string, creator: string;

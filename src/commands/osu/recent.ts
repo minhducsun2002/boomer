@@ -53,14 +53,13 @@ export = class extends OsuCommand {
         let out : MessageEmbed[] = [];
         if (failed) {
             let [score] = await fetchRecentApi(OSU_API_KEY, user, mode_int, 1);
-            out = score ? [await embedSingleScoreApi(mode_int, score)] : [];
+            out = score ? [await embedSingleScoreApi(mode_int, score, user)] : [];
         }
         else {
             let [recent] = await fetchRecent(user_id, modes[mode_int], 1, 1);
             out = recent ? [await embedSingleScore(modes[mode_int], recent, user)] : [];
         }
 
-        if (out.length) out[0] = out[0].setTitle(`Most recent play of user **${user}**`);
         return out;
     }
 
@@ -97,7 +96,7 @@ export = class extends OsuCommand {
                 // we got the ID, now we start fetching things
                 let recents = await fetchRecent(id, mode, limit, MAX_SINGLE);
                 embeds = embedScoreset(recents, username, id, mode)
-                    .map((a, i, c) => a.setFooter(`Recent plays - page ${i + 1}/${c.length} | All times are UTC`))
+                    .map((a, i, c) => a.setFooter(`Recent plays - page ${i + 1}/${c.length}`))
             }
         }
 
@@ -108,7 +107,7 @@ export = class extends OsuCommand {
                 .run({ idle: 20000, dispose: true })
         else
             m.channel.send(
-                embeds[0].setFooter(`All times are UTC`)
+                embeds[0]
                 || new MessageEmbed().setDescription(
                     `No recent play found for user [**${username}**](https://osu.ppy.sh/users/${id}).`
                 )

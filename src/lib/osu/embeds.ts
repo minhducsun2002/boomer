@@ -99,20 +99,30 @@ export function embedBeatmapset(
     }).flat();
 }
 
+function serializeBeatmapInformationForSingleScore(b : Beatmap) {
+    return (
+        `\n${b.difficulty_rating} :star: `
+        + `- \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}** `
+        + `- **${b.bpm}** BPM `
+        + `- :clock3: ${pad(2)(Math.floor(b.hit_length / 60))}:${pad(2)(b.hit_length % 60)}`
+    )
+}
+
 export async function embedSingleScoreApi(
     mode_int: keyof typeof accuracy,
-    score : PromiseValue<ReturnType<typeof fetchRecentApi>>[0]
+    score : PromiseValue<ReturnType<typeof fetchRecentApi>>[0],
+    username: string
 ) {
     let {
-        beatmap_id, enabled_mods, rank, perfect, date, maxcombo,
+        beatmap_id, enabled_mods, rank, perfect, date, maxcombo, user_id,
         count50, count100, count300, countkatu, countgeki, countmiss
     } = score;
 
-    let mapset = await fetchMapset(+beatmap_id);
-    let map = [...mapset.beatmaps, ...mapset.converts].find(map => map.id === +beatmap_id);
+    let s = await fetchMapset(+beatmap_id);
+    let b = [...s.beatmaps, ...s.converts].find(map => map.id === +beatmap_id);
     let mods = modbits.string(+enabled_mods);
 
-    let { count_circles, count_sliders, count_spinners } = map;
+    let { count_circles, count_sliders, count_spinners } = b;
     let completion = (+countmiss + +count50 + +count100 + +count300) / (count_circles + count_sliders + count_spinners);
     let _accuracy = accuracy[mode_int]({
         countMiss: +countmiss,
@@ -137,19 +147,22 @@ export async function embedSingleScoreApi(
     }).total
 
     return new MessageEmbed()
-        .setURL(`https://osu.ppy.sh/users/${score.user_id}`)
+        .setAuthor(username, `https://a.ppy.sh/${user_id}`, `https://osu.ppy.sh/users/${user_id}`)
+        .setTitle(`[**${rank}**] ${s.artist} - ${s.title} [${b.version}]` + (mods ? `+${mods}` : ''))
+        .setURL(`https://osu.ppy.sh/beatmapsets/${s.id}#${b.mode}/${b.id}`)
         .addField(
-            `${mapset.artist} - ${mapset.title} [${map.version}]` + (mods.length ? `+${mods}` : ''),
-            `[**${rank}**] **${pp.toFixed(4)}**pp (?) **${_accuracy.toFixed(3)}**% - **${maxcombo}**x${+perfect ? '' : `/**${map.max_combo}**x`} `
-            + (+perfect ? '(FC)' : (completion != 1 ? `(completed ${(completion * 100).toFixed(2)}%)` : ''))
-            + (+perfect ? '' : ` (**${full_combo_pp.toFixed(2)}**pp (?) if FC)`)
-            + `\n[**${count300}**/**${count100}**/**${count50}**/**${countmiss}**] `
-            + `@ **${new Date(date).toLocaleString('vi-VN', { timeZone: 'UTC' })}**`
-            + `\n${map.difficulty_rating} :star: `
-            + `- \`AR\`**${map.ar}** \`CS\`**${map.cs}** \`OD\`**${map.accuracy}** \`HP\`**${map.drain}** `
-            + `- **${map.bpm}** BPM`
-            + `\n[[**Beatmap**]](https://osu.ppy.sh/beatmaps/${map.id})`
-        );
+            'Statistics',
+            `**${maxcombo}**x/**${parser.map.max_combo()}**x • `
+            + `[**${count300}**/**${count100}**/**${count50}**/**${countmiss}**]`
+            + ` • **${_accuracy.toFixed(3)}**%`
+            + `\n**${pp.toFixed(2)}**pp (?)`
+            + (+perfect ? '' : ` / **${full_combo_pp.toFixed(2)}**pp (?)`)
+            + (completion === 1 ? '' : ` • ${(completion * 100).toFixed(2)}% completed`),
+            true
+        )
+        .addField(`Beatmap information`, serializeBeatmapInformationForSingleScore(b))
+        .setTimestamp(new Date(date))
+        .setThumbnail(`https://assets.ppy.sh/beatmaps/${s.id}/covers/list@2x.jpg?`);
 }
 
 export async function embedSingleScore(
@@ -180,25 +193,22 @@ export async function embedSingleScore(
     }).total;
 
     return new MessageEmbed()
-        .setTitle(`Most recent play of **${username}**`)
-        .setURL(`https://osu.ppy.sh/users/${user_id}`)
+        .setAuthor(username, `https://a.ppy.sh/${user_id}`, `https://osu.ppy.sh/users/${user_id}`)
+        .setTitle(`[**${rank}**] ${s.artist} - ${s.title} [${b.version}]` + (mods.length ? `+${mods.join('')}` : ''))
+        .setURL(`https://osu.ppy.sh/beatmapsets/${s.id}#${b.mode}/${b.id}`)
         .addField(
-            `${s.artist} - ${s.title} [${b.version}]`
-            + (mods.length ? `+${mods.join('')}` : ''),
-            `[**${rank}**] **${pp.toFixed(4)}**pp${calculated ? ' (?)' : ''} `
-            + `(**${accuracy.toFixed(3)}**% | **${max_combo}**x/**${parser.map.max_combo()}**x) `
-            + (perfect ? `(FC)` : `(**${full_combo_pp.toFixed(2)}**pp (?) if FC)`)
-            + `\n${b.difficulty_rating} :star: `
-            + `- \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}** `
-            + `- **${b.bpm}** BPM`
-            + `\n[**${count_300}**/**${count_100}**/**${count_50}**/**${count_miss}**]`
-            + ` @ **${
-                new Date(created_at)
-                    .toLocaleString('vi-VN', { timeZone: 'UTC' })
-            }**`
-            + `\n[[**Beatmap**]](https://osu.ppy.sh/beatmapsets/${s.id}#${b.mode}/${b.id}) `
-            + (best_id ? ` [[**Score**]](https://osu.ppy.sh/scores/${mode_path}/${best_id})` : '')
-        );
+            'Statistics',
+            `**${max_combo}**x/**${parser.map.max_combo()}**x • `
+            + `[**${count_300}**/**${count_100}**/**${count_50}**/**${count_miss}**]`
+            + ` • **${accuracy.toFixed(3)}**%`
+            + `\n**${pp.toFixed(2)}**pp ${calculated ? ' (?)' : ''}`
+            + (perfect ? '' : ` / **${full_combo_pp.toFixed(2)}**pp (?)`)
+            + (best_id ? ` • [[**Score**]](https://osu.ppy.sh/scores/${mode_path}/${best_id})` : ''),
+            true
+        )
+        .addField(`Beatmap information`, serializeBeatmapInformationForSingleScore(b))
+        .setTimestamp(new Date(created_at))
+        .setThumbnail(`https://assets.ppy.sh/beatmaps/${s.id}/covers/list@2x.jpg?`);
 }
 
 export function embedScoreset(
