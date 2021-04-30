@@ -1,5 +1,5 @@
 export { accuracy, modToString, ModNames } from './utils';
-export { embedBeatmapset, embedBeatmap, embedScoreset, embedScoresetApi } from './embeds';
+export { embedBeatmapset, embedBeatmap, embedScoreset, embedScoresetApi, embedSingleScore, embedSingleScoreApi } from './embeds';
 export type { Beatmap } from './beatmap';
 export type { Beatmapset } from './beatmapset';
 export { fetchMapset, fetchUser, fetchBest, fetchRecent, fetchRecentApi, fetchScore, fetchBeatmapFile } from './fetch';

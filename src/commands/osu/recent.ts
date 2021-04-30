@@ -1,11 +1,12 @@
 import { OsuCommand } from './baseCommand';
 import { Message, MessageEmbed } from 'discord.js';
-import { modes } from '@pepper/constants/osu'
-import { fetchUser, fetchRecent, embedScoreset, fetchRecentApi, embedScoresetApi } from '@pepper/lib/osu';
+import { modes } from '@pepper/constants/osu';
+import {
+    accuracy, fetchUser, fetchRecent, fetchRecentApi,
+    embedScoreset, embedScoresetApi, embedSingleScore, embedSingleScoreApi
+} from '@pepper/lib/osu';
 import { paginatedEmbed } from '@pepper/utils';
-import { accuracy } from '@pepper/lib/osu';
 import type { CommandUtil } from 'discord-akairo';
-import { embedSingleScore, embedSingleScoreApi } from '@pepper/lib/osu/embeds';
 
 const singleModeAlias = 'rs';
 const commandName = 'recent';
