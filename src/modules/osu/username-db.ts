@@ -27,6 +27,7 @@ export = class extends OsuModule {
             { osuUsername: username.trim(), discordUserId: userId.trim() },
             { upsert: true, new: true }
         ).exec().then(record => {
+            this.cache.delete(record.discordUserId);
             this.cache.set(record.discordUserId, record.osuUsername);
             return record;
         });
@@ -43,6 +44,7 @@ export = class extends OsuModule {
         return this.cache.peek(userId)
             ? { discordUserId: userId, osuUsername: this.cache.get(userId) }
             : await this.model.findOne({ discordUserId: userId.trim() }).exec().then(record => {
+                this.cache.delete(record.discordUserId);
                 this.cache.set(record.discordUserId, record.osuUsername);
                 return record;
             })
@@ -54,8 +56,10 @@ export = class extends OsuModule {
         let requesting = userIds.filter(uid => !this.cache.peek(uid));
         return await this.model.find({ $or: requesting.map(id => ({ discordUserId: id.trim() })) })
             .exec().then(records => {
-                for (let { discordUserId, osuUsername } of records)
+                for (let { discordUserId, osuUsername } of records) {
+                    this.cache.delete(discordUserId);
                     this.cache.set(discordUserId, osuUsername);
+                }
                 return [...records, ...cached] as UsernameRecord[];
             });
     }
