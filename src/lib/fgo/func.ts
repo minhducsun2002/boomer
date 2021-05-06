@@ -1,10 +1,9 @@
 import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
-import { getBuffById } from './buff';
 import { ValsType as vType } from '@pepper/constants/fgo';
 import { ValsKey as vKey, Trait } from '@pepper/constants/fgo/strings';
 import { Statistics, renderChance, renderCount } from './buff';
-
+import { DBInstance } from '@pepper/db/fgo';
 import {
     ApplyTarget as aTgt,
     FuncTypes as fTp,
@@ -16,13 +15,14 @@ import { FuncType } from '@pepper/constants/fgo';
 
 export async function renderInvocation({
     vals, funcType, targetType, applyTarget, id, popupText, tvals, questTvals
-} : mstFunc, db : Parameters<typeof getBuffById>[1]) {
+} : mstFunc, db : DBInstance) {
     // list of buff IDs
     let teamApply = aTgt[applyTarget],
         target = tTp[targetType];
     let buff = await Promise.all(
-        vals.map(buffId => getBuffById(buffId, db)
-            .catch(() => ({ name: tr[buffId as keyof typeof tr], simple: 1 }))
+        vals.map(
+            buffId => db.buffCache.get(buffId)
+                .catch(() => ({ name: tr[buffId as keyof typeof tr], simple: 1 }))
         )
     );
     // ignore the traits?

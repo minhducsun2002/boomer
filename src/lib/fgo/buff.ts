@@ -5,16 +5,6 @@ import type { EmbedRenderer } from './renderer';
 import type { DBInstance } from '@pepper/db/fgo';
 import { deduplicate } from '@pepper/utils';
 
-/**
- * Fetch a `mstBuff` by its ID.
- * @param id Buff ID
- */
-export async function getBuffById(id: number, db : DBInstance) {
-    let _ = await db.mstBuff.findOne({ id }).exec();
-    if (_ === null) throw new Error(`Could not find any buff with ID ${id}. Is that a trait?`);
-    return _;
-}
-
 // serializeValue is for cases when we want to provide a "recommended" method of serializing .value values into a string.
 export type BuffEntry = { name: string, value: string[], serializeValue?: () => string };
 export function renderTurn(s : string[]) : BuffEntry {
