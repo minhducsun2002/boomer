@@ -600,7 +600,7 @@ export class EmbedRenderer {
     craftEssenceEmbed = async (id : number) => {
         let mstSvt = await this.JP.mstSvt.findOne({ id }).exec();
         let { name, cost, collectionNo } = mstSvt;
-        let englishName = await this.complementary.svtObject.findOne({ id }).then(res => res.name);
+        let englishName = await this.complementary.svtObject.findOne({ id }).then(res => res?.name);
         englishName = await this.NA.mstSvt.findOne({ id }).then(res => res?.name) ?? englishName;
         let fields = await this.craftEssenceFields(mstSvt);
         return new MessageEmbed()
