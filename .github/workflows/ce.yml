@@ -5,6 +5,8 @@ on:
     - '.github/workflows/ce.yml'
     - 'src/**/fgo/**'
     - 'scripts/prepareCE.ts'
+  repository_dispatch:
+  workflow_dispatch:
 jobs:
   build:
     name: Prepare CE data
@@ -39,7 +41,7 @@ jobs:
         repository: atlasacademy/fgo-game-data
         ref: JP
         path: 'database/dataset/JP'
-        token: ${{ secrets.CONFIG_TOKEN }}  
+        token: ${{ secrets.CONFIG_TOKEN }}
     - name: Checkout NA dataset
       uses: actions/checkout@v2
       with:
@@ -47,7 +49,7 @@ jobs:
         ref: NA
         path: 'database/dataset/NA'
         token: ${{ secrets.CONFIG_TOKEN }}
-      
+
     - name: Sync dataset to local instance
       run: cd database && env > env && docker build -t run . && docker run --network host --env-file env -t run
       env:
@@ -65,7 +67,7 @@ jobs:
       run: yarn
     - name: Checkout config
       uses: actions/checkout@v2
-      with: 
+      with:
         repository: ${{ secrets.CONFIG_REPOSITORY }}
         path: config
         token: ${{ secrets.CONFIG_TOKEN }}
