@@ -1,7 +1,6 @@
 import type { mstFunc } from '@pepper/db/fgo/master/mstFunc';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
-import { ValsType as vType } from '@pepper/constants/fgo';
-import { ValsKey as vKey, Trait } from '@pepper/constants/fgo/strings';
+import { ValsType as vType, FuncType } from '@pepper/constants/fgo';
 import { Statistics, renderChance, renderCount } from './buff';
 import { DBInstance } from '@pepper/db/fgo';
 import {
@@ -9,9 +8,10 @@ import {
     FuncTypes as fTp,
     TargetType as tTp,
     Trait as tr,
-    BuffTypes as bTp
+    BuffTypes as bTp,
+    ValsKey as vKey,
+    Trait
 } from '@pepper/constants/fgo/strings';
-import { FuncType } from '@pepper/constants/fgo';
 
 export async function renderInvocation({
     vals, funcType, targetType, applyTarget, id, popupText, tvals, questTvals
