@@ -42,6 +42,7 @@
     "nconf": "^0.10.0",
     "ojsama": "^2.1.0",
     "queue-ts": "^0.1.0",
+    "quickchart-js": "^1.0.7",
     "rimraf": "^3.0.2",
     "splashy": "^5.0.2",
     "strip-ansi": "^6.0.0",
@@ -49,6 +50,7 @@
     "trailduck": "https://github.com/cipherallies/trailduck/archive/47df7a9f4a8e2c5f356bbe051b4eeacf552212c4.tar.gz"
   },
   "devDependencies": {
+    "@types/chart.js": "^2.9.32",
     "@types/cheerio": "^0.22.16",
     "@types/csprng": "^0.1.1",
     "@types/mongoose": "5.10.1",

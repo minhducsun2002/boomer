@@ -69,7 +69,7 @@ export default class extends OsuCommand {
 
             } else {
                 m.channel.send(
-                    embedBeatmap(
+                    await embedBeatmap(
                         __.beatmaps.concat(__.converts)
                             .filter(a => a.id === _id)[0],
                         __

@@ -1,4 +1,5 @@
 import { Mods, AccuracyCount, Gamemode } from '@minhducsun2002/node-osr-parser';
+import { parser, diff, ppv2, modbits } from 'ojsama';
 
 export const ModNames = {
     [Mods.None]: '',
@@ -62,4 +63,13 @@ export const accuracy = {
         return (count50 / 6 + count100 / 3 + count100k / 2 + 300 * (count300 + count300k))
             / (countMiss + count100 + count100k + count300 + count300k + count50)
     }
+}
+
+
+export const calculatePP = (map : string, combo : number, accuracy : number, mods : modbits = modbits.nomod) => {
+    let _parser = new parser(); _parser.feed(map);
+    return ppv2({
+        stars: new diff().calc({ map: _parser.map }),
+        acc_percent: accuracy, combo, mods
+    });
 }

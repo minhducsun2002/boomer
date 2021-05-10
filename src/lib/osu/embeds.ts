@@ -1,15 +1,16 @@
-import { MessageEmbed } from 'discord.js';
-import { chunk, pad } from '@pepper/utils';
+import { MessageAttachment, MessageEmbed } from 'discord.js';
+import { chunk, pad, range } from '@pepper/utils';
 import { mode_friendly, modes } from '@pepper/constants/osu';
 import type { Beatmapset } from './beatmapset';
 import type { Beatmap } from './beatmap';
 import { osuUserExtra } from './user';
 import { fetchRecentApi, fetchMapset, fetchBeatmapFile } from './fetch';
 import type { PromiseValue } from 'type-fest';
-import { accuracy } from './utils';
+import { accuracy, calculatePP } from './utils';
 import { modbits, parser as beatmapParser, diff, ppv2 } from 'ojsama';
+import quickchart from 'quickchart-js';
 
-export function embedBeatmap(b: Beatmap, s: Beatmapset) {
+export async function embedBeatmap(b: Beatmap, s: Beatmapset) {
     let {
         version, difficulty_rating,
         max_combo, ar, accuracy, cs, drain, total_length,
@@ -18,6 +19,30 @@ export function embedBeatmap(b: Beatmap, s: Beatmapset) {
         title, artist, id: set_id, status, creator, user_id,
         ranked, ranked_date, last_updated, covers
     } = s
+
+    const ACC_START = 93, ACC_END = 100, ACC_STEP = 0.5;
+    let map_file = await fetchBeatmapFile(map_id);
+    let accuracies = range(ACC_START, ACC_END + ACC_STEP, ACC_STEP);
+    let pps = accuracies.map(accuracy => calculatePP(map_file, max_combo, accuracy)).map(_ => _.total);
+
+    let data = {
+        labels: accuracies.map(_ => `${_}%`),
+        datasets: [{
+            label: `${artist} - ${title}`,
+            data: pps
+        }],
+        options: {
+            scales: {
+                y: {
+                    min: Math.min(...pps)
+                }
+            }
+        }
+    };
+    const ppChartFilename = `pp-${map_id}.png`;
+    let chart = await new quickchart().setConfig({ type: 'line', data }).setHeight(300).setWidth(500).toBinary();
+
+
     return new MessageEmbed()
         .setTitle(`${artist} - ${title} [${version}]`)
         .setURL(`https://osu.ppy.sh/beatmapsets/${set_id}#${modes[mode_int]}/${map_id}`)
@@ -28,7 +53,7 @@ export function embedBeatmap(b: Beatmap, s: Beatmapset) {
                 ? `Ranked **${new Date(ranked_date).toUTCString()}**.`
                 : `Last updated **${new Date(last_updated)}**`)
         )
-        .setImage(covers["cover@2x"])
+        .setThumbnail(covers["list@2x"])
         .addField(
             `Difficulty`,
             `${difficulty_rating} :star: - \`AR\`**${ar}** \`CS\`**${cs}** \`OD\`**${accuracy}** \`HP\`**${drain}**`
@@ -40,6 +65,8 @@ export function embedBeatmap(b: Beatmap, s: Beatmapset) {
             true
         )
         .addField(`Game mode`, mode_friendly[mode_int], true)
+        .attachFiles([new MessageAttachment(chart, `pp-${map_id}.png`)])
+        .setImage(`attachment://${ppChartFilename}`)
 }
 
 export function embedBeatmapset(
@@ -141,11 +168,6 @@ export async function embedSingleScoreApi(
         acc_percent: _accuracy, nmiss: +countmiss, n50: +count50, n100: +count100, n300: +count300, combo: +maxcombo
     }).total
 
-    let full_combo_pp = ppv2({
-        stars: new diff().calc({ map: parser.map, mods: +enabled_mods }),
-        acc_percent: _accuracy, nmiss: 0
-    }).total
-
     return new MessageEmbed()
         .setAuthor(username, `https://a.ppy.sh/${user_id}`, `https://osu.ppy.sh/users/${user_id}`)
         .setTitle(`[**${rank}**] ${s.artist} - ${s.title} [${b.version}]` + (mods ? `+${mods}` : ''))
@@ -156,7 +178,9 @@ export async function embedSingleScoreApi(
             + `[**${count300}**/**${count100}**/**${count50}**/**${countmiss}**]`
             + ` • **${_accuracy.toFixed(3)}**%`
             + `\n**${pp.toFixed(2)}**pp (?)`
-            + (+perfect ? '' : ` / **${full_combo_pp.toFixed(2)}**pp (?)`)
+            + (+perfect
+                ? ''
+                : ` / **${calculatePP(map_file, parser.map.max_combo(), _accuracy, +enabled_mods).total.toFixed(2)}**pp (?)`)
             + (completion === 1 ? '' : ` • ${(completion * 100).toFixed(2)}% completed`),
             true
         )
