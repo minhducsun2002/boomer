@@ -2,7 +2,6 @@ import { Buff, CardModifier, ValsType as vType } from '@pepper/constants/fgo';
 import { ValsType, Trait, ValsKey } from '@pepper/constants/fgo/strings';
 import type { mstBuff } from '@pepper/db/fgo/master/mstBuff';
 import type { EmbedRenderer } from './renderer';
-import type { DBInstance } from '@pepper/db/fgo';
 import { deduplicate } from '@pepper/utils';
 
 // serializeValue is for cases when we want to provide a "recommended" method of serializing .value values into a string.
