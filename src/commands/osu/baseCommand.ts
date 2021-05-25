@@ -4,6 +4,7 @@ import { client } from '@pepper/client';
 import User from '@pepper/modules/osu/username-db';
 import { countries } from 'countries-list';
 
+
 export const OsuCommand = class extends extendCommand({
     category: 'osu!', typing: true, prefix: client.config.prefix['osu']
 }) {
@@ -20,7 +21,13 @@ export const OsuCommand = class extends extendCommand({
                 target = id;
             } else return user;
         }
-        return (await client.moduleHandler.findInstance(User).getUser(target)).osuUsername;
+        let username = (await client.moduleHandler.findInstance(User).getUser(target))?.osuUsername;
+        if (!username)
+            throw new Error(
+                `User ID ${target} has not been bound to any username.`
+                + `\nUse ${(this.prefix as string[])[0]}${this.aliases[0]} <username> to set one.`
+            )
+        return username;
     }
 
     resolveEarthEmoji(countryCode : string) {
