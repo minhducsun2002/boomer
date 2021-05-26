@@ -21,7 +21,7 @@
   "license": "GPL-3.0-only",
   "dependencies": {
     "@akashbabu/lfu-cache": "^1.0.2",
-    "@minhducsun2002/node-osr-parser": "0.0.1-1",
+    "@minhducsun2002/node-osr-parser": "0.0.1-2",
     "@minhducsun2002/paged-embeds": "0.1.1",
     "@msgpack/msgpack": "^1.12.2",
     "@octokit/rest": "^16.43.1",
