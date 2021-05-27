@@ -24,6 +24,7 @@ export = class extends FgoModule {
      * @param s Search query
      */
     async search(s : string, opt? : fuzzySearchOpt) {
+        s = s.toLowerCase();
         let t = this.tokenSearch(s);
         let res = await this.fuzzySearch(s, opt);
         if (t?.size) {
@@ -43,7 +44,7 @@ export = class extends FgoModule {
      * @returns A set of CE collectionNo.
      */
     tokenSearch(s : string) {
-        return this.tokens.get(s.trim().toLowerCase());
+        return this.tokens.get(s);
     }
 
     /**

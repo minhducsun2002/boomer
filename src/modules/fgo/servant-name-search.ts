@@ -41,6 +41,7 @@ export = class extends FgoModule {
      * @param s Search query
      */
     search(s : string, opt? : fuzzySearchOpt) {
+        s = s.toLowerCase();
         let t = this.tokenSearch(s);
         let res = this.fuse.search(s, Object.assign({}, { shouldSort: true }, opt));
         if (t?.size) {
