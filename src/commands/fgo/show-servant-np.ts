@@ -48,7 +48,10 @@ export = class extends FgoCommand {
                 .setEmbeds(
                     embeds.map((embed, i, _) => embed.setFooter(`Page ${i + 1}/${_.length}`))
                 )
-                .run({ idle: 20000, dispose: true })
+                .run(
+                    { idle: 20000, dispose: true },
+                    `Migration is in progress; please add servant aliases you see fit to <https://shrtco.de/i1HKZD>.`
+                )
         else
             m.channel.send(embeds[0]);
     }

@@ -91,6 +91,9 @@ export = class extends FgoCommand {
                 .setEmbeds(
                     r.map(render).map((m, i, a) => m.setFooter(`Page ${i + 1}/${a.length}`))
                 )
-                .run({ idle: 20000, dispose: true })
+                .run(
+                    { idle: 20000, dispose: true },
+                    `Migration is in progress; please add servant aliases you see fit to <https://shrtco.de/i1HKZD>.`
+                )
     }
 }

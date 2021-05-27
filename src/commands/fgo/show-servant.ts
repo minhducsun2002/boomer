@@ -49,7 +49,7 @@ export = class extends FgoCommand {
             if (alias)
                 _id = alias.collectionNo;
             else {
-                let res = search_instance.search(query);
+                let res = search_instance.search(query.toLowerCase());
                 if (!res.length) return bail();
                 _id = res[0].item.id;
             }
@@ -88,6 +88,9 @@ export = class extends FgoCommand {
         paginatedEmbed()
             .setChannel(m.channel)
             .setEmbeds(e)
-            .run({ idle: 20000, dispose: true }, notice)
+            .run(
+                { idle: 20000, dispose: true },
+                (notice + `\nMigration is in progress; please add servant aliases you see fit to <https://shrtco.de/i1HKZD>.`).trimLeft()
+            )
     }
 }
