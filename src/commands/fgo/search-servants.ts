@@ -74,7 +74,7 @@ export = class extends FgoCommand {
 
         let render = (_ : typeof r[0]) => new MessageEmbed()
             .setTitle(`Search results` + (query ? ` for \`${query}\`` : ''))
-            .setDescription(_.map(s => `[${s.rarity}★] ${s.id}. **${s.name}**`))
+            .setDescription(_.map(s => `${s.id}. **${s.name}**`))
             .addFields(
                 qTrait.length
                 ? [{

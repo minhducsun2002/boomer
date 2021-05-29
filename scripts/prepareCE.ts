@@ -6,6 +6,7 @@ import { encode } from '@msgpack/msgpack';
 import { join } from 'path';
 import { isMainThread,  workerData, Worker, parentPort } from 'worker_threads';
 import { cpus } from 'os';
+import axios from 'axios';
 
 import { EmbedRenderer } from '../src/lib/fgo';
 import { componentLog } from '../src/utils';
@@ -22,7 +23,7 @@ enum WorkerMessages
 
 const config = require('../config/test.json');
 let { path } = yargs.option('path', { default: '/tmp/pepper_CE', demandOption: true }).argv;
-const { masterData: { JP, NA }, complementary: { english_names } } = config.database.fgo;
+const { masterData: { JP, NA }, complementary: { english_names }, servant_aliases_2 } = config.database.fgo;
 mkdirSync(path, { recursive: true });
 
 if (isMainThread) mainThread();
@@ -79,13 +80,21 @@ async function doWorkerWork(workerData : WorkerData) {
     const { threadIndex, ceIDs } = workerData
     const log = new componentLog(`CE details processor | Thread ${threadIndex}`);
 
+    const csv = await axios.get(servant_aliases_2, { responseType: 'text' }).then(_ => _.data as string);
+    const mapping = new Map(
+        csv.split('\n')
+            .map(csv => csv.split(','))
+            .filter(line => !isNaN(+line[0]) && !isNaN(+line[1]) && line[2] !== '')
+            .map(line => [+line[0], line[2]])
+    )
 
     const conns = { JP: createConnection(JP), NA: createConnection(NA), comp: createConnection(english_names) };
     const models = { JP: initializeMasterModels(conns.JP), NA: initializeMasterModels(conns.NA) }
     const renderer = new EmbedRenderer(
         models.NA,
         models.JP,
-        { svtObject: conns.comp.model('svt', object, 'svt'), item: conns.comp.model('items', item, 'items') }
+        { svtObject: conns.comp.model('svt', object, 'svt'), item: conns.comp.model('items', item, 'items') },
+        mapping
     );
 
     for (let id of ceIDs)

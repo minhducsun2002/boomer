@@ -2,8 +2,9 @@ import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
 import f from 'fuse.js';
 import { Schema, Document, createConnection, Model } from 'mongoose';
-import db, { Servant } from './servant-main-database';
+import aliases from './servant-aliases';
 
+type Servant = { id: number, name: string, aliases: string[] };
 type fuzzySearchOpt = Parameters<f<Servant>['search']>[1];
 
 
@@ -30,9 +31,7 @@ export = class extends FgoModule {
     private log = new componentLog('F/GO servant name search');
     private fuse : f<Servant>;
     private tokens = new Map<string, Set<number>>();
-
-    private _records : Servant[];
-    public get records() { return this._records };
+    public records : Servant[];
 
     private aliasModel:  Model<AliasEntry>;
 
@@ -86,7 +85,7 @@ export = class extends FgoModule {
     }
 
     private async verifyDupes(s : Servant[]) {
-        let _ = s.map(s => [s.name, ...s.alias]).flat();
+        let _ = s.map(s => [s.name, ...s.aliases]).flat();
         let _1 = new Set(_).size;
         if (_1 !== _.length)
             this.log.warning(
@@ -107,21 +106,21 @@ export = class extends FgoModule {
         return await this.aliasModel.find({ collectionNo }).exec();
     }
 
-    require = [new db().id];
+    require = [new aliases().id];
 
     async initialize() {
-        await this.initializeAlias();
+        this.initializeAlias();
 
-        let c = this.handler.findInstance(db);
-        let records = await c.query({}).select('name alias id class rarity').exec();
-        this._records = records;
-        this.log.info(`Found aliases for ${records.length} servants.`);
+        let c = this.handler.findInstance(aliases);
+        let aliases2 = this.records = [...c.cache.entries()]
+            .map(record => ({ id: record[0], name: record[1].name, aliases: record[1].aliases.map(_ => _.toLowerCase()) }));
+        this.log.info(`Found aliases for ${aliases2.length} servants.`);
 
         // warning for dupes sh*t
-        this.verifyDupes(records);
+        this.verifyDupes(aliases2);
 
-        for (let entry of records) {
-            let tokens = [entry.alias, entry.name].flat()
+        for (let entry of aliases2) {
+            let tokens = [entry.aliases, entry.name].flat()
                 .map(a => a.replace(/\(/g, '').replace(/\)/g, ''))
                 .map(a => a.toLowerCase())
                 .map(a => a.split(' ').filter(Boolean))
@@ -136,12 +135,12 @@ export = class extends FgoModule {
         this.log.success(`Servant aliases tokenization complete.`);
 
         // building index
-        let index = f.createIndex(['name', 'alias'], records);
+        let index = f.createIndex(['name', 'aliases'], aliases2);
         this.fuse = new f(
-            records,
+            aliases2,
             {
                 keys: ['name', {
-                    name: 'alias',
+                    name: 'aliases',
                     weight: 1.5
                 }],
                 includeScore: true,
@@ -153,7 +152,7 @@ export = class extends FgoModule {
         this.log.success(`Servant aliases indexing complete.`)
     }
 
-    private async initializeAlias() {
+    private initializeAlias() {
         let { servant_aliases } = this.client.config.database.fgo as { [k: string]: string };
         this.aliasModel = createConnection(servant_aliases)
             .on('open', () => this.log.success(`Connected to servant alias database.`))

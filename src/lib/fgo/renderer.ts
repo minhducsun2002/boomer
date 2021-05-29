@@ -27,6 +27,7 @@ import type { DBInstance } from '@pepper/db/fgo';
 import { ComplementaryDataModel } from '@pepper/modules/fgo/complementary-data';
 import { EmbedFieldData } from 'discord.js';
 
+type NameOverwrite = Map<number, string>;
 type tr = keyof typeof Trait;
 type statistics = PromiseValue<ReturnType<typeof renderBuffStatistics>> | ReturnType<typeof renderFunctionStatistics>;
 const attribs = Object.values(Attribute);
@@ -44,10 +45,12 @@ export class EmbedRenderer {
     NA : DBInstance;
     JP : DBInstance;
     complementary : ComplementaryDataModel;
+    servantNameOverwrites : NameOverwrite;
 
-    constructor(NA : DBInstance, JP : DBInstance, _comp : ComplementaryDataModel) {
+    constructor(NA : DBInstance, JP : DBInstance, _comp : ComplementaryDataModel, servantNameOverwrites : NameOverwrite = new Map()) {
         this.NA = NA; this.JP = JP;
         this.complementary = _comp;
+        this.servantNameOverwrites = servantNameOverwrites;
     }
 
     /**
@@ -492,10 +495,10 @@ export class EmbedRenderer {
         return Promise.all(words);
     }
 
-    servantDashboardEmbed = async (name : string, id : number) : Promise<MessageEmbed[]> => {
+    servantDashboardEmbed = async (collectionNo : number, name : string = '') : Promise<MessageEmbed[]> => {
         let { NA, JP } = this;
 
-        const svt = await JP.mstSvt.findOne({ collectionNo: +id }).exec();
+        const svt = await JP.mstSvt.findOne({ collectionNo }).exec();
         let { baseSvtId, classId, classPassive } = svt;
         const [limits, cards, svtClass, bondCESkill] = await Promise.all([
             // ascensions
@@ -513,7 +516,7 @@ export class EmbedRenderer {
         const td_npGain = await JP.mstTreasureDeviceLv.findOne({ treaureDeviceId: tdId }).exec();
 
         // overwrite name
-        svt.name = name;
+        svt.name = name || this.servantNameOverwrites.get(collectionNo) || svt.name;
         let base = () => this.servantBase(svt, svtClass.name, Math.max(...limits.map(_ => _.rarity)));
 
         let bondCE = async () => {

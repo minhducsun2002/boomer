@@ -2,6 +2,7 @@ import { FgoModule } from './base';
 import { componentLog } from '@pepper/utils';
 import mst from './master-data';
 import comp from './complementary-data';
+import aliases from './servant-aliases';
 import { decode, encode } from '@msgpack/msgpack'
 import { EmbedRenderer } from '@pepper/lib/fgo'
 import { Collection, MessageEmbed } from 'discord.js';
@@ -11,7 +12,7 @@ import c from 'chalk';
 import { SvtType } from '@pepper/constants/fgo';
 
 export = class extends FgoModule {
-    require = [new mst().id];
+    require = [new mst().id, new aliases().id];
     constructor() {
         super(`servant-details-preprocess`, {});
     }
@@ -30,9 +31,8 @@ export = class extends FgoModule {
             // try to get this from DB & parse it
             try {
                 let _ = await this.handler.findInstance(mst).JP.mstSvt.findOne({ collectionNo: s }).exec();
-                let name = await this.getLocalizedSvtName(_.baseSvtId) ?? _.name;
                 if (!_) throw new Error(`Servant with ID ${s} not found!`)
-                this.push(_.collectionNo, await this.process(name, _.collectionNo));
+                this.push(_.collectionNo, await this.process(_.collectionNo));
                 return decode(this.cache.get(s)) as MessageEmbed[];
             } catch (e) {
                 this.log.error(`Key ${s} is not found in cache & re-render failed!`);
@@ -48,16 +48,16 @@ export = class extends FgoModule {
         return _;
     }
 
-    private getLocalizedSvtName = (baseSvtId: number) => this.client.moduleHandler.findInstance(comp)
-            .svtObject.findOne({ id: baseSvtId }).exec().then(obj => obj?.name)
-
-    private process = (name: string, collectionNo: number) => {
+    private process = (collectionNo: number) => {
         let { NA, JP } = this.client.moduleHandler.findInstance(mst);
         let _comp = this.client.moduleHandler.findInstance(comp);
-        return new EmbedRenderer(NA, JP, _comp).servantDashboardEmbed(name, collectionNo);
+        let nameOverwrites = [...this.client.moduleHandler.findInstance(aliases).cache.entries()]
+            .map(entry => [entry[0], entry[1].name] as const);
+
+        return new EmbedRenderer(NA, JP, _comp, new Map(nameOverwrites)).servantDashboardEmbed(collectionNo);
     }
 
-    async initialize() {
+    public async load() {
         let _mst = this.handler.findInstance(mst);
         let _ = await _mst.JP.mstSvt.find({
             $or: [
@@ -65,17 +65,16 @@ export = class extends FgoModule {
                 { type: SvtType.HEROINE },
                 { type: SvtType.ENEMY_COLLECTION_DETAIL }
             ]
-        }).select('collectionNo name baseSvtId').exec();
+        }).select('collectionNo name').exec();
         // delegate this to another function to run in parallel
         let queue = new Queue(cpus().length * 2);
 
-        for (let { collectionNo, name, baseSvtId } of _) {
+        for (let { collectionNo, name } of _) {
             if (collectionNo)
             queue.add(
                 async () => {
                     try {
-                        name = await this.getLocalizedSvtName(baseSvtId) ?? name;
-                        let e = (await this.process(name, collectionNo)).map(e => e.toJSON());
+                        let e = (await this.process(collectionNo)).map(e => e.toJSON());
                         this.log.success(`Processed data of servant ${collectionNo}. ${
                             c.bgBlue.yellowBright(name)
                         }`);
@@ -85,6 +84,11 @@ export = class extends FgoModule {
                     };
                 }
             )
+
         };
+    }
+
+    async initialize() {
+        this.load();
     }
 }
