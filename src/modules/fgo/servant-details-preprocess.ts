@@ -84,7 +84,7 @@ export = class extends FgoModule {
                     };
                 }
             )
-
+            return _;
         };
     }
 
