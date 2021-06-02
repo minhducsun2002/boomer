@@ -32,7 +32,7 @@ export = class extends OsuCommand {
             }, {
                 id: 'failed',
                 match: 'flag',
-                description: 'Whether to show failed plays. Use another method to get scores.',
+                description: 'Whether to show failed plays. Use another method to get scores. Inverted for single-score calls.',
                 flag: ['/f', '/failed']
             }, {
                 id: 'limit',
@@ -82,7 +82,7 @@ export = class extends OsuCommand {
         let { user: { id, username } } = await fetchUser(user, mode);
         let mode_int = modes.indexOf(mode) as keyof typeof accuracy;
 
-        if (singleMode) embeds = await this.handleSingleMode({ user: username, user_id: id }, mode_int, failed);
+        if (singleMode) embeds = await this.handleSingleMode({ user: username, user_id: id }, mode_int, !failed);
         else {
             if (failed) {
                 let _ = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));
