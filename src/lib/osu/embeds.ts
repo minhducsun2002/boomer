@@ -142,7 +142,7 @@ export async function embedSingleScoreApi(
 ) {
     let {
         beatmap_id, enabled_mods, rank, perfect, date, maxcombo, user_id,
-        count50, count100, count300, countkatu, countgeki, countmiss
+        count50, count100, count300, countkatu, countgeki, countmiss, score: _score
     } = score;
 
     let s = await fetchMapset(+beatmap_id);
@@ -181,7 +181,8 @@ export async function embedSingleScoreApi(
             + (+perfect
                 ? ''
                 : ` / **${calculatePP(map_file, parser.map.max_combo(), _accuracy, +enabled_mods).total.toFixed(2)}**pp (?)`)
-            + (completion === 1 ? '' : ` • ${(completion * 100).toFixed(2)}% completed`),
+            + ` • **\`${new Intl.NumberFormat('en-US').format(+_score)}\`**`
+            + (completion === 1 ? '' : `\n(${(completion * 100).toFixed(2)}% completed)`),
             true
         )
         .addField(`Beatmap information`, serializeBeatmapInformationForSingleScore(b))
@@ -195,7 +196,7 @@ export async function embedSingleScore(
     username : string
 ) {
     let {
-        user_id, best_id,
+        user_id, best_id, score: _score,
         accuracy, mods, perfect, rank, max_combo,
         beatmap: b, beatmapset: s, pp, created_at,
         statistics: { count_miss, count_50, count_100, count_300 }
@@ -227,7 +228,8 @@ export async function embedSingleScore(
             + ` • **${accuracy.toFixed(3)}**%`
             + `\n**${pp.toFixed(2)}**pp ${calculated ? ' (?)' : ''}`
             + (perfect ? '' : ` / **${full_combo_pp.toFixed(2)}**pp (?)`)
-            + (best_id ? ` • [[**Score**]](https://osu.ppy.sh/scores/${mode_path}/${best_id})` : ''),
+            + ` • **\`${new Intl.NumberFormat('en-US').format(_score)}\`**`
+            + (best_id ? ` • [[**Link**]](https://osu.ppy.sh/scores/${mode_path}/${best_id})` : ''),
             true
         )
         .addField(`Beatmap information`, serializeBeatmapInformationForSingleScore(b))
