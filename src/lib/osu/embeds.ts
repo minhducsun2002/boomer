@@ -131,7 +131,7 @@ function serializeBeatmapInformationForSingleScore(b : Beatmap) {
         `\n${b.difficulty_rating} :star: `
         + `- \`AR\`**${b.ar}** \`CS\`**${b.cs}** \`OD\`**${b.accuracy}** \`HP\`**${b.drain}** `
         + `- **${b.bpm}** BPM `
-        + `- :clock3: ${pad(2)(Math.floor(b.hit_length / 60))}:${pad(2)(b.hit_length % 60)}`
+        + `- :clock3: ${pad(2)(Math.floor(b.total_length / 60))}:${pad(2)(b.total_length % 60)}`
     )
 }
 
