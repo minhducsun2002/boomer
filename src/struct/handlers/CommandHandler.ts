@@ -47,4 +47,7 @@ export class CommandHandler extends c {
 
     modules: Collection<string, PepperCommand>;
     findCommand: (name: string) => PepperCommand;
+    findCommandInstance<Module extends typeof PepperCommand>(ctor : Module) {
+        return this.modules.find(m => m instanceof ctor) as InstanceType<typeof ctor>;
+    }
 }

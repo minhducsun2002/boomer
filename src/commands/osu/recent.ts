@@ -47,6 +47,7 @@ export = class extends OsuCommand {
     }
 
     private async handleSingleMode(
+        channelId: string,
         { user, user_id } : { user: string, user_id: number },
         mode_int : number,
         failed : boolean
@@ -55,10 +56,14 @@ export = class extends OsuCommand {
         if (failed) {
             let [score] = await fetchRecentApi(OSU_API_KEY, user, mode_int, 1);
             out = score ? [await embedSingleScoreApi(mode_int, score, user)] : [];
+
+            if (score) this.mapIdCache.setChannelMapId(channelId, +score.beatmap_id);
         }
         else {
             let [recent] = await fetchRecent(user_id, modes[mode_int], 1, 1);
             out = recent ? [await embedSingleScore(modes[mode_int], recent, user)] : [];
+
+            if (recent) this.mapIdCache.setChannelMapId(channelId, recent.beatmap.id);
         }
 
         return out;
@@ -82,7 +87,7 @@ export = class extends OsuCommand {
         let { user: { id, username } } = await fetchUser(user, mode);
         let mode_int = modes.indexOf(mode) as keyof typeof accuracy;
 
-        if (singleMode) embeds = await this.handleSingleMode({ user: username, user_id: id }, mode_int, !failed);
+        if (singleMode) embeds = await this.handleSingleMode(m.channel.id, { user: username, user_id: id }, mode_int, !failed);
         else {
             if (failed) {
                 let _ = await fetchRecentApi(OSU_API_KEY, user, mode_int, Math.min(limit, 10));

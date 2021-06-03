@@ -18,7 +18,7 @@ export default class extends OsuCommand {
             args: [{
                 id: 'beatmap',
                 match: 'phrase',
-                description: 'Beatmap(set) ID, or URL'
+                description: 'Beatmap(set) ID, or URL. Omit to show the last beatmap posted in this channel.'
             },{
                 id: 'set',
                 match: 'flag',
@@ -30,55 +30,52 @@ export default class extends OsuCommand {
     }
 
     async exec(m : Message, { beatmap, set } = { beatmap: '', set: false }) {
-        const err = new MessageEmbed().setColor(ERROR_COLOR)
-            .setDescription(`Sorry, an error occurred.`)
+        let bail = () => m.channel.send(new MessageEmbed().setColor(ERROR_COLOR)
+            .setDescription(`Sorry, couldn't find such beatmap(set).`));
+
         // check if ID or URL
         let _id = +beatmap, mode = '';
         if (isNaN(_id)) {
-            let _e = () : any =>
-                m.channel.send(err.setDescription(`Sorry, couldn't find such beatmap(set).`));
-            try {
-                let _ = checkURL(beatmap);
-                mode = _.mode;
-                // base logic :
-                // URL overrides everything.
-                // if id is available, fetch map, else fetch mapset
-                _id = (_.id ? _.id : _.set)
-                // /set is enabled in the following cases :
-                // - no ID is present, and setId is present
-                // - set ID is present, and /set is passed
-                set = (!!_.set && !_.id) || (set && !!_.set);
-                if (set && !!_.set) _id = _.set;
-            }
-            catch { return _e(); }
-            if (!_id) return _e();
+            let _ = checkURL(beatmap);
+            mode = _.mode;
+            // base logic :
+            // URL overrides everything.
+            // if id is available, fetch map, else fetch mapset
+            _id = (_.id ? _.id : _.set)
+            // /set is enabled in the following cases :
+            // - no ID is present, and setId is present
+            // - set ID is present, and /set is passed
+            set = (!!_.set && !_.id) || (set && !!_.set);
+            if (set && !!_.set) _id = _.set;
         }
-        try {
-            let __ = await fetchMapset(_id, set);
+        if (!_id && !beatmap) _id = this.mapIdCache.getChannelMapId(m.channel.id);
+        if (!_id) return bail();
 
-            if (set) {
-                paginatedEmbed()
-                    .setChannel(m.channel)
-                    .setEmbeds(
-                        embedBeatmapset(
-                        __, MAX_DIFF_PER_PAGE,
-                        a => mode ? a.filter(a => a.mode === mode) : a
-                        ).flat()
-                    )
-                    .run({ idle: 20000, dispose: true })
+        let __ = await fetchMapset(_id, set);
+        this.mapIdCache.setChannelMapId(
+            m.channel.id,
+            set ? __.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating).pop().id : _id
+        )
 
-            } else {
-                m.channel.send(
-                    await embedBeatmap(
-                        __.beatmaps.concat(__.converts)
-                            .filter(a => a.id === _id)[0],
-                        __
-                    )
+        if (set) {
+            paginatedEmbed()
+                .setChannel(m.channel)
+                .setEmbeds(
+                    embedBeatmapset(
+                    __, MAX_DIFF_PER_PAGE,
+                    a => mode ? a.filter(a => a.mode === mode) : a
+                    ).flat()
                 )
-            }
+                .run({ idle: 20000, dispose: true })
 
-        } catch (e) {
-            m.channel.send(err.setDescription(`Sorry, an error occurred.`));
+        } else {
+            m.channel.send(
+                await embedBeatmap(
+                    __.beatmaps.concat(__.converts)
+                        .filter(a => a.id === _id)[0],
+                    __
+                )
+            )
         }
     }
 }

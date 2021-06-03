@@ -2,6 +2,7 @@ import type { PepperCommand } from '@pepper/struct';
 import { extendCommand } from '@pepper/struct';
 import { client } from '@pepper/client';
 import User from '@pepper/modules/osu/username-db';
+import Cache from '@pepper/modules/osu/map-cache';
 import { countries } from 'countries-list';
 
 
@@ -10,6 +11,10 @@ export const OsuCommand = class extends extendCommand({
 }) {
     constructor(...args: ConstructorParameters<typeof PepperCommand>) {
         super(`osu-${args[0]}`, args[1]);
+    }
+
+    get mapIdCache() {
+        return this.resolveModule(Cache);
     }
 
     async resolveUserFromAuthor(user : string, author : string) {
