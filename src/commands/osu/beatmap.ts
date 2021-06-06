@@ -54,7 +54,7 @@ export default class extends OsuCommand {
         let __ = await fetchMapset(_id, set);
         this.mapIdCache.setChannelMapId(
             m.channel.id,
-            set ? __.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating).pop().id : _id
+            set ? [...__.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating)].pop().id : _id
         )
 
         if (set) {
