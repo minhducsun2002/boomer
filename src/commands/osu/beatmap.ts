@@ -29,6 +29,10 @@ export default class extends OsuCommand {
         })
     }
 
+    private mirrors = process.env.OSU_MIRROR_PATH ? new Map([
+        ['My mirror', process.env.OSU_MIRROR_PATH]
+    ]) : undefined;
+
     async exec(m : Message, { beatmap, set } = { beatmap: '', set: false }) {
         let bail = () => m.channel.send(new MessageEmbed().setColor(ERROR_COLOR)
             .setDescription(`Sorry, couldn't find such beatmap(set).`));
@@ -62,8 +66,9 @@ export default class extends OsuCommand {
                 .setChannel(m.channel)
                 .setEmbeds(
                     embedBeatmapset(
-                    __, MAX_DIFF_PER_PAGE,
-                    a => mode ? a.filter(a => a.mode === mode) : a
+                        __, MAX_DIFF_PER_PAGE,
+                        a => mode ? a.filter(a => a.mode === mode) : a,
+                        this.mirrors
                     ).flat()
                 )
                 .run({ idle: 20000, dispose: true })
@@ -73,7 +78,8 @@ export default class extends OsuCommand {
                 await embedBeatmap(
                     __.beatmaps.concat(__.converts)
                         .filter(a => a.id === _id)[0],
-                    __
+                    __,
+                    this.mirrors
                 )
             )
         }

@@ -10,7 +10,7 @@ import { accuracy, calculatePP } from './utils';
 import { modbits, parser as beatmapParser, diff, ppv2 } from 'ojsama';
 import quickchart from 'quickchart-js';
 
-export async function embedBeatmap(b: Beatmap, s: Beatmapset) {
+export async function embedBeatmap(b: Beatmap, s: Beatmapset, customMirrorsBasePaths = new Map<string, string>()) {
     let {
         version, difficulty_rating,
         max_combo, ar, accuracy, cs, drain, total_length,
@@ -48,10 +48,17 @@ export async function embedBeatmap(b: Beatmap, s: Beatmapset) {
         .setURL(`https://osu.ppy.sh/beatmapsets/${set_id}#${modes[mode_int]}/${map_id}`)
         .setDescription(
             `Mapped by **[${creator}](https://osu.ppy.sh/users/${user_id})**. `
-            + (!(ranked > 0) ? `**${status.charAt(0).toUpperCase() + status.substr(1)}**.\n` : `\n`)
+            + (!(ranked > 0)
+                ? `**${status.toLowerCase() === 'wip' ? 'WIP' : status.charAt(0).toUpperCase() + status.substr(1)}**.\n`
+                : `\n`)
             + ((ranked > 0)
                 ? `Ranked **${new Date(ranked_date).toUTCString()}**.`
                 : `Last updated **${new Date(last_updated)}**`)
+            + `\nDownload from `
+            + `[[**Ripple mirror**]](https://storage.ripple.moe/d/${set_id})`
+            + [...customMirrorsBasePaths.entries()].map(
+                ([name, path]) => ` [[**${name}**]](${path}/${set_id})`
+            ).join('')
         )
         .setThumbnail(covers["list@2x"])
         .addField(
@@ -73,6 +80,7 @@ export function embedBeatmapset(
     s : Beatmapset,
     MAX_DIFF_PER_PAGE: number,
     mapFilter = (b : Beatmap[]) : Beatmap[] => b,
+    customMirrorsBasePaths = new Map<string, string>()
 ) {
     let {
         beatmaps, converts,
@@ -99,8 +107,11 @@ export function embedBeatmapset(
                 + ((ranked > 0)
                     ? `Ranked **${new Date(ranked_date).toLocaleString('en-US')}**.`
                     : `Last updated **${new Date(last_updated).toLocaleString('en-US')}**.`)
-                + `\nDownload : [main site](https://osu.ppy.sh/beatmapsets/${set_id}/download) | `
-                + `[Ripple mirror](https://storage.ripple.moe/d/${set_id})`
+                + `\nDownload from `
+                + `[[**Ripple mirror**]](https://storage.ripple.moe/d/${set_id})`
+                + [...customMirrorsBasePaths.entries()].map(
+                    ([name, path]) => ` [[**${name}**]](${path}/${set_id})`
+                ).join('')
             )
             .setImage(covers["cover@2x"])
             .addFields(chunked.map(
