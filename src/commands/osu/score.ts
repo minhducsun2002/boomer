@@ -101,6 +101,8 @@ export = class extends OsuCommand {
                 date: string, rank: string, pp: string
             }[];
 
+            this.mapIdCache.setChannelMapId(m.channel.id, _);
+
             if (scores.length === 0)
                 return m.channel.send(err.setDescription(`Sorry, no scores found on that beatmap.`))
 
@@ -162,6 +164,7 @@ export = class extends OsuCommand {
         let singleMode = async () => {
             let details = checkScoreURL(beatmap);
             let score = await fetchScore(details.id, details.mode);
+            this.mapIdCache.setChannelMapId(m.channel.id, score.beatmap.id);
             m.channel.send(await embedSingleScore(modes[score.beatmap.mode_int], score, score.user.username));
         }
 
