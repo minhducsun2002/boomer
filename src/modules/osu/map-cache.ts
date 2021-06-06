@@ -48,8 +48,8 @@ export = class extends OsuModule {
                     return { channelId, map, time };
                 });
                 axios.post(url.href, JSON.stringify(_));
-            }, 1000 * 10);
-            this.log.success(`Set up interval to flush the cache to host every 10 seconds.`);
+            }, 1000 * 90);
+            this.log.success(`Set up interval to flush the cache to host every 90 seconds.`);
         }
     }
 }
