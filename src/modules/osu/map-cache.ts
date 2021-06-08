@@ -11,8 +11,6 @@ export = class extends OsuModule {
 
     private cache = new Cache<{ map: number, time: number }>({ maxAge: 86400 * 1000, evictCount: 5, max: 50000 });
     private log = new componentLog('osu! map ID cache');
-    private syncEnabled = true;
-    private interval : ReturnType<typeof setInterval>;
 
     getChannelMapId = (channelId : string) : number => this.cache.get(channelId)?.map;
     setChannelMapId = (channelId : string, map : number) => {
@@ -22,6 +20,14 @@ export = class extends OsuModule {
             time: new Date().getTime(),
             map,
         });
+    }
+
+    async flush(url : string) {
+        let _ = this.cache.map(([channelId, payload]) => {
+            let { map, time } = payload;
+            return { channelId, map, time };
+        });
+        axios.post(url, JSON.stringify(_));
     }
 
     async initialize() {
@@ -40,16 +46,6 @@ export = class extends OsuModule {
                     time: new Date().getTime()
                 })
 
-        if (this.syncEnabled) {
-            this.interval = setInterval(() => {
-                if (!this.syncEnabled) clearInterval(this.interval);
-                let _ = this.cache.map(([channelId, payload]) => {
-                    let { map, time } = payload;
-                    return { channelId, map, time };
-                });
-                axios.post(url.href, JSON.stringify(_));
-            }, 1000 * 90);
-            this.log.success(`Set up interval to flush the cache to host every 90 seconds.`);
-        }
+        process.on('SIGTERM', () => this.flush(url.href)).on('SIGINT', () => this.flush(url.href))
     }
 }
