@@ -84,8 +84,8 @@ export = class extends FgoModule {
                     };
                 }
             )
-            return _;
         };
+        return _;
     }
 
     async initialize() {
