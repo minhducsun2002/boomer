@@ -2,6 +2,11 @@
 ##### just another Discord bot that provide information for some games
 ###### (as of commit `30977aea6c3cb1750c279a1a1aae3343be562a83`)
 
+---
+**I will not provide any further support for self-hosting this bot. You are on your own. You have been warned.**
+
+---
+
 Currently, the bot provides data for two games: __Fate/Grand Order__ and __osu!__, through a number of commands.
 
 This README will not cover how to use them - call the `help` command.
