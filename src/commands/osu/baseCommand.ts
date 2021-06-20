@@ -26,11 +26,14 @@ export const OsuCommand = class extends extendCommand({
                 target = id;
             } else return user;
         }
+
+        // static import will create a loop, resulting in the subcommand extending an unfinished copy of this base command
+        let alias = new ((await import('./user-set')).default)().aliases.sort((a, b) => a.length - b.length)[0];
         let username = (await client.moduleHandler.findInstance(User).getUser(target))?.osuUsername;
         if (!username)
             throw new Error(
                 `User ID ${target} has not been bound to any username.`
-                + `\nUse ${(this.prefix as string[])[0]}${this.aliases[0]} <username> to set one.`
+                + `\nUse ${(this.prefix as string[])[0]}${alias} <username> to set one.`
             )
         return username;
     }
