@@ -44,6 +44,7 @@ export = class extends OsuModule {
         return this.cache.peek(userId)
             ? { discordUserId: userId, osuUsername: this.cache.get(userId) }
             : await this.model.findOne({ discordUserId: userId.trim() }).exec().then(record => {
+                if (!record) return null;
                 this.cache.delete(record.discordUserId);
                 this.cache.set(record.discordUserId, record.osuUsername);
                 return record;
