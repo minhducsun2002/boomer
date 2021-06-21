@@ -27,6 +27,7 @@ interface PepperConfiguration extends cfg {
         /** Prefixes for commands */
         prefix?: { [key: string]: string[] };
         database?: { [key: string]: databaseMapping | string };
+        "error-reporting"? : { [key: string]: string };
     }
 }
 

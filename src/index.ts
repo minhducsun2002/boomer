@@ -1,4 +1,5 @@
 import './globals';
+import { WebhookClient, MessageEmbed } from 'discord.js';
 import { PepperClient } from './struct';
 import { join } from 'path';
 
@@ -49,5 +50,48 @@ Promise.all([client.inhibitorHandler, client.moduleHandler].map(_ => _.loadAll()
             client.login(process.env.DISCORD_TOKEN)
         else process.exit(1)
     })
+
+// error reporting service
+const [token, id] = client.config["error-reporting"]?.["discord-webhook"]?.split('/').reverse() || [];
+if (token && id) {
+    let webhookClient = new WebhookClient(id, token);
+    process.on(
+        'uncaughtException',
+        error => {
+            let { stack, message, name } = error;
+            let stackLines = stack.split('\n'), outputtedLines : string[] = [], length = 0;
+            for (let line of stackLines)
+                if (length + line.length + 1 <= 1000) {
+                    outputtedLines.push(line);
+                    length += line.length + 1;
+                }
+
+            webhookClient.send(
+                new MessageEmbed()
+                    .setTitle(`An uncaught exception of type \`${name}\` has occurred.`)
+                    .setDescription('```' + message + '```')
+                    .addField(
+                        'Stack',
+                        [
+                            '```',
+                            outputtedLines.join('\n'),
+                            (outputtedLines.length !== stackLines.length ? '(truncated)' : ''),
+                            '```'
+                        ].filter(Boolean).join('\n')
+                    ),
+                    {
+                        files: (outputtedLines.length !== stackLines.length)
+                            ? [{
+                                name: 'error.txt',
+                                attachment: Buffer.from(stack, 'utf-8')
+                            }]
+                            : []
+                    }
+            )
+                .then(() => console.error(error))
+                .then(() => process.exit(1));
+        }
+    )
+}
 
 export { client };
