@@ -9,7 +9,7 @@
   },
   "scripts": {
     "transpile": "ttsc --project tsconfig.build.json",
-    "start": "node dist/index.js",
+    "start": "node --unhandled-rejections=warn dist/index.js",
     "build": "npm run transpile",
     "build:clean": "rimraf dist/ && rimraf .tsbuildinfo && npm run transpile",
     "build:test": "tsc --noEmit",
