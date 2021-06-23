@@ -141,6 +141,9 @@ export async function renderBuffStatistics(buff : mstBuff, val : Map<string, str
                 value: val.get(ValsKey[vType.Value])?.map(card => Trait[+ card + CardModifier as keyof typeof Trait])
             });
             break;
+        case Buff.ADD_INDIVIDUALITY:
+            _.amount = val.get(ValsKey[vType.Value]).map(value => Trait[+value as keyof typeof Trait]);
+            break;
         case Buff.AVOID_STATE:
         case Buff.DONOT_SKILL:
     };
