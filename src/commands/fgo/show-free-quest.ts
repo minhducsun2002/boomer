@@ -39,8 +39,6 @@ export = class extends FgoCommand {
         let rayshiftio = this.resolveModule(rayshift_io);
         let phases = await this.resolveModule(masterData).NA.mstQuestPhase.find({ questId: quest.id }).exec()
             .then(phases => phases.sort((phase1, phase2) => phase1.phase - phase2.phase))
-            // we only need a single phase for free quests
-            .then(phases => phases.slice(0, 1));
 
         let spotIconPrefix = `${spot.warId}`.padStart(4, '0');
 
@@ -54,17 +52,14 @@ export = class extends FgoCommand {
             .setURL(`https://apps.atlasacademy.io/db/NA/quest/${quest.id}/1`)
             .setFooter(`AP : ${quest.actConsume}`);
 
-        let { phase } = phases[0];
-        let queryIds = await rayshiftio.list(2, quest.id, phase)
-            .then(res => res.quests.find(_ => _.questId === quest.id && _.questPhase === phase)?.queryIds);
+        let data = await Promise.allSettled(
+            phases.map(phase => rayshiftio.query(2, quest.id, phase.phase))
+        )
+            .then(response => response.filter(response => response.status === 'fulfilled'))
+            .then(response => response.map(response => (response as Exclude<typeof response, PromiseRejectedResult>).value))
+            .then(_ => _.slice(0, 1)?.[0].questDetails)
+            .then(details => Object.values(details)[0]);
 
-        if (!queryIds.length)
-            return m.channel.send(
-                baseEmbed()
-                    .setDescription(`[No data found for quest ID ${quest.id} - phase ${phase} on Rayshift.io]`)
-            )
-
-        let { questDetails: { [queryIds[0]] : data } } = await rayshiftio.query(queryIds[0]);
         let userSvt = new Map(data.userSvt.map(svt => [svt.id, svt]));
         let out = data.enemyDeck
             .map((stage, index) => {

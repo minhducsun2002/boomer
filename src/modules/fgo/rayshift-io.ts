@@ -27,9 +27,9 @@ export = class extends FgoModule {
         return await this.get(`get?${id.map(num => `ids=${num}`).join('&')}`) as ReturnType<typeof _>;
     }
 
-    async query(id : number) {
+    async query(region : 1 | 2, questId : number, questPhase : number) {
         return (
-            await this.get(`get?id=${id}`)
+            await this.get(`get?questId=${questId}&questPhase=${questPhase}&region=${region}`)
         ) as {
             questDetails: {
                 [k : number]: {
