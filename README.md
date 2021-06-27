@@ -12,7 +12,7 @@ Currently, the bot provides data for two games: __Fate/Grand Order__ and __osu!_
 This README will not cover how to use them - call the `help` command.
 
 ### Prerequisites
-- Node.js v14.8.0. I don't test with anything after 14.8.0 yet, feel free to try.
+- Node.js v16.3.0. I don't test with anything after 16.3.0 yet, feel free to try.
 - Anything that my dependencies require. For reference, I developed my bot on a `x86_64` Linux system.
 - Data source for F/GO. I'll explain this later.
 
