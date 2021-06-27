@@ -82,7 +82,7 @@ export class EmbedRenderer {
         for (let a of attribs) ind.delete(a);
         return {
             name: 'Traits',
-            value: [...ind].map(a => `* **${Trait[a as tr] || a}**`).join('\n'),
+            value: [...ind].map(a => `${Trait[a as tr] || a}`).join(', '),
             inline
         }
     }
@@ -311,7 +311,7 @@ export class EmbedRenderer {
             + (limits ? ` (${limits})` : '')
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
             + amount
-            + (stat.onField?.length ? ' when the wearer is on field' : '')
+            + (stat.onField?.length ? ' (wearer must be on field)' : '')
             + (f.fieldTraits.length ? ` if on ${f.fieldTraits.map(a => `__[${a}]__`).join(' & ')} field` : '')
             + (`\n` + (stat?.other?.map(_ => {
                 let { name, value } = _;
@@ -349,7 +349,7 @@ export class EmbedRenderer {
             + (limits ? ` (${limits})` : '')
             + ` to **${f.affectTarget}**`
             + (f.traitVals?.length ? ` for ${f.traitVals.join(' & ')} targets` : '')
-            + (stat.onField?.length ? ' when the wearer is on field' : '')
+            + (stat.onField?.length ? ' (wearer must be on field)' : '')
             + (f.fieldTraits.length ? ` if on ${f.fieldTraits.map(a => `__[${a}]__`).join(' & ')} field` : '')
             + (`\n` + (stat?.other?.map(_ => `${_.name} : ${_.value[level]}`).join('\n') || '')).trimRight()
         )
@@ -527,12 +527,11 @@ export class EmbedRenderer {
             let { svtId } = skillMapping;
             let mstSvt = await JP.mstSvt.findOne({ id: svtId }).exec();
             if (mstSvt) {
-                let { name, cost, collectionNo, id } = mstSvt;
+                let { name, collectionNo, id } = mstSvt;
                 let englishName = await this.complementary.svtObject.findOne({ id }).exec();
                 return {
-                    title: `[**${collectionNo}**. **${englishName?.name || name}**]`
-                        + `(https://apps.atlasacademy.io/db/#/JP/craft-essence/${id})`
-                        + ` - Cost : **${cost}**`,
+                    title: `[[**${collectionNo}**. **${englishName?.name || name}**]]`
+                        + `(https://apps.atlasacademy.io/db/#/JP/craft-essence/${id})`,
                     svt: mstSvt,
                     effects: (await this.craftEssenceFields(mstSvt)).filter(field => field.value),
                 }
@@ -545,13 +544,23 @@ export class EmbedRenderer {
         let skillItems = await this.renderItems(await this.JP.mstCombineSkill.find({ id: baseSvtId }).limit(9).exec(), 'skill');
         return [
             base()
-                .addFields(this.servantDashboard(svt, limits, cards, td_npGain))
+                .addFields(
+                    [
+                        ...this.servantDashboard(svt, limits, cards, td_npGain),
+                        this.traits(svt),
+                        bondCEInfo && {
+                            name: `Bond CE`,
+                            value: (
+                                bondCEInfo.title
+                                + '\n'
+                                + bondCEInfo.effects.map(_ => `${_.value}`).join('\n\n')
+                            )
+                        }
+                    ]
+                    .filter(Boolean)
+                )
                 .setFooter(`Basic details`),
-            base()
-                .addFields([this.traits(svt)]).setFooter('Traits'),
             base().addFields(passives.map(_ => ({ name: _.name, value: _.value.join('\n') }))).setFooter(`Passive skills`),
-            (bondCEInfo
-                && base().addFields(bondCEInfo.effects).setFooter(`Bond CE`).setDescription(bondCEInfo.title)),
             // cover case where no ascension material
             (ascItems.length
             ? base().addFields(ascItems).setFooter(`Ascension materials`)
