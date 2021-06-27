@@ -1,6 +1,6 @@
 import { Document, Schema } from 'mongoose';
 
-import { AP, Level, Chapter, Spot } from '../../../constants/fgo'
+import { AP, Level, Chapter, Spot, QuestType } from '@pepper/constants/fgo'
 export interface mstQuest {
     actConsume: AP;
     recommendLv: Level;
@@ -10,6 +10,7 @@ export interface mstQuest {
     noticeAt: number; openedAt: number; closedAt: number;
     /** mstSpot */
     spotId: Spot;
+    type: QuestType
 }
 
 export interface mstQuestDocument extends Document, mstQuest { id: number }
@@ -21,5 +22,6 @@ export const mstQuestSchema : Schema<mstQuest> = new Schema({
     name: String,
     chapterId: Number,
     noticeAt: Number, openedAt: Number, closedAt: Number,
-    spotId: Number
+    spotId: Number,
+    type: Number
 })
