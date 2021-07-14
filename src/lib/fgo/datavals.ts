@@ -79,6 +79,9 @@ export function parseVals (s : string, f : FuncType) {
     }, {
         condition: [...FRIEND_FUNCTIONS],
         values: ["Type1", "Exp1", "Individuality"]
+    }, {
+        condition: [FuncType.TRANSFORM_SERVANT],
+        values: ["Rate", "Value", "Target", "SetLimitCount"]
     }]
 
     let match = mappings.find(a => a.condition.includes(f));
