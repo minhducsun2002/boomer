@@ -3,7 +3,7 @@ FROM node:13.8.0-alpine3.11 as build
 WORKDIR /app
 
 COPY package.json .
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 COPY tsconfig.build.json .
 COPY tsconfig.json .

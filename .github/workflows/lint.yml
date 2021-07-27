@@ -15,6 +15,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Install packages
-      run: yarn
+      run: yarn install --frozen-lockfile
     - name: Running the lint
       run: yarn lint

@@ -64,7 +64,7 @@ jobs:
       with:
         node-version: '14.x'
     - name: Install packages
-      run: yarn
+      run: yarn install --frozen-lockfile
     - name: Checkout config
       uses: actions/checkout@v2
       with:
