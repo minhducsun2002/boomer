@@ -10,6 +10,6 @@ export interface mstSkill {
 
 export interface mstSkillDocument extends Document, mstSkill { id: number }
 
-export const mstSkillSchema : Schema<mstSkill> = new Schema({
+export const mstSkillSchema : Schema<mstSkillDocument> = new Schema({
     id: Number, actIndividuality: [Number], name: String, ruby: String, maxLv: Number, type: Number
 })

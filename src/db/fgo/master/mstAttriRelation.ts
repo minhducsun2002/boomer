@@ -11,6 +11,6 @@ export interface mstAttriRelation {
 
 export interface mstAttriRelationDocument extends mstAttriRelation, Document {}
 
-export const mstAttriRelationSchema : Schema<mstAttriRelation> = new Schema({
+export const mstAttriRelationSchema : Schema<mstAttriRelationDocument> = new Schema({
     atkAttri: Number, defAttri: Number, attackRate: Number
 })

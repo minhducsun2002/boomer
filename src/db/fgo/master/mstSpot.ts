@@ -10,7 +10,7 @@ export interface mstSpot {
 
 export interface mstSpotDocument extends Document, mstSpot { id: number }
 
-export const mstSpotSchema : Schema<mstSpot> = new Schema({
+export const mstSpotSchema : Schema<mstSpotDocument> = new Schema({
     id: Number,
     warId: Number,
     name: String,

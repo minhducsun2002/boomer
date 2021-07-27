@@ -11,7 +11,7 @@ export interface mstFunc {
 
 export interface mstFuncDocument extends Document, mstFunc { id: number }
 
-export const mstFuncSchema : Schema<mstFunc> = new Schema({
+export const mstFuncSchema : Schema<mstFuncDocument> = new Schema({
     id: Number, cond: Number,
     funcType: Number, targetType: Number, applyTarget: Number,
     popupText: String, vals: [Number], tvals: [Number], questTvals: [Number]

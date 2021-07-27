@@ -10,6 +10,6 @@ export interface mstQuestConsumeItem {
 
 export interface mstQuestConsumeItemDocument extends Document, mstQuestConsumeItem { id: Item }
 
-export const mstQuestConsumeItemSchema : Schema<mstQuestConsumeItem> = new Schema({
+export const mstQuestConsumeItemSchema : Schema<mstQuestConsumeItemDocument> = new Schema({
     itemIds: [Number], nums: [Number], questId: Number
 })

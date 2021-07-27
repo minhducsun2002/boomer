@@ -10,7 +10,7 @@ export interface mstBuff {
 
 export interface mstBuffDocument extends Document, mstBuff { id: number }
 
-export const mstBuffSchema : Schema<mstBuff> = new Schema({
+export const mstBuffSchema : Schema<mstBuffDocument> = new Schema({
     vals: [Number], tvals: [Number],
     ckSelfIndv: [Number], ckOpIndv: [Number],
     id: Number, type: Number,

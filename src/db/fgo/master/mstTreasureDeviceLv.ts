@@ -13,7 +13,7 @@ export interface mstTreasureDeviceLv {
 
 export interface mstTreasureDeviceLvDocument extends Document, mstTreasureDeviceLv { id: number }
 
-export const mstTreasureDeviceLvSchema : Schema<mstTreasureDeviceLv> = new Schema({
+export const mstTreasureDeviceLvSchema : Schema<mstTreasureDeviceLvDocument> = new Schema({
     treaureDeviceId: Number, lv: Number, detailId: Number,
     tdPoint: Number, tdPointDef: Number,
     tdPointQ: Number, tdPointA: Number, tdPointB: Number, tdPointEx: Number,

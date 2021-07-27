@@ -10,7 +10,7 @@ export interface mstSkillLv {
 
 export interface mstSkillLvDocument extends Document, mstSkillLv {}
 
-export const mstSkillLvSchema : Schema<mstSkillLv> = new Schema({
+export const mstSkillLvSchema : Schema<mstSkillLvDocument> = new Schema({
     funcId: [Number], svals: [String], skillId: Number,
     lv: Number, chargeTurn: Number
 })

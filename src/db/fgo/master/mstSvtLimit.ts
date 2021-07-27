@@ -16,7 +16,7 @@ export interface mstSvtLimit {
 
 export interface mstSvtLimitDocument extends Document, mstSvtLimit { id: number }
 
-export const mstSvtLimitSchema : Schema<mstSvtLimit> = new Schema({
+export const mstSvtLimitSchema : Schema<mstSvtLimitDocument> = new Schema({
     svtId: Number, weaponColor: Number,
     rarity: Number, lvMax: Number, criticalWeight: Number,
 

@@ -9,7 +9,7 @@ export interface mstClass {
 
 export interface mstClassDocument extends Document, mstClass { id: ClassType }
 
-export const mstClassSchema : Schema<mstClass> = new Schema({
+export const mstClassSchema : Schema<mstClassDocument> = new Schema({
     id: Number,
     attri: Number,
     name: String,

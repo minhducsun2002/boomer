@@ -6,6 +6,6 @@ export interface mstSvtComment {
 
 export interface mstSvtCommentDocument extends Document, mstSvtComment { id: number }
 
-export const mstSvtCommentSchema : Schema<mstSvtComment> = new Schema({
+export const mstSvtCommentSchema : Schema<mstSvtCommentDocument> = new Schema({
     svtId: Number, comment: String
 })

@@ -10,6 +10,6 @@ export interface mstWar {
 
 export interface mstWarDocument extends Document, mstWar { id: number }
 
-export const mstWarSchema : Schema<mstWar> = new Schema({
+export const mstWarSchema : Schema<mstWarDocument> = new Schema({
     id: Number, age: String, longName: String, name: String, coordinates: [[Number]]
 })

@@ -13,7 +13,7 @@ export interface mstSvtSkill {
 
 export interface mstSvtSkillDocument extends Document, mstSvtSkill { id: number }
 
-export const mstSvtSkillSchema : Schema<mstSvtSkill> = new Schema({
+export const mstSvtSkillSchema : Schema<mstSvtSkillDocument> = new Schema({
     svtId: Number, skillId: Number, condLimitCount: Number,
     num: Number, priority: Number
 })

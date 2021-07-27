@@ -15,7 +15,7 @@ export interface mstQuest {
 
 export interface mstQuestDocument extends Document, mstQuest { id: number }
 
-export const mstQuestSchema : Schema<mstQuest> = new Schema({
+export const mstQuestSchema : Schema<mstQuestDocument> = new Schema({
     actConsume: Number,
     recommendLv: Number,
     id: Number,

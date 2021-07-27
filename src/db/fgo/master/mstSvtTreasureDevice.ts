@@ -12,7 +12,7 @@ export interface mstSvtTreasureDevice {
 
 export interface mstSvtTreasureDeviceDocument extends Document, mstSvtTreasureDevice { id: number }
 
-export const mstSvtTreasureDeviceSchema : Schema<mstSvtTreasureDevice> = new Schema({
+export const mstSvtTreasureDeviceSchema : Schema<mstSvtTreasureDeviceDocument> = new Schema({
     svtId: Number, condLv: Number, condFriendshipRank: Number,
     treasureDeviceId: Number, priority: Number, condQuestId: Number,
     cardId: Number, damage: [Number], num: Number

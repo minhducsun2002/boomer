@@ -7,6 +7,6 @@ export interface mstSkillDetail {
 
 export interface mstSkillDetailDocument extends Document, mstSkillDetail { id: number }
 
-export const mstSkillDetailSchema : Schema<mstSkillDetail> = new Schema({
+export const mstSkillDetailSchema : Schema<mstSkillDetailDocument> = new Schema({
     id: Number, detail: String, detailShort: String
 })

@@ -14,7 +14,7 @@ export interface mstItem {
 
 export interface mstItemDocument extends Document, mstItem { id: Item }
 
-export const mstItemSchema : Schema<mstItem> = new Schema({
+export const mstItemSchema : Schema<mstItemDocument> = new Schema({
     id: Number, sellQp: Number, isSell: Boolean,
     name: String, detail: String,
     startedAt: Number, endedAt: Number,

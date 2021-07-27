@@ -8,7 +8,7 @@ export interface mstTreasureDevice {
 
 export interface mstTreasureDeviceDocument extends Document, mstTreasureDevice { id: number }
 
-export const mstTreasureDeviceSchema : Schema<mstTreasureDevice> = new Schema({
+export const mstTreasureDeviceSchema : Schema<mstTreasureDeviceDocument> = new Schema({
     individuality: [Number], id: Number, seqId: Number,
     rank: String, maxLv: Number, typeText: String, attackAttri: Number,
     name: String,

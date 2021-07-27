@@ -47,7 +47,7 @@ export interface mstSvt {
 
 export interface mstSvtDocument extends mstSvt, Document { id: number; }
 
-export const mstSvtSchema : Schema<mstSvt> = new Schema({
+export const mstSvtSchema : Schema<mstSvtDocument> = new Schema({
     name: String,
     ruby: String,
     battleName: String,
