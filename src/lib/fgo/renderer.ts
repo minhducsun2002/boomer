@@ -500,7 +500,7 @@ export class EmbedRenderer {
 
         const svt = await JP.mstSvt.findOne({ collectionNo }).exec();
         let { baseSvtId, classId, classPassive } = svt;
-        let [limits, cards, svtClass, bondCESkill] = await Promise.all([
+        const [limits, cards, svtClass, bondCESkill] = await Promise.all([
             // ascensions
             await JP.mstSvtLimit.find({ svtId: baseSvtId }).limit(5).exec(),
             // card set
@@ -510,9 +510,6 @@ export class EmbedRenderer {
             // getting skills of bond CE
             await JP.mstSkill.findOne({ actIndividuality: baseSvtId }).exec()
         ]);
-
-        if (!svtClass) svtClass = await JP.mstClass.findOne({ id: classId }).exec();
-
         // render NP gain
         const svtTdMapping = await JP.mstSvtTreasureDevice.find({ svtId: baseSvtId, num: 1 }).exec();
         let [{ treasureDeviceId: tdId }] = svtTdMapping;

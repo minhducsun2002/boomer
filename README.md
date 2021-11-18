@@ -1,3 +1,8 @@
+## Deprecation notice
+I have moved to a [reimplementation of this bot in C#](https://github.com/minhducsun2002/boomer).
+
+The code in this repository will stay as-is, but no further patches or updates will be published.
+
 # Pepper
 ##### just another Discord bot that provide information for some games
 ###### (as of commit `30977aea6c3cb1750c279a1a1aae3343be562a83`)
